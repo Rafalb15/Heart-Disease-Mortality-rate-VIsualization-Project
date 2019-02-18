@@ -19,26 +19,23 @@
 
 	<style>#map { width: 100%; height: 80%; }
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
-.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }</style>
+.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 56px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; }</style>
 	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
 </head>
 
 <body data-gr-c-s-loaded="true">
 
+	<div><h4>US Heart Disease Mortality rate</h4></div>
+	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
+	<div id="bottomofpage"></div>
 
-	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;">
-		<div class="leaflet-control-container">
-			<div class="leaflet-top leaflet-right">
-				<div class="info leaflet-control"></div>
-			</div>
-			<div class="leaflet-bottom leaflet-left"></div>
-			<div class="leaflet-bottom leaflet-right">
-			</div>
-		</div>
-	</div>
 
+
+	<!-- source: https://leafletjs.com/examples/choropleth/ -->
 	<script type="text/javascript" src="./supplemental/us-states.js"></script>
+	<!-- source: stateToAbbr.js borrowed from https://gist.github.com/calebgrove/c285a9510948b633aa47 -->
 	<script type="text/javascript" src="./supplemental/stateToAbbr.js"></script>
+	<!-- this is the data from the data.gov -->
 	<script type="text/javascript" src="./data/data_as_json.js"></script>
 
 
@@ -56,8 +53,11 @@
 					return a + b;
 				});
 				avg = sum / array.length;
+				return Math.round(avg);
+			} else {
+				return "Insufficient information";
 			}
-			return avg;
+
 		}
 
 		// get color depending on population density value
@@ -75,18 +75,21 @@
 		function return_state_information(state_name) {
 			// return information about the state's heart disease mortality rate
 			var mortality_rate_list = [];
+			var prev_state;
+			var curr_state;
 			for (var i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
 				if (json_data[i][9] === abbrState(state_name, "abbr") && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
 					// if undefined, set it as 0
-					rate = json_data[i][15] || 0
-					mortality_rate_list.push(parseFloat(rate));
+					if( json_data[i][15]  != null){
+							// get the mortaility rate and push it to the array as a float
+							rate = json_data[i][15]
+							mortality_rate_list.push(parseFloat(rate));
+					}
 				}
-
 			}
 			// return the rounded value
-			//
-			return Math.round(return_avg(mortality_rate_list));
+			return return_avg(mortality_rate_list);
 		}
 
 		function style(feature) {
@@ -129,7 +132,7 @@
 			// define the min Zoom so the user doesn't see a grey background
 			maxZoom: 10,
 			minZoom: 2,
-			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
 			id: 'mapbox.light'
 		}).addTo(map);
 
@@ -146,8 +149,8 @@
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + props.density + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall Mortality rate: ' + return_state_information(props.name) + ' / 100,000 persons' :
 				'Hover over a state to learn more!');
+				document.getElementById("bottomofpage").innerHTML='Now hovered over: ' + (props ? '<b>' + 'State: ' + props.name: 'Nowhere');
 		};
-
 		info.addTo(map);
 
 
@@ -175,7 +178,7 @@
 			onEachFeature: onEachFeature
 		}).addTo(map);
 
-		map.attributionControl.addAttribution('Heart disease data: &copy; <a href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
+		map.attributionControl.addAttribution('Heart disease data: <a href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
 
 		var legend = L.control({
@@ -204,6 +207,7 @@
 
 		legend.addTo(map);
 	</script>
+
 </body>
 
 </html>
