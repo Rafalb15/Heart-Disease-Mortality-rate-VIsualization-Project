@@ -155,7 +155,7 @@
 
 		info.update = function(props) {
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + props.density + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall Mortality rate: ' + return_state_information(props.name) + ' / 100,000 persons' :
+				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + props.density + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall Mortality rate: ' + return_state_information(props.name) + ' / 100,000 people' :
 				'Hover over a state to learn more!');
 			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 		};
