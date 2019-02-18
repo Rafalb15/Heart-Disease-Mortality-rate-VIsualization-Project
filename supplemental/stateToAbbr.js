@@ -5,7 +5,7 @@
 // --> 'NY'
 
 function abbrState(input, to){
-    
+
     var states = [
         ['Arizona', 'AZ'],
         ['Alabama', 'AL'],
@@ -48,6 +48,7 @@ function abbrState(input, to){
         ['Oregon', 'OR'],
         ['Pennsylvania', 'PA'],
         ['Rhode Island', 'RI'],
+        ['Puerto Rico', 'PR'],
         ['South Carolina', 'SC'],
         ['South Dakota', 'SD'],
         ['Tennessee', 'TN'],
@@ -67,13 +68,13 @@ function abbrState(input, to){
             if(states[i][0] == input){
                 return(states[i][1]);
             }
-        }    
+        }
     } else if (to == 'name'){
         input = input.toUpperCase();
         for(i = 0; i < states.length; i++){
             if(states[i][1] == input){
                 return(states[i][0]);
             }
-        }    
+        }
     }
 }

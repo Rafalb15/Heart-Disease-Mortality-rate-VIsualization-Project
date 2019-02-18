@@ -13,7 +13,7 @@
 	<style>
 		html, body {
 			height: 100%;
-			margin: 0;
+			margin: 10;
 		}
 	</style>
 
@@ -24,13 +24,16 @@
 </head>
 
 <body data-gr-c-s-loaded="true">
-
-	<div><h4>US Heart Disease Mortality rate</h4></div>
+	<!-- #################################### TOP OF PAGE ############################################################################## -->
+	<div>
+		<h4>US Heart Disease Mortality rate</h4>
+	</div>
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
+	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
 	<div id="bottomofpage"></div>
 
 
-
+  <!-- #################################### SCRIPTS ############################################################################## -->
 	<!-- source: https://leafletjs.com/examples/choropleth/ -->
 	<script type="text/javascript" src="./supplemental/us-states.js"></script>
 	<!-- source: stateToAbbr.js borrowed from https://gist.github.com/calebgrove/c285a9510948b633aa47 -->
@@ -75,21 +78,26 @@
 		function return_state_information(state_name) {
 			// return information about the state's heart disease mortality rate
 			var mortality_rate_list = [];
+			var mort_rate_val;
 			var prev_state;
 			var curr_state;
 			for (var i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
-				if (json_data[i][9] === abbrState(state_name, "abbr") && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
+				if (json_data[i][9] === abbrState(state_name, "abbr") && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
 					// if undefined, set it as 0
-					if( json_data[i][15]  != null){
-							// get the mortaility rate and push it to the array as a float
-							rate = json_data[i][15]
-							mortality_rate_list.push(parseFloat(rate));
-					}
+					// if( json_data[i][15]  != null){
+					// 		// get the mortaility rate and push it to the array as a float
+					// 		rate = json_data[i][15]
+					// 		mortality_rate_list.push(parseFloat(rate));
+					// }
+					// instead of calculating the overall mortaility rate, present informaiton from the state level
+					// GeographicalLevel = "State"
+					mort_rate_val = json_data[i][15];
 				}
 			}
 			// return the rounded value
-			return return_avg(mortality_rate_list);
+			return mort_rate_val;
+			//return return_avg(mortality_rate_list);
 		}
 
 		function style(feature) {
@@ -149,7 +157,7 @@
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + props.density + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall Mortality rate: ' + return_state_information(props.name) + ' / 100,000 persons' :
 				'Hover over a state to learn more!');
-				document.getElementById("bottomofpage").innerHTML='Now hovered over: ' + (props ? '<b>' + 'State: ' + props.name: 'Nowhere');
+			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 		};
 		info.addTo(map);
 
@@ -191,11 +199,9 @@
 				grades = [0, 50, 100, 150, 200, 250, 300, 350],
 				labels = [],
 				from, to;
-
 			for (var i = 0; i < grades.length; i++) {
 				from = grades[i];
 				to = grades[i + 1];
-
 				labels.push(
 					'<i style="background:' + return_Color(from + 1) + '"></i> ' +
 					from + (to ? '&ndash;' + to : '+'));
@@ -204,7 +210,6 @@
 			div.innerHTML = labels.join('<br>');
 			return div;
 		};
-
 		legend.addTo(map);
 	</script>
 
