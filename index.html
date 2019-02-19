@@ -65,7 +65,9 @@
 
 		// get color depending on population density value
 		function return_Color(d) {
-			return d > 350 ? '#800026' :
+			return d > 450 ? '#210009' :
+			  d > 400 ? '#560019' :
+			  d > 350 ? '#800026' :
 				d > 300 ? '#BD0026' :
 				d > 250 ? '#E31A1C' :
 				d > 200 ? '#FC4E2A' :
@@ -155,7 +157,7 @@
 
 		info.update = function(props) {
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + props.density + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall Mortality rate: ' + return_state_information(props.name) + ' / 100,000 people' :
+				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall Mortality rate: ' + return_state_information(props.name) + ' / 100,000 people' :
 				'Hover over a state to learn more!');
 			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 		};
@@ -196,7 +198,7 @@
 		legend.onAdd = function(map) {
 
 			var div = L.DomUtil.create('div', 'info legend'),
-				grades = [0, 50, 100, 150, 200, 250, 300, 350],
+				grades = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450],
 				labels = [],
 				from, to;
 			for (var i = 0; i < grades.length; i++) {
