@@ -17,7 +17,7 @@
 		}
 	</style>
 
-	<style>#map { width: 100%; height: 80%; }
+	<style>#map { width: 75%; height: 60%; }
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; }</style>
 	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
@@ -132,7 +132,7 @@
 		}
 
 
-		var southWest = L.latLng(15, -175),
+		var southWest = L.latLng(5, -175),
 			northEast = L.latLng(80, -25),
 			mybounds = L.latLngBounds(southWest, northEast);
 		// setview 4 zoom and coordinates to middle of United States
@@ -157,7 +157,7 @@
 
 		info.update = function(props) {
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall Mortality rate: ' + return_state_information(props.name) + ' / 100,000 people' :
+				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Overall mortality rate: ' + return_state_information(props.name) + ' / 100K people' :
 				'Hover over a state to learn more!');
 			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 		};
@@ -192,7 +192,7 @@
 
 
 		var legend = L.control({
-			position: 'bottomright'
+			position: 'bottomleft'
 		});
 
 		legend.onAdd = function(map) {
