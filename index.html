@@ -49,6 +49,7 @@
 		// default values for race and gender
 		var race = "Overall";
 		var gender = "Overall";
+		var selected = 0;
 
 		function return_avg(array) {
 			// find the average from a list, return the average only if the length of the array is more than 0
@@ -165,16 +166,23 @@
 		}
 
 		// this is what happens when a state is clicked on
-		function zoomToFeature(e) {
+		function clicked(e) {
 			map.fitBounds(e.target.getBounds());
+			selected = selected + 1;
+			document.getElementById("bottomofpage1").innerHTML = selected + ' - ' + e.target.feature.properties.name;
 		}
 
 		function onEachFeature(feature, layer) {
+			//if (selected < 3){
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
-				click: zoomToFeature
+				click: clicked
 			});
+			//}
+			//else {
+			//	selected = 0;
+			//}
 		}
 
 		geojson = L.geoJson(statesData, {
