@@ -49,7 +49,11 @@
 		// default values for race and gender
 		var race = "Overall";
 		var gender = "Overall";
-		var selected = 0;
+		var selection_count = 0;
+		var selection_max = 4;
+		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
+		// selecting additional state will override previous selections
+		var selection_list = [];
 
 		function return_avg(array) {
 			// find the average from a list, return the average only if the length of the array is more than 0
@@ -145,7 +149,6 @@
 
 		function highlightFeature(e) {
 			var layer = e.target;
-
 			layer.setStyle({
 				weight: 5,
 				color: '#666',
@@ -156,7 +159,6 @@
 			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
 				layer.bringToFront();
 			}
-
 			info.update(layer.feature.properties);
 		}
 
@@ -167,22 +169,37 @@
 
 		// this is what happens when a state is clicked on
 		function clicked(e) {
-			map.fitBounds(e.target.getBounds());
-			selected = selected + 1;
-			document.getElementById("bottomofpage1").innerHTML = selected + ' - ' + e.target.feature.properties.name;
+			//map.fitBounds(e.target.getBounds());
+			var layer = e.target;
+			state = e.target.feature.properties.name;
+			// determine if user can select another state
+			layer.setStyle({
+				weight: 8,
+				color: '#FFF',
+				dashArray: '',
+				fillOpacity: 0.7,
+				fillColor: 'red'
+			});
+			if (selection_count < selection_max) {
+				selection_count += 1;
+				// document.getElementById("bottomofpage1").innerHTML = selection_count + ' - ' + e.target.feature.properties.name;
+				selection_list.push(state);
+			} else {
+				selection_count = 1;
+				// reset the list and push the pushed
+				selection_list.length = 0;
+				selection_list.push(state);
+			}
+			// update the bottom div with the list
+			document.getElementById("bottomofpage1").innerHTML = selection_list;
 		}
 
 		function onEachFeature(feature, layer) {
-			//if (selected < 3){
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
 				click: clicked
 			});
-			//}
-			//else {
-			//	selected = 0;
-			//}
 		}
 
 		geojson = L.geoJson(statesData, {
@@ -197,7 +214,7 @@
 		});
 
 
-		function some_func() {
+		function geojson_update() {
 			geojson = L.geoJson(statesData, {
 				style: style,
 				onEachFeature: onEachFeature
@@ -206,7 +223,7 @@
 
 		function reload_JSON() {
 			map.removeLayer(geojson);
-			some_func();
+			geojson_update();
 		}
 
 		dropdown.onAdd = function(e) {
