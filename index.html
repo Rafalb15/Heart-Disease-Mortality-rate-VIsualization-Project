@@ -196,12 +196,17 @@
 			position: 'bottomright'
 		});
 
-		function reload_JSON() {
-			map.removeLayer(geojson);
+
+		function some_func() {
 			geojson = L.geoJson(statesData, {
 				style: style,
 				onEachFeature: onEachFeature
 			}).addTo(map);
+		}
+
+		function reload_JSON() {
+			map.removeLayer(geojson);
+			some_func();
 		}
 
 		dropdown.onAdd = function(e) {
@@ -221,7 +226,8 @@
 			// record the values to the global variables
 			gender = gen.value;
 			race = rac.value;
-			reload_JSON();
+			setTimeout(reload_JSON, 250);
+			//reload_JSON();
 		}
 
 		var legend = L.control({

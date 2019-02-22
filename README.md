@@ -11,3 +11,4 @@
 
 # TODO:
 ~~fast search through json array~~<br />
+allow two state selection <br />
