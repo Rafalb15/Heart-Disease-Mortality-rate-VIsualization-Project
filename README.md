@@ -9,5 +9,5 @@ code -- <br />
       --> notes.txt <br />
       --> index.html <br />
 
-# TODO: 
-* fast search through json array <br />
+# TODO:
+* fast search through json array <DONE> <br />
