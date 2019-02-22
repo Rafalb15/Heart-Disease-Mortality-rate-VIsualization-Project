@@ -82,22 +82,26 @@
 
 		function return_state_information(state_name, gender, race) {
 			// return information about the state's heart disease mortality rate
-			var mortality_rate_list = [];
-			var mort_rate_val;
+			var mort_rate_val = 0;
 			for (var i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
-				if (json_data[i][9] === abbrState(state_name, "abbr") && json_data[i][11] === "State" && json_data[i][21] === gender && json_data[i][23] === race) {
+				if (json_data[i][9] === state_name && json_data[i][11] === "State" && json_data[i][21] === gender && json_data[i][23] === race) {
 					// GeographicalLevel = "State"
 					mort_rate_val = json_data[i][15];
 				}
 			}
 			// return the rounded value
-			return Math.round(mort_rate_val);
-			//return return_avg(mortality_rate_list);
-		}
+			if (mort_rate_val < 1){
+					return_str = "Insufficient information";
+			}
+			else {
+					return_str = Math.round(mort_rate_val) + "/100K people";
+			}
+			return [return_str, mort_rate_val];
+		};
 
 		function style(feature) {
-			var temp = return_state_information(feature.properties.name, gender, race);
+			var temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
 			return {
 				weight: 2,
 				opacity: 1,
@@ -106,15 +110,9 @@
 				fillOpacity: 0.7,
 				fillColor: return_Color(temp)
 			};
-		}
+		};
 
-
-
-
-
-		var southWest = L.latLng(5, -175),
-			northEast = L.latLng(80, -25),
-			mybounds = L.latLngBounds(southWest, northEast);
+		var southWest = L.latLng(5, -175), northEast = L.latLng(80, -25), mybounds = L.latLngBounds(southWest, northEast);
 		// setview 4 zoom and coordinates to middle of United States
 		var map = L.map('map').setView([37.8, -98], 4).setMaxBounds(mybounds);
 
@@ -137,7 +135,7 @@
 
 		info.update = function(props) {
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + race + ' - ' + gender + ' mortality rate: ' + return_state_information(props.name, gender, race) + ' / 100K people' :
+				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0]:
 				'Hover over a state to learn more!');
 			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 		};
@@ -183,45 +181,35 @@
 			style: style,
 			onEachFeature: onEachFeature
 		}).addTo(map);
-
 		map.attributionControl.addAttribution('Heart disease data: <a href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
 
-		var legend = L.control({
-			position: 'bottomleft'
+		var dropdown = L.control({
+			position: 'bottomright'
 		});
 
-		var dropdown1 = L.control({
-			position: 'bottomright'
-		})
-		var dropdown2 = L.control({
-			position: 'bottomright'
-		})
-
-		dropdown1.onAdd = function (e) {
+		dropdown.onAdd = function (e) {
 			// add some values to the dropdown
-			this._div = L.DomUtil.create('div', 'dropdown gender');
-			this._div.innerHTML = '<select id="dd_gender" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>';
+			this._div = L.DomUtil.create('div', 'info');
+			this._div.innerHTML = '<h4>Race / Gender interaction</h4>' + 'Gender - ' + '<select id="dd_gender" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>'
+			+ '<br />' + 'Race - ' + '<select id="dd_race" onchange="change_map()"><option>Overall</option><option>White</option>' +
+			'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>';
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
 		};
 
-		dropdown2.onAdd = function (e) {
-			// add some values to the dropdown
-			this._div = L.DomUtil.create('div', 'dropdown race');
-			this._div.innerHTML = '<select id="dd_race" onchange="change_map()"><option>Overall</option><option>White</option><option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>';
-			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-			return this._div;
-		};
-
-		// onchange function (this format makes the function global)
 		window.change_map = function(e){
-				// Get the select element
+				// Get the select element from the dropdowns for the race/gender interaction
 				var gen = document.getElementById("dd_gender");
 				var rac = document.getElementById("dd_race");
+				// record the values to the global variables
 				gender = gen.value;
 				race = rac.value;
 			}
+
+		var legend = L.control({
+				position: 'bottomleft'
+		});
 
 		legend.onAdd = function(map) {
 			var div = L.DomUtil.create('div', 'info legend'),
@@ -245,8 +233,7 @@
 		// add legend to map
 		legend.addTo(map);
 		// add dropdown to the map
-		dropdown1.addTo(map);
-		dropdown2.addTo(map);
+		dropdown.addTo(map);
 
 
 	</script>
