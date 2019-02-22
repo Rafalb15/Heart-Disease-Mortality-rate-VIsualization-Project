@@ -1,11 +1,11 @@
 # Heart-Disease-Mortality-rate-VIsualization-Project
 
 # structure:
-##code  <br />
+## code  <br />
 #### data (omitted) <br />
-###### data_as_json.js <br />
+###### ----> data_as_json.js <br />
 #### supplemental <br />
-###### supporting files  <br />
+###### ----> supporting files  <br />
 #### notes.txt <br />
 #### index.html <br />
 
