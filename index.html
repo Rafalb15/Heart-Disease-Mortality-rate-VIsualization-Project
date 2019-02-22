@@ -36,8 +36,7 @@
 	<!-- #################################### SCRIPTS ############################################################################## -->
 	<!-- source: https://leafletjs.com/examples/choropleth/ -->
 	<script type="text/javascript" src="./supplemental/us-states.js"></script>
-	<!-- source: stateToAbbr.js borrowed from https://gist.github.com/calebgrove/c285a9510948b633aa47 -->
-	<script type="text/javascript" src="./supplemental/stateToAbbr.js"></script>
+
 	<!-- this is the data from the data.gov -->
 	<script type="text/javascript" src="./data/data_as_json.js"></script>
 
@@ -188,6 +187,15 @@
 			position: 'bottomright'
 		});
 
+		function reload_JSON() {
+			 map.removeLayer(geojson);
+			 alert("Reloading");
+			 geojson = L.geoJson(statesData, {
+				 style: style,
+				 onEachFeature: onEachFeature
+			 }).addTo(map);
+		}
+
 		dropdown.onAdd = function (e) {
 			// add some values to the dropdown
 			this._div = L.DomUtil.create('div', 'info');
@@ -205,6 +213,7 @@
 				// record the values to the global variables
 				gender = gen.value;
 				race = rac.value;
+				reload_JSON();
 			}
 
 		var legend = L.control({

@@ -10,4 +10,4 @@ code -- <br />
       --> index.html <br />
 
 # TODO:
-* fast search through json array <DONE> <br />
+* fast search through json array DONE! <br />
