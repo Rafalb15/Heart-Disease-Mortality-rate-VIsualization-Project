@@ -90,11 +90,10 @@
 				}
 			}
 			// return the rounded value
-			if (mort_rate_val < 1){
-					return_str = "Insufficient information";
-			}
-			else {
-					return_str = Math.round(mort_rate_val) + "/100K people";
+			if (mort_rate_val < 1) {
+				return_str = "Insufficient information";
+			} else {
+				return_str = Math.round(mort_rate_val) + "/100K people";
 			}
 			return [return_str, mort_rate_val];
 		};
@@ -111,7 +110,9 @@
 			};
 		};
 
-		var southWest = L.latLng(5, -175), northEast = L.latLng(80, -25), mybounds = L.latLngBounds(southWest, northEast);
+		var southWest = L.latLng(5, -175),
+			northEast = L.latLng(80, -25),
+			mybounds = L.latLngBounds(southWest, northEast);
 		// setview 4 zoom and coordinates to middle of United States
 		var map = L.map('map').setView([37.8, -98], 4).setMaxBounds(mybounds);
 
@@ -134,7 +135,7 @@
 
 		info.update = function(props) {
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0]:
+				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
 				'Hover over a state to learn more!');
 			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 		};
@@ -188,36 +189,35 @@
 		});
 
 		function reload_JSON() {
-			 map.removeLayer(geojson);
-			 alert("Reloading");
-			 geojson = L.geoJson(statesData, {
-				 style: style,
-				 onEachFeature: onEachFeature
-			 }).addTo(map);
+			map.removeLayer(geojson);
+			geojson = L.geoJson(statesData, {
+				style: style,
+				onEachFeature: onEachFeature
+			}).addTo(map);
 		}
 
-		dropdown.onAdd = function (e) {
+		dropdown.onAdd = function(e) {
 			// add some values to the dropdown
 			this._div = L.DomUtil.create('div', 'info');
-			this._div.innerHTML = '<h4>Race / Gender interaction</h4>' + 'Gender - ' + '<select id="dd_gender" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>'
-			+ '<br />' + 'Race - ' + '<select id="dd_race" onchange="change_map()"><option>Overall</option><option>White</option>' +
-			'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>';
+			this._div.innerHTML = '<h4>Race / Gender interaction</h4>' + 'Gender - ' + '<select id="dd_gender" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<br />' + 'Race - ' + '<select id="dd_race" onchange="change_map()"><option>Overall</option><option>White</option>' +
+				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>';
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
 		};
 
-		window.change_map = function(e){
-				// Get the select element from the dropdowns for the race/gender interaction
-				var gen = document.getElementById("dd_gender");
-				var rac = document.getElementById("dd_race");
-				// record the values to the global variables
-				gender = gen.value;
-				race = rac.value;
-				reload_JSON();
-			}
+		window.change_map = function(e) {
+			// Get the select element from the dropdowns for the race/gender interaction
+			var gen = document.getElementById("dd_gender");
+			var rac = document.getElementById("dd_race");
+			// record the values to the global variables
+			gender = gen.value;
+			race = rac.value;
+			reload_JSON();
+		}
 
 		var legend = L.control({
-				position: 'bottomleft'
+			position: 'bottomleft'
 		});
 
 		legend.onAdd = function(map) {
@@ -243,8 +243,6 @@
 		legend.addTo(map);
 		// add dropdown to the map
 		dropdown.addTo(map);
-
-
 	</script>
 
 </body>
