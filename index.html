@@ -106,7 +106,7 @@
 		function style(feature) {
 			var temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
 			return {
-				weight: 2,
+				weight: 3,
 				opacity: 1,
 				color: 'white',
 				dashArray: '3',
@@ -191,7 +191,7 @@
 				selection_list.length = 0;
 				selection_list.push(state);
 			}
-			document.getElementById("bottomofpage1").innerHTML = "Items in the selection_list: " + selection_list;
+			document.getElementById("bottomofpage1").innerHTML = "Items in the selection_list: " + selection_list + '<br />' + 'Gender selection: ' + gender + '<br />' + 'Race selection: ' + race;
 		}
 
 		function onEachFeature(feature, layer) {
