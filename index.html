@@ -168,11 +168,10 @@
 		}
 
 		// this is what happens when a state is clicked on
-		function clicked(e) {
+		function click_event_handler(e) {
 			//map.fitBounds(e.target.getBounds());
 			var layer = e.target;
 			state = e.target.feature.properties.name;
-			// determine if user can select another state
 			layer.setStyle({
 				weight: 8,
 				color: '#FFF',
@@ -181,24 +180,25 @@
 				fillColor: 'red'
 			});
 			if (selection_count < selection_max) {
-				selection_count += 1;
-				// document.getElementById("bottomofpage1").innerHTML = selection_count + ' - ' + e.target.feature.properties.name;
-				selection_list.push(state);
+				if (!selection_list.includes(state)) {
+					selection_count += 1;
+					selection_list.push(state);
+				} else {
+					alert(state + " is already in the list");
+				}
 			} else {
 				selection_count = 1;
-				// reset the list and push the pushed
 				selection_list.length = 0;
 				selection_list.push(state);
 			}
-			// update the bottom div with the list
-			document.getElementById("bottomofpage1").innerHTML = selection_list;
+			document.getElementById("bottomofpage1").innerHTML = "Items in the selection_list: " + selection_list;
 		}
 
 		function onEachFeature(feature, layer) {
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
-				click: clicked
+				click: click_event_handler
 			});
 		}
 
@@ -243,8 +243,7 @@
 			// record the values to the global variables
 			gender = gen.value;
 			race = rac.value;
-			setTimeout(reload_JSON, 250);
-			//reload_JSON();
+			setTimeout(reload_JSON, 300);
 		}
 
 		var legend = L.control({
