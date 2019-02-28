@@ -6,9 +6,10 @@
 	<title>Heart Disease Mortality Data Among US Adults (population age 35+)</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" type="image/x-icon" href="https://leafletjs.com/examples/choropleth/docs/images/favicon.ico">
-	<link rel="stylesheet" href="./supplemental/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="">
-	<script src="./supplemental/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
-
+	<link rel="stylesheet" href="./supplemental/leaflet.css" crossorigin="">
+	<!-- integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" -->
+	<script src="./supplemental/leaflet.js" crossorigin=""></script>
+	<!-- integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" -->
 
 	<style>
 		html, body {
@@ -19,7 +20,8 @@
 
 	<style>#map { width: 75%; height: 60%; }
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
-.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; }</style>
+.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
+</style>
 	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
 </head>
 
@@ -31,7 +33,6 @@
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
 	<div id="bottomofpage"></div>
-	<div id="bottomofpage1"></div>
 
 	<!-- #################################### SCRIPTS ############################################################################## -->
 	<!-- source: https://leafletjs.com/examples/choropleth/ -->
@@ -103,17 +104,6 @@
 			return [return_str, mort_rate_val];
 		};
 
-		function style(feature) {
-			var temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
-			return {
-				weight: 3,
-				opacity: 1,
-				color: 'white',
-				dashArray: '3',
-				fillOpacity: 0.7,
-				fillColor: return_Color(temp)
-			};
-		};
 
 		var southWest = L.latLng(5, -175),
 			northEast = L.latLng(80, -25),
@@ -129,7 +119,9 @@
 			id: 'mapbox.light'
 		}).addTo(map);
 
-		//show state information in the top right of the screen when mouse is hovered
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Info shows the state information to the user in the top right side of the map
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		var info = L.control();
 
 		info.onAdd = function(map) {
@@ -177,21 +169,23 @@
 				color: '#FFF',
 				dashArray: '',
 				fillOpacity: 0.7,
-				fillColor: 'red'
+				fillColor: 'blue'
 			});
 			if (selection_count < selection_max) {
 				if (!selection_list.includes(state)) {
 					selection_count += 1;
 					selection_list.push(state);
 				} else {
-					alert(state + " is already in the list");
+					//alert(state + " is already in the list");
 				}
 			} else {
 				selection_count = 1;
 				selection_list.length = 0;
 				selection_list.push(state);
 			}
-			document.getElementById("bottomofpage1").innerHTML = "Items in the selection_list: " + selection_list + '<br />' + 'Gender selection: ' + gender + '<br />' + 'Race selection: ' + race;
+			//document.getElementById("bottomofpage1").innerHTML = "Items in the selection_list: " + selection_list + '<br />' + 'Gender selection: ' + gender + '<br />' + 'Race selection: ' + race;
+			// update the queue with the selection
+			queue.update();
 		}
 
 		function onEachFeature(feature, layer) {
@@ -200,19 +194,27 @@
 				mouseout: resetHighlight,
 				click: click_event_handler
 			});
-		}
+		};
 
+		function style(feature) {
+			var temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
+			return {
+				weight: 3,
+				opacity: 1,
+				color: 'white',
+				dashArray: '3',
+				fillOpacity: 0.7,
+				fillColor: return_Color(temp)
+			};
+		};
+
+		// for each feature in the geojson file, set the style and add it to the map
 		geojson = L.geoJson(statesData, {
 			style: style,
 			onEachFeature: onEachFeature
 		}).addTo(map);
+
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
-
-
-		var dropdown = L.control({
-			position: 'bottomright'
-		});
-
 
 		function geojson_update() {
 			geojson = L.geoJson(statesData, {
@@ -225,6 +227,15 @@
 			map.removeLayer(geojson);
 			geojson_update();
 		}
+
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Dropdown allows the user to make a selection to view the data by race or gender
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		var dropdown = L.control({
+			position: 'bottomright'
+		});
 
 		dropdown.onAdd = function(e) {
 			// add some values to the dropdown
@@ -244,8 +255,40 @@
 			gender = gen.value;
 			race = rac.value;
 			setTimeout(reload_JSON, 300);
+		};
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Queue displays the states that the user selects by clicking, currently there can be only two states in the queue at a time
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		var queue = L.control({
+			position: 'topcenter'
+		});
+
+		queue.onAdd = function(e) {
+			// Initially, make the div invisible to the user
+			this._div = L.DomUtil.create('div', 'info');
+			this._div.style.opacity = "0.0";
+			return this._div;
 		}
 
+		queue.update = function(props) {
+			// show the div if the user clicks any state and wants to add it to the queue
+			// set the opacity of the div to 1.0
+			this._div.style.opacity = "1.0";
+			s = this._div.style;
+			// update the contents of the div
+			this._div.innerHTML = '<b>Items in the selection queue: ' + selection_list + '</b>';
+			// make the div fade out slowly
+			(function fade() {
+				(s.opacity -= .1) < 0 ? "nothing" : setTimeout(fade, 400)
+			})();
+		}
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Legend displays the color of the states that is corresponding to the mortaility rate
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		var legend = L.control({
 			position: 'bottomleft'
 		});
@@ -269,10 +312,13 @@
 			div.innerHTML = labels.join('<br>');
 			return div;
 		};
+
 		// add legend to map
 		legend.addTo(map);
 		// add dropdown to the map
 		dropdown.addTo(map);
+		// add queue to the map
+		queue.addTo(map);
 	</script>
 
 </body>

@@ -633,3 +633,8 @@
 	margin-left: -12px;
 	border-right-color: #fff;
 	}
+
+.leaflet-center {
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
