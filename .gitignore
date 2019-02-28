@@ -1,2 +1,3 @@
 .DS_Store
-/data/data_as_json.js
+/static/data_as_json.js
+/static/.DS_Store
