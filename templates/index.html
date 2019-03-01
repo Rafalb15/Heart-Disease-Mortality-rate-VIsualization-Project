@@ -225,7 +225,7 @@
 
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
-		function reload_JSON() {
+			function reload_JSON() {
 			geojson.eachLayer(function(layer) {
 				layer.setStyle(style(layer.feature));
 			});
@@ -341,6 +341,7 @@
 		dropdown.addTo(map);
 		// add queue to the map
 		queue.addTo(map);
+		// disable double click from zooming in the map
 		map.doubleClickZoom.disable();
 	</script>
 
