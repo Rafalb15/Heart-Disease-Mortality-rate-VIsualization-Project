@@ -43,6 +43,8 @@
 
 
 	<script type="text/javascript">
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// define the window of the map that can be viewed
 		// this function stops the map from going past US and US
 		var json_data = heart_disease_data.data;
@@ -118,6 +120,9 @@
 			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
 			id: 'mapbox.light'
 		}).addTo(map);
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Info shows the state information to the user in the top right side of the map
@@ -196,6 +201,10 @@
 			});
 		};
 
+		function sleep(ms) {
+		  return new Promise(resolve => setTimeout(resolve, ms));
+		}
+
 		function style(feature) {
 			var temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
 			return {
@@ -216,18 +225,13 @@
 
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
-		function geojson_update() {
-			geojson = L.geoJson(statesData, {
-				style: style,
-				onEachFeature: onEachFeature
-			}).addTo(map);
-		}
-
 		function reload_JSON() {
-			map.removeLayer(geojson);
-			geojson_update();
+			geojson.eachLayer(function(layer) {
+				layer.setStyle(style(layer.feature));
+			});
 		}
-
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,6 +260,8 @@
 			race = rac.value;
 			setTimeout(reload_JSON, 300);
 		};
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,11 +285,24 @@
 			s = this._div.style;
 			// update the contents of the div
 			this._div.innerHTML = '<b>Items in the selection queue: ' + selection_list + '</b>';
-			// make the div fade out slowly
-			(function fade() {
-				(s.opacity -= .1) < 0 ? "nothing" : setTimeout(fade, 400)
-			})();
+			// provide smooth fadeout effect to the div
+			fade_Out_Effect(this._div);
 		}
+
+		function fade_Out_Effect(div) {
+			var fadeEffect = setInterval(function() {
+				if (!div.style.opacity) {
+					div.style.opacity = 1;
+				}
+				if (div.style.opacity > 0) {
+					div.style.opacity -= 0.01;
+				} else {
+					clearInterval(fadeEffect);
+				}
+			}, 20);
+		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,24 +313,27 @@
 		});
 
 		legend.onAdd = function(map) {
-			var div = L.DomUtil.create('div', 'info legend'),
+			// create a div with legend styling
+			var legend_div = L.DomUtil.create('div', 'info legend'),
 				// establish different ranges for the grades of mortality rate
-				segments = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450],
-				labels = [],
+				partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450],
+				resp_labels = [],from, to;
 				// define
-				from, to;
-			for (var i = 0; i < segments.length; i++) {
+			for (var i = 0; i < partitions.length; i++) {
 				// from is the first range and to is the second
-				from = segments[i];
-				to = segments[i + 1];
+				from = partitions[i];
+				to = partitions[i + 1];
 				// add to screen
-				labels.push(
+				resp_labels.push(
 					'<i style="background:' + return_Color(from + 1) + '"></i> ' +
 					from + (to ? '&ndash;' + to : '+'));
 			}
-			div.innerHTML = labels.join('<br>');
-			return div;
+			legend_div.innerHTML = resp_labels.join('<br>');
+			return legend_div;
 		};
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 		// add legend to map
 		legend.addTo(map);
@@ -319,6 +341,7 @@
 		dropdown.addTo(map);
 		// add queue to the map
 		queue.addTo(map);
+		map.doubleClickZoom.disable();
 	</script>
 
 </body>
