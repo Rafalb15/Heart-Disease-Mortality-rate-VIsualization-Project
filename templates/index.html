@@ -202,7 +202,7 @@
 		};
 
 		function sleep(ms) {
-		  return new Promise(resolve => setTimeout(resolve, ms));
+			return new Promise(resolve => setTimeout(resolve, ms));
 		}
 
 		function style(feature) {
@@ -225,9 +225,33 @@
 
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
-			function reload_JSON() {
-			geojson.eachLayer(function(layer) {
-				layer.setStyle(style(layer.feature));
+		//
+		function reload_geojson() {
+			geojson.eachLayer(async function(layer) {
+				// get the current color of the respective layer
+				var existing_color = layer.options.fillColor;
+				var return_style;
+				// get the new color based on the selection of the data
+				return_style = style(layer.feature);
+				//console.log('State: ' + layer.feature.properties.name + ' Existing fill color' + existing_color + ' - ' + return_style.fillColor);
+				if (existing_color != return_style.fillColor) {
+					// if the existing color does not match the new color that will be applied to the layer
+					// signal to the user by changing the outline of the state in a blinking red and white fashion
+					// sleep the change for 100 ms seconds so users will be able to register
+					sleep_time = 120;
+					number_of_blinks = 6;
+					for (var i = 0; i < number_of_blinks; i++) {
+						layer.setStyle({
+							color: 'red'
+						});
+						await sleep(sleep_time);
+						layer.setStyle({
+							color: 'white'
+						});
+						await sleep(sleep_time);
+					}
+				};
+				layer.setStyle(return_style);
 			});
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,7 +282,7 @@
 			// record the values to the global variables
 			gender = gen.value;
 			race = rac.value;
-			setTimeout(reload_JSON, 300);
+			setTimeout(reload_geojson, 200);
 		};
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,6 +314,7 @@
 		}
 
 		function fade_Out_Effect(div) {
+			// decrease the opacity of the div by 0.01 every 20 ms, to provide a smooth fadeout effect
 			var fadeEffect = setInterval(function() {
 				if (!div.style.opacity) {
 					div.style.opacity = 1;
@@ -317,8 +342,9 @@
 			var legend_div = L.DomUtil.create('div', 'info legend'),
 				// establish different ranges for the grades of mortality rate
 				partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450],
-				resp_labels = [],from, to;
-				// define
+				resp_labels = [],
+				from, to;
+			// define
 			for (var i = 0; i < partitions.length; i++) {
 				// from is the first range and to is the second
 				from = partitions[i];
