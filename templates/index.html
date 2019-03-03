@@ -147,8 +147,8 @@
 		function highlightFeature(e) {
 			var layer = e.target;
 			layer.setStyle({
-				weight: 5,
-				color: '#666',
+				weight: 6,
+				color: 'white',
 				dashArray: '',
 				fillOpacity: 0.7
 			});
@@ -170,8 +170,8 @@
 			var layer = e.target;
 			state = e.target.feature.properties.name;
 			layer.setStyle({
-				weight: 5,
-				color: '#FFF',
+				weight: 6,
+				color: 'white',
 				dashArray: '',
 				fillOpacity: 0.7,
 				fillColor: 'blue'
@@ -188,7 +188,6 @@
 				selection_list.length = 0;
 				selection_list.push(state);
 			}
-			//document.getElementById("bottomofpage1").innerHTML = "Items in the selection_list: " + selection_list + '<br />' + 'Gender selection: ' + gender + '<br />' + 'Race selection: ' + race;
 			// update the queue with the selection
 			queue.update();
 		}
@@ -237,9 +236,9 @@
 				if (existing_color != return_style.fillColor) {
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
-					// sleep the change for 100 ms seconds so users will be able to register
-					sleep_time = 120;
-					number_of_blinks = 6;
+					// sleep the change for 250 ms seconds so users will be able to register
+					sleep_time = 200;
+					number_of_blinks = 3;
 					for (var i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
@@ -248,7 +247,7 @@
 						layer.setStyle({
 							color: 'white'
 						});
-						await sleep(sleep_time);
+						i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
 					}
 				};
 				layer.setStyle(return_style);
@@ -282,7 +281,14 @@
 			// record the values to the global variables
 			gender = gen.value;
 			race = rac.value;
-			setTimeout(reload_geojson, 200);
+			setTimeout(function() {drop_down_operator(true);}, 100);
+			setTimeout(reload_geojson, 50);
+			setTimeout(function() {drop_down_operator(false);}, 1200);
+		};
+
+		function drop_down_operator(bool_val) {
+			document.getElementById("dd_gender").disabled = bool_val;
+			document.getElementById("dd_race").disabled = bool_val;
 		};
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
