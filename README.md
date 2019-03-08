@@ -19,3 +19,5 @@
 ~~fast search through json array~~<br />
 ~~allow two state selection~~ <br />
 ~~application runs on a Flask server~~ <br />
+display county information once the user clicks <br />
+allow a comparison mode between race and genders (diverging color map) <br />
