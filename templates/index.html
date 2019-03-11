@@ -399,10 +399,10 @@
 				drop_down_operator(true);
 			}, 100);
 			if(map.getZoom() > zoom_state_county_split){
-							setTimeout(reload_geojson_county, 50);
+							setTimeout(reload_geojson_county(), 50);
 			}
 			else{
-							setTimeout(reload_geojson, 50);
+							setTimeout(reload_geojson(), 50);
 			}
 			setTimeout(function() {
 				drop_down_operator(false);
