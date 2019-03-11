@@ -60,6 +60,7 @@
 		var gender = "Overall";
 		var selection_count = 0;
 		var selection_max = 2;
+		var zoom_state_county_split = 5;
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
 		// selecting additional state will override previous selections
 		var selection_list = [];
@@ -117,7 +118,6 @@
 			var mort_rate_val = 0;
 			for (var i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
-				console.log()
 				if (json_data[i][10].includes(county) && json_data[i][11] === "County" && json_data[i][21] === gender && json_data[i][23] === race) {
 					// GeographicalLevel = "State"
 					mort_rate_val = json_data[i][15];
@@ -137,20 +137,24 @@
 			northEast = L.latLng(80, -25),
 			mybounds = L.latLngBounds(southWest, northEast);
 		// setview 4 zoom and coordinates to middle of United States
-		var map = L.map('map').setView([37.8, -98], 4).setMaxBounds(mybounds);
+		var map = L.map('map', {
+			// enable smoother map zooming level
+			zoomDelta: 0.25,
+			zoomSnap: 0
+		}).setView([37.8, -98], 4).setMaxBounds(mybounds);
 
 		map.on('zoomend', function() {
-			if (map.getZoom() > 5){
-					map.removeLayer(geojson);
-					map.addLayer(geojson_county);
-			}
-			else{
+			//console.log(map.getZoom());
+			if (map.getZoom() > zoom_state_county_split) {
+				map.removeLayer(geojson);
+				map.addLayer(geojson_county);
+				reload_geojson_county();
+			} else {
 				map.removeLayer(geojson_county);
 				map.addLayer(geojson);
+				reload_geojson();
 			}
-
-			}
-		);
+		});
 
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 			// define the min Zoom so the user doesn't see a grey background
@@ -182,6 +186,14 @@
 		};
 		info.addTo(map);
 
+		info.update_county = function(props) {
+			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
+				'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
+				'Hover over a county to learn more!');
+			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.NAME : 'Nowhere');
+		};
+		info.addTo(map);
+
 
 		function highlightFeature(e) {
 			var layer = e.target;
@@ -198,8 +210,28 @@
 			info.update(layer.feature.properties);
 		}
 
+		function highlightCountyFeature(e) {
+			var layer = e.target;
+			layer.setStyle({
+				weight: 6,
+				color: 'white',
+				dashArray: '',
+				fillOpacity: 0.7
+			});
+
+			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+				layer.bringToFront();
+			}
+			info.update_county(layer.feature.properties);
+		}
+
 		function resetHighlight(e) {
 			geojson.resetStyle(e.target);
+			info.update();
+		}
+
+		function resetHighlightCounty(e) {
+			geojson_county.resetStyle(e.target);
 			info.update();
 		}
 
@@ -232,10 +264,19 @@
 		}
 
 		function onEachFeature(feature, layer) {
+			// state level
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
 				click: click_event_handler
+			});
+		};
+
+		function onEachCountyFeature(feature, layer) {
+			// county level
+			layer.on({
+				mouseover: highlightCountyFeature,
+				mouseout: resetHighlightCounty
 			});
 		};
 
@@ -258,11 +299,11 @@
 		function county_style(feature) {
 			var temp = return_county_information(feature.properties.NAME, gender, race)[1];
 			return {
-				weight: 3,
+				weight: 1,
 				opacity: 1,
 				color: 'white',
 				dashArray: '3',
-				fillOpacity: 0.7,
+				fillOpacity: 0.5,
 				fillColor: return_Color(temp)
 			};
 		};
@@ -270,7 +311,7 @@
 		function zoomToFeature(e) {
 			var layer = e.target;
 			map.fitBounds(e.target.getBounds());
-			map.removeLayer(layer);
+			//map.removeLayer(layer);
 		}
 
 		// for each feature in the geojson file, set the style and add it to the map
@@ -280,8 +321,8 @@
 		}).addTo(map);
 
 		geojson_county = L.geoJson(countyData, {
-			style: county_style
-			//onEachFeature: onEachFeature
+			style: county_style,
+			onEachFeature: onEachCountyFeature
 		});
 
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
@@ -312,6 +353,17 @@
 						i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
 					}
 				};
+				layer.setStyle(return_style);
+			});
+		}
+
+
+		function reload_geojson_county() {
+			geojson_county.eachLayer(async function(layer) {
+				// get the current color of the respective layer
+				// get the new color based on the selection of the data
+				return_style = county_style(layer.feature);
+				//console.log('State: ' + layer.feature.properties.name + ' Existing fill color' + existing_color + ' - ' + return_style.fillColor);
 				layer.setStyle(return_style);
 			});
 		}
@@ -346,7 +398,12 @@
 			setTimeout(function() {
 				drop_down_operator(true);
 			}, 100);
-			setTimeout(reload_geojson, 50);
+			if(map.getZoom() > zoom_state_county_split){
+							setTimeout(reload_geojson_county, 50);
+			}
+			else{
+							setTimeout(reload_geojson, 50);
+			}
 			setTimeout(function() {
 				drop_down_operator(false);
 			}, 1200);
