@@ -21,3 +21,4 @@
 ~~application runs on a Flask server~~ <br />
 display county information once the user clicks <br />
 allow a comparison mode between race and genders (diverging color map) <br />
+#### county data is made available by US census, data downloaded from http://eric.clst.org/tech/usgeojson/ <br />
