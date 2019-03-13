@@ -55,12 +55,15 @@
 		// this function stops the map from going past US and US
 		var json_data = heart_disease_data.data;
 		var geojson;
+		var geojson_county;
 		// default values for race and gender
 		var race = "Overall";
 		var gender = "Overall";
 		var selection_count = 0;
 		var selection_max = 2;
-		var zoom_state_county_split = 5;
+		var zoom_state_county_split = 6.5;
+		var map_type_level = "state";
+		var current_zoom = 4;
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
 		// selecting additional state will override previous selections
 		var selection_list = [];
@@ -141,18 +144,21 @@
 			// enable smoother map zooming level
 			zoomDelta: 0.25,
 			zoomSnap: 0
-		}).setView([37.8, -98], 4).setMaxBounds(mybounds);
+			//scrollWheelZoom: false
+		}).setView([37.8, -98], current_zoom).setMaxBounds(mybounds);
 
 		map.on('zoomend', function() {
 			//console.log(map.getZoom());
-			if (map.getZoom() > zoom_state_county_split) {
+			if (map.getZoom() > zoom_state_county_split && map_type_level != "county") {
 				map.removeLayer(geojson);
 				map.addLayer(geojson_county);
-				reload_geojson_county();
-			} else {
+				//     //reload_geojson_county();
+				map_type_level = "county";
+			} else if (map.getZoom() < zoom_state_county_split && map_type_level != "state") {
 				map.removeLayer(geojson_county);
 				map.addLayer(geojson);
-				reload_geojson();
+				// 		//reload_geojson();
+				map_type_level = "state";
 			}
 		});
 
@@ -161,7 +167,8 @@
 			maxZoom: 10,
 			minZoom: 2,
 			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
-			id: 'mapbox.light'
+			id: 'mapbox.light',
+			scrollWheelZoom: false
 		}).addTo(map);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +317,7 @@
 
 		function zoomToFeature(e) {
 			var layer = e.target;
-			map.fitBounds(e.target.getBounds());
+			//map.fitBounds(e.target.getBounds());
 			//map.removeLayer(layer);
 		}
 
@@ -320,10 +327,14 @@
 			onEachFeature: onEachFeature
 		}).addTo(map);
 
-		geojson_county = L.geoJson(countyData, {
-			style: county_style,
-			onEachFeature: onEachCountyFeature
-		});
+		function load_county_data() {
+			geojson_county = L.geoJson(countyData, {
+				style: county_style,
+				onEachFeature: onEachCountyFeature
+			})
+		}
+
+		setTimeout(load_county_data, 0);
 
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
@@ -398,12 +409,12 @@
 			setTimeout(function() {
 				drop_down_operator(true);
 			}, 100);
-			if(map.getZoom() > zoom_state_county_split){
-							setTimeout(reload_geojson_county(), 50);
-			}
-			else{
-							setTimeout(reload_geojson(), 50);
-			}
+			// if(map_type_level === "county"){
+			setTimeout(reload_geojson(), 0);
+			setTimeout(reload_geojson_county(), 0);
+			// }
+			// else{
+			// }
 			setTimeout(function() {
 				drop_down_operator(false);
 			}, 1200);
