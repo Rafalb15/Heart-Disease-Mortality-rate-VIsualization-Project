@@ -36,11 +36,11 @@
 			box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
 			pointer-events: none;
 		}
-		
+
 		#tooltip.hidden {
 			display: none;
 		}
-		
+
 		#tooltip p {
 			margin: 0;
 			font-family: sans-serif;
@@ -101,7 +101,7 @@
 		var gender = "Overall";
 		var selection_count = 0;
 		var selection_max = 2;
-		var zoom_state_county_split = 6.5;
+		var zoom_state_county_split = 6.0;
 		var map_type_level = "state";
 		var current_zoom = 4;
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
@@ -145,6 +145,7 @@
 				if (json_data[i][9] === state_name && json_data[i][11] === "State" && json_data[i][21] === gender && json_data[i][23] === race) {
 					// GeographicalLevel = "State"
 					mort_rate_val = json_data[i][15];
+					break;
 				}
 			}
 			// return the rounded value
@@ -156,6 +157,8 @@
 			return [return_str, mort_rate_val];
 		};
 
+
+
 		function return_county_information(county, gender, race) {
 			// return information about the state's heart disease mortality rate
 			var mort_rate_val = 0;
@@ -164,6 +167,7 @@
 				if (json_data[i][10].includes(county) && json_data[i][11] === "County" && json_data[i][21] === gender && json_data[i][23] === race) {
 					// GeographicalLevel = "State"
 					mort_rate_val = json_data[i][15];
+					break;
 				}
 			}
 			// return the rounded value
@@ -183,18 +187,19 @@
 		var map = L.map('map', {
 			// enable smoother map zooming level
 			zoomDelta: 0.25,
-			zoomSnap: 0
+			zoomSnap: 0,
+			wheelPxPerZoomLevel: 200
 			//scrollWheelZoom: false
 		}).setView([37.8, -98], current_zoom).setMaxBounds(mybounds);
 
 		map.on('zoomend', function() {
 			//console.log(map.getZoom());
-			if (map.getZoom() > zoom_state_county_split && map_type_level != "county") {
+			if (map.getZoom() >= zoom_state_county_split && map_type_level != "county") {
 				map.removeLayer(geojson);
 				map.addLayer(geojson_county);
 				//     //reload_geojson_county();
 				map_type_level = "county";
-			} else if (map.getZoom() < zoom_state_county_split && map_type_level != "state") {
+			} else if (map.getZoom() <= zoom_state_county_split && map_type_level != "state") {
 				map.removeLayer(geojson_county);
 				map.addLayer(geojson);
 				// 		//reload_geojson();
@@ -391,8 +396,8 @@
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					sleep_time = 200;
-					number_of_blinks = 3;
+					sleep_time = 150;
+					number_of_blinks = 4;
 					for (var i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
@@ -413,8 +418,28 @@
 			geojson_county.eachLayer(async function(layer) {
 				// get the current color of the respective layer
 				// get the new color based on the selection of the data
+				var existing_color = layer.options.fillColor;
+				var return_style;
+				// get the new color based on the selection of the data
 				return_style = county_style(layer.feature);
 				//console.log('State: ' + layer.feature.properties.name + ' Existing fill color' + existing_color + ' - ' + return_style.fillColor);
+				if (existing_color != return_style.fillColor) {
+					// if the existing color does not match the new color that will be applied to the layer
+					// signal to the user by changing the outline of the state in a blinking red and white fashion
+					// sleep the change for 250 ms seconds so users will be able to register
+					sleep_time = 100;
+					number_of_blinks = 4;
+					for (var i = 0; i < number_of_blinks; i++) {
+						layer.setStyle({
+							color: 'red'
+						});
+						await sleep(sleep_time);
+						layer.setStyle({
+							color: 'white'
+						});
+						i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
+					}
+				};
 				layer.setStyle(return_style);
 			});
 		}
@@ -448,18 +473,13 @@
 			race = rac.value;
 			setTimeout(function() {
 				drop_down_operator(true);
-			}, 100);
-			// if(map_type_level === "county"){
-			setTimeout(reload_geojson(), 0);
-			setTimeout(reload_geojson_county(), 0);
-			// }
-			// else{
-			// }
+			}, 0);
+			setTimeout(reload_geojson(), 10);
+			setTimeout(reload_geojson_county(), 20);
 			setTimeout(function() {
 				drop_down_operator(false);
-			}, 1200);
+			}, 1800);
 		};
-
 		function drop_down_operator(bool_val) {
 			document.getElementById("dd_gender").disabled = bool_val;
 			document.getElementById("dd_race").disabled = bool_val;
@@ -605,7 +625,7 @@
 							return "green";
 						}
 						return "rgb(0, 0, " + Math.round(colorScale(d.mort_rate)) + ")";
-						
+
 				})
 				.on("mouseover", function(d) {
 
@@ -616,7 +636,7 @@
 					//Update the tooltip position and value
 					d3.select("#tooltip")
 					.style("left", (w+10) + "px")
-					//.style("top", yPosition + "px")						
+					//.style("top", yPosition + "px")
 					.select("#value")
 					.text(d.mort_rate + "/100K");
 
@@ -654,9 +674,9 @@
 				.duration(1500)
 				.attr("x", function(d, i){
 					return xScale(i);
-				});	
+				});
 		};
-			
+
 		d3.select("#graphButtons")
 		.select("#refreshGraph")
 		.on("click", function() {
@@ -667,7 +687,7 @@
 				county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
 				update_bars(county_data_of_state);
 				sortOrder = false;
-			}				
+			}
 		});
 
 		d3.select("#graphButtons")
@@ -676,7 +696,7 @@
 			sort_bars();
 		});
 
-		
+
 		var county_data_of_state = get_county_data_of_state("MA", gender, race);
 
 		// returns an array of d3 scales to use with the county_data_of_state dataset
