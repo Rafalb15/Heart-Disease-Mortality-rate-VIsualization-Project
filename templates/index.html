@@ -96,6 +96,7 @@
 		var json_data = heart_disease_data.data;
 		var geojson;
 		var geojson_county;
+
 		// default values for race and gender
 		var race = "Overall";
 		var gender = "Overall";
@@ -104,6 +105,7 @@
 		var zoom_state_county_split = 6.0;
 		var map_type_level = "state";
 		var current_zoom = 4;
+
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
 		// selecting additional state will override previous selections
 		var selection_list = [];
@@ -185,25 +187,27 @@
 			mybounds = L.latLngBounds(southWest, northEast);
 		// setview 4 zoom and coordinates to middle of United States
 		var map = L.map('map', {
-			// enable smoother map zooming level
+			// wheel mouse zoom options to enable a smoooth zooming function
 			zoomDelta: 0.25,
 			zoomSnap: 0,
 			wheelPxPerZoomLevel: 200
-			//scrollWheelZoom: false
 		}).setView([37.8, -98], current_zoom).setMaxBounds(mybounds);
 
 		map.on('zoomend', function() {
-			//console.log(map.getZoom());
+			// based on the zoom of the map, determine which layer to show/remove
+			// once the map is swtiched, update the global layer variable
+			// update the informational section in top right
 			if (map.getZoom() >= zoom_state_county_split && map_type_level != "county") {
+
 				map.removeLayer(geojson);
 				map.addLayer(geojson_county);
-				//     //reload_geojson_county();
 				map_type_level = "county";
+				info.update();
 			} else if (map.getZoom() <= zoom_state_county_split && map_type_level != "state") {
 				map.removeLayer(geojson_county);
 				map.addLayer(geojson);
-				// 		//reload_geojson();
 				map_type_level = "state";
+				info.update();
 			}
 		});
 
@@ -212,8 +216,7 @@
 			maxZoom: 10,
 			minZoom: 2,
 			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
-			id: 'mapbox.light',
-			scrollWheelZoom: false
+			id: 'mapbox.light'
 		}).addTo(map);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,21 +234,22 @@
 		};
 
 		info.update = function(props) {
+			// based on the current layer of the map, display different information in the top right
+			if (map_type_level === "state"){
 			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
 				'Hover over a state to learn more!');
-			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
+				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
+			}
+			else {
+				this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
+					'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
+					'Hover over a county to learn more!');
+				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.NAME : 'Nowhere');
+			}
+
 		};
 		info.addTo(map);
-
-		info.update_county = function(props) {
-			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-				'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
-				'Hover over a county to learn more!');
-			document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.NAME : 'Nowhere');
-		};
-		info.addTo(map);
-
 
 		function highlightFeature(e) {
 			var layer = e.target;
@@ -274,7 +278,7 @@
 			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
 				layer.bringToFront();
 			}
-			info.update_county(layer.feature.properties);
+			info.update(layer.feature.properties);
 		}
 
 		function resetHighlight(e) {
@@ -314,7 +318,8 @@
 			// update the queue with the selection
 			queue.update();
 		}
-
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// only let users add states to the queue, not implemented on county level
 		function onEachFeature(feature, layer) {
 			// state level
 			layer.on({
@@ -322,15 +327,17 @@
 				mouseout: resetHighlight,
 				click: click_event_handler
 			});
-		};
-
+		}
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		function onEachCountyFeature(feature, layer) {
 			// county level
 			layer.on({
 				mouseover: highlightCountyFeature,
 				mouseout: resetHighlightCounty
 			});
-		};
+		}
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		function sleep(ms) {
 			return new Promise(resolve => setTimeout(resolve, ms));
@@ -379,6 +386,7 @@
 			})
 		}
 
+		// load the data asynchrously
 		setTimeout(load_county_data, 0);
 
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
@@ -396,7 +404,7 @@
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					sleep_time = 150;
+					sleep_time = 100;
 					number_of_blinks = 4;
 					for (var i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
@@ -471,15 +479,14 @@
 			// record the values to the global variables
 			gender = gen.value;
 			race = rac.value;
-			setTimeout(function() {
-				drop_down_operator(true);
-			}, 0);
-			setTimeout(reload_geojson(), 10);
-			setTimeout(reload_geojson_county(), 20);
+			drop_down_operator(true);
+			reload_geojson();
+			reload_geojson_county();
 			setTimeout(function() {
 				drop_down_operator(false);
-			}, 1800);
+			}, 900);
 		};
+
 		function drop_down_operator(bool_val) {
 			document.getElementById("dd_gender").disabled = bool_val;
 			document.getElementById("dd_race").disabled = bool_val;
@@ -569,7 +576,8 @@
 		queue.addTo(map);
 		// disable double click from zooming in the map
 		map.doubleClickZoom.disable();
-
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		var body = document.getElementsByTagName('body')[0]
 		var w = Math.round(body.clientWidth*0.7);
 		var h = Math.round(body.clientHeight*0.3);
