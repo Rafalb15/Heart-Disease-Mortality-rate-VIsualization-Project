@@ -199,13 +199,15 @@
 			// update the informational section in top right
 			if (map.getZoom() >= zoom_state_county_split && map_type_level != "county") {
 
-				map.removeLayer(geojson);
+
 				map.addLayer(geojson_county);
+				map.removeLayer(geojson);
 				map_type_level = "county";
 				info.update();
 			} else if (map.getZoom() <= zoom_state_county_split && map_type_level != "state") {
-				map.removeLayer(geojson_county);
+
 				map.addLayer(geojson);
+				map.removeLayer(geojson_county);
 				map_type_level = "state";
 				info.update();
 			}
@@ -404,7 +406,7 @@
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					sleep_time = 100;
+					sleep_time = 150;
 					number_of_blinks = 4;
 					for (var i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
