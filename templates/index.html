@@ -14,7 +14,8 @@
 
 
 	<style>
-		html, body {
+		html,
+		body {
 			height: 100%;
 			margin: 10;
 		}
@@ -74,7 +75,7 @@
 		<p><span id="value">100</span></p>
 	</div>
 
-	<div id ="graphButtons"><button type="button" id="refreshGraph">Refresh Graph</button><button type="button" id = "sortGraph">sort graph</button></div>
+	<div id="graphButtons"><button type="button" id="refreshGraph">Refresh Graph</button><button type="button" id="sortGraph">sort graph</button></div>
 
 
 	<!-- #################################### SCRIPTS ############################################################################## -->
@@ -105,6 +106,7 @@
 		var zoom_state_county_split = 6.0;
 		var map_type_level = "state";
 		var current_zoom = 4;
+		var race_gender_inspector = "Single"
 
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
 		// selecting additional state will override previous selections
@@ -237,13 +239,12 @@
 
 		info.update = function(props) {
 			// based on the current layer of the map, display different information in the top right
-			if (map_type_level === "state"){
-			this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-				'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
-				'Hover over a state to learn more!');
+			if (map_type_level === "state") {
+				this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
+					'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
+					'Hover over a state to learn more!');
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
-			}
-			else {
+			} else {
 				this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 					'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
 					'Hover over a county to learn more!');
@@ -467,9 +468,23 @@
 		dropdown.onAdd = function(e) {
 			// add some values to the dropdown
 			this._div = L.DomUtil.create('div', 'info');
-			this._div.innerHTML = '<h4>Race / Gender interaction</h4>' + 'Gender - ' + '<select id="dd_gender" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+			this._div.innerHTML = '<h4>Race / Gender interaction</h4>' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked>Single comparison</label>' +
+				'&nbsp;&nbsp;&nbsp;&nbsp;' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple">Multiple comparison</label>  <br />' +
+				'<div id = "single_selection_dropdown">Gender - <select id="dd_gender" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'<br />' + 'Race - ' + '<select id="dd_race" onchange="change_map()"><option>Overall</option><option>White</option>' +
-				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>';
+				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select><br />' +
+				'<button type="button">Submit</button></div>' +
+				'<div id = "multiple_selection_dropdown" style="display:none">1st criteria : <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+				'<select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
+				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select> <br />' +
+				'2nd criteria : <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'&nbsp;&nbsp;&nbsp;&nbsp;' +
+				'<select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
+				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>'
+
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
 		};
@@ -488,6 +503,26 @@
 				drop_down_operator(false);
 			}, 900);
 		};
+
+		window.radio_change = function() {
+			var curr_selection;
+			var radio_choice = document.getElementsByName("radio_comp_type");
+			for (var i = 0; i < radio_choice.length; i++) {
+				if (radio_choice[i].checked) {
+					curr_selection = radio_choice[i].value;
+					break;
+				}
+			}
+			race_gender_inspector = curr_selection;
+			if(curr_selection === "Multiple"){
+				document.getElementById("single_selection_dropdown").style.display = "none";
+				document.getElementById("multiple_selection_dropdown").style.display = "block";
+			}
+			else {
+				document.getElementById("single_selection_dropdown").style.display = "block";
+				document.getElementById("multiple_selection_dropdown").style.display = "none";
+			}
+		}
 
 		function drop_down_operator(bool_val) {
 			document.getElementById("dd_gender").disabled = bool_val;
@@ -581,12 +616,12 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		var body = document.getElementsByTagName('body')[0]
-		var w = Math.round(body.clientWidth*0.7);
-		var h = Math.round(body.clientHeight*0.3);
+		var w = Math.round(body.clientWidth * 0.7);
+		var h = Math.round(body.clientHeight * 0.3);
 
-		function get_state_abbreviation(state_name){
-			for(let i = 0; i < json_data.length; i++){
-				if(json_data[i][10] === state_name && json_data[i][11] == "State"){
+		function get_state_abbreviation(state_name) {
+			for (let i = 0; i < json_data.length; i++) {
+				if (json_data[i][10] === state_name && json_data[i][11] == "State") {
 					return json_data[i][9];
 				}
 			}
@@ -596,24 +631,32 @@
 		};
 
 		// a list that contains the name, state vs county type and mortality rate
-		function get_county_data_of_state(state_abbreviation, gender, race){
+		function get_county_data_of_state(state_abbreviation, gender, race) {
 			var data = [];
-			for(let i = 0; i < json_data.length; i++){
-				if(json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race){
-					data.push({county: json_data[i][10], type: json_data[i][11], mort_rate: json_data[i][15]});
+			for (let i = 0; i < json_data.length; i++) {
+				if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race) {
+					data.push({
+						county: json_data[i][10],
+						type: json_data[i][11],
+						mort_rate: json_data[i][15]
+					});
 				}
 			}
-			if(data.length === 0){
+			if (data.length === 0) {
 				console.log('did not find any state/counties with matching state abbreviation ' + state_abbreviation);
 			}
 			return data;
 		};
 
-		function update_bars(county_data_of_state){
+		function update_bars(county_data_of_state) {
 			// update scales
 			xScale.domain(d3.range(county_data_of_state.length));
-			yScale.domain([0, d3.max(county_data_of_state, function(d) { return d.mort_rate; })]);
-			colorScale.domain([0, d3.max(county_data_of_state, function(d) { return d.mort_rate; })]);
+			yScale.domain([0, d3.max(county_data_of_state, function(d) {
+				return d.mort_rate;
+			})]);
+			colorScale.domain([0, d3.max(county_data_of_state, function(d) {
+				return d.mort_rate;
+			})]);
 
 			//Update all rects
 			var bars = svg.selectAll("rect").data(county_data_of_state);
@@ -621,20 +664,20 @@
 			bars.enter().append("rect")
 				.merge(bars)
 				.attr("x", function(d, i) {
-						return xScale(i);
+					return xScale(i);
 				})
 				.attr("y", function(d) {
-						return h - yScale(d.mort_rate)+5;
+					return h - yScale(d.mort_rate) + 5;
 				})
 				.attr("width", xScale.bandwidth())
 				.attr("height", function(d) {
-						return yScale(d.mort_rate);
+					return yScale(d.mort_rate);
 				})
 				.attr("fill", function(d) {
-						if(d.type === "State"){
-							return "green";
-						}
-						return "rgb(0, 0, " + Math.round(colorScale(d.mort_rate)) + ")";
+					if (d.type === "State") {
+						return "green";
+					}
+					return "rgb(0, 0, " + Math.round(colorScale(d.mort_rate)) + ")";
 
 				})
 				.on("mouseover", function(d) {
@@ -645,10 +688,10 @@
 
 					//Update the tooltip position and value
 					d3.select("#tooltip")
-					.style("left", (w+10) + "px")
-					//.style("top", yPosition + "px")
-					.select("#value")
-					.text(d.mort_rate + "/100K");
+						.style("left", (w + 10) + "px")
+						//.style("top", yPosition + "px")
+						.select("#value")
+						.text(d.mort_rate + "/100K");
 
 					d3.select("#tooltip").select("#tooltipLabel").text(d.county)
 
@@ -669,67 +712,71 @@
 		var sortOrder = false;
 
 		// switch between sorting alphabetically and by mort rate
-		function sort_bars(){
+		function sort_bars() {
 			sortOrder = !sortOrder;
 			svg.selectAll("rect")
-				.sort(function(a, b){
-					if(sortOrder){
+				.sort(function(a, b) {
+					if (sortOrder) {
 						return d3.descending(a.mort_rate, b.mort_rate);
-					}else{
+					} else {
 						return d3.ascending(a.county, b.county);
 					}
 				})
 				.transition("sort_bars")
 				.delay(300)
 				.duration(1500)
-				.attr("x", function(d, i){
+				.attr("x", function(d, i) {
 					return xScale(i);
 				});
 		};
 
 		d3.select("#graphButtons")
-		.select("#refreshGraph")
-		.on("click", function() {
+			.select("#refreshGraph")
+			.on("click", function() {
 
-			if(selection_list.length > 0){
-				//New values for dataset
-				var state_abbreviation = get_state_abbreviation(selection_list[selection_list.length-1]);
-				county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-				update_bars(county_data_of_state);
-				sortOrder = false;
-			}
-		});
+				if (selection_list.length > 0) {
+					//New values for dataset
+					var state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
+					county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
+					update_bars(county_data_of_state);
+					sortOrder = false;
+				}
+			});
 
 		d3.select("#graphButtons")
-		.select("#sortGraph")
-		.on("click", function() {
-			sort_bars();
-		});
+			.select("#sortGraph")
+			.on("click", function() {
+				sort_bars();
+			});
 
 
 		var county_data_of_state = get_county_data_of_state("MA", gender, race);
 
 		// returns an array of d3 scales to use with the county_data_of_state dataset
 		var xScale = d3.scaleBand()
-					.domain(d3.range(county_data_of_state.length))
-					.rangeRound([0, w])
-					.paddingInner(0.05);
+			.domain(d3.range(county_data_of_state.length))
+			.rangeRound([0, w])
+			.paddingInner(0.05);
 
 		var yScale = d3.scaleLinear()
-						.domain([0, d3.max(county_data_of_state, function(d) { return d.mort_rate; })])
-						.range([15, h]);
+			.domain([0, d3.max(county_data_of_state, function(d) {
+				return d.mort_rate;
+			})])
+			.range([15, h]);
 
 		var colorScale = d3.scaleLinear()
-						.domain([0, d3.max(county_data_of_state, function(d) { return d.mort_rate; })])
-						.range([0,255]);
+			.domain([0, d3.max(county_data_of_state, function(d) {
+				return d.mort_rate;
+			})])
+			.range([0, 255]);
 
 
 
 		var svg = d3.select("body")
-					.append("svg")
-					.attr("width", w)
-					.attr("height", h)
-					.append("g");
+			.append("svg")
+			.attr("width", w)
+			.attr("height", h)
+			.append("g");
 
 		update_bars(county_data_of_state);
 	</script>
