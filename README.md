@@ -22,5 +22,8 @@
 ~~display county information once the user clicks zooms far enough~~<br />
 ~~----> this is implemented, will looking for optimization possibilities to make this faster~~<br />
 ~~----> dataset is large and there are many features because (counties > states)~~<br />
-allow a comparison mode between race and genders (diverging color map) <br />
+~~allow a comparison mode between race and genders (diverging color map)~~ <br />
+----> clean up styling<br />
+----> show percentage change difference instead of absolute difference<br />
+----> update legend<br />
 #### county data is made available by US census, data downloaded from http://eric.clst.org/tech/usgeojson/ <br />

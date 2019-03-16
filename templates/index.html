@@ -52,7 +52,7 @@
 
 
 
-	<style>#map { width: 75%; height: 60%; }
+	<style>#map { width: 100%; height: 80%; }
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
 </style>
@@ -97,17 +97,20 @@
 		var json_data = heart_disease_data.data;
 		var geojson;
 		var geojson_county;
-
-		// default values for race and gender
-		var race = "Overall";
-		var gender = "Overall";
 		var selection_count = 0;
 		var selection_max = 2;
 		var zoom_state_county_split = 6.0;
 		var map_type_level = "state";
 		var current_zoom = 4;
+		// default values for race and gender
+		var race = "Overall";
+		var gender = "Overall";
+		// values used to store the values in the dropdowns for multiple criteria view
+		var g1 = "Overall";
+		var g2 = "Overall";
+		var r1 = "Overall";
+		var r2 = "Overall";
 		var race_gender_inspector = "Single"
-
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
 		// selecting additional state will override previous selections
 		var selection_list = [];
@@ -161,8 +164,6 @@
 			return [return_str, mort_rate_val];
 		};
 
-
-
 		function return_county_information(county, gender, race) {
 			// return information about the state's heart disease mortality rate
 			var mort_rate_val = 0;
@@ -181,8 +182,79 @@
 				return_str = Math.round(mort_rate_val) + "/100K people";
 			}
 			return [return_str, mort_rate_val];
+		}
+
+		function return_state_information_difference(state_name) {
+			// variables that will be used
+			var mort_rate_difference = 0;
+			// value_1` and value_2 are undefined at this point, will be used to know when to break out of loop
+			var value_1;
+			var value_2;
+			for (var i = 0; i < json_data.length; i++) {
+				// iterate through the json array and look for the specific state
+				if (json_data[i][9] === state_name && json_data[i][11] === "State") {
+					// once the state is correct, then look whether the gender and race for value 1 matches
+					if (json_data[i][21] === g1 && json_data[i][23] === r1) {
+						value_1 = json_data[i][15];
+					}
+					// once the state is correct, then look whether the gender and race for value 2 matches
+					if (json_data[i][21] === g2 && json_data[i][23] === r2) {
+						value_2 = json_data[i][15];
+					}
+					// once the two values are found, break out of the loop
+					if (value_1 != undefined && value_2 != undefined) {
+						break;
+					}
+				}
+			}
+			// check whether the values are null, if they are null, then it makes no sense to return a numeric difference
+			if (value_1 === null || value_2 === null) {
+				return_str = "Insufficient information";
+			} else {
+				mort_rate_difference = value_1 - value_2;
+				return_str = Math.round(mort_rate_difference) + "/100K people";
+			}
+			value_1 = value_1 == null ? "Insufficient information" : value_1;
+			value_2 = value_2 == null ? "Insufficient information" : value_2;
+			return [return_str, mort_rate_difference, value_1, value_2];
 		};
 
+
+
+		function return_county_information_difference(county) {
+			// variables that will be used
+			var mort_rate_difference = 0;
+			// value_1` and value_2 are undefined at this point, will be used to know when to break out of loop
+			var value_1;
+			var value_2;
+			for (var i = 0; i < json_data.length; i++) {
+				// iterate through the json array and look for the specific county
+				if (json_data[i][10].includes(county) && json_data[i][11] === "County") {
+					// once the county is correct, then look whether the gender and race for value 1 matches
+					if (json_data[i][21] === g1 && json_data[i][23] === r1) {
+						value_1 = json_data[i][15];
+					}
+					// once the county is correct, then look whether the gender and race for value 2 matches
+					if (json_data[i][21] === g2 && json_data[i][23] === r2) {
+						value_2 = json_data[i][15];
+					}
+					// once the two values are found, break out of the loop
+					if (value_1 != undefined && value_2 != undefined) {
+						break;
+					}
+				}
+			}
+			// check whether the values are null, if they are null, then it makes no sense to return a numeric difference
+			if (value_1 === null || value_2 === null) {
+				return_str = "Insufficient information";
+			} else {
+				mort_rate_difference = value_1 - value_2;
+				return_str = Math.round(mort_rate_difference) + "/100K people";
+			}
+			value_1 = value_1 == null ? "Insufficient information" : value_1;
+			value_2 = value_2 == null ? "Insufficient information" : value_2;
+			return [return_str, mort_rate_difference, value_1, value_2];
+		}
 
 		var southWest = L.latLng(5, -175),
 			northEast = L.latLng(80, -25),
@@ -200,14 +272,11 @@
 			// once the map is swtiched, update the global layer variable
 			// update the informational section in top right
 			if (map.getZoom() >= zoom_state_county_split && map_type_level != "county") {
-
-
 				map.addLayer(geojson_county);
 				map.removeLayer(geojson);
 				map_type_level = "county";
 				info.update();
 			} else if (map.getZoom() <= zoom_state_county_split && map_type_level != "state") {
-
 				map.addLayer(geojson);
 				map.removeLayer(geojson_county);
 				map_type_level = "state";
@@ -240,14 +309,29 @@
 		info.update = function(props) {
 			// based on the current layer of the map, display different information in the top right
 			if (map_type_level === "state") {
-				this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-					'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
-					'Hover over a state to learn more!');
+				if (race_gender_inspector === "Single") {
+					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
+						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
+						'Hover over a state to learn more!');
+				} else {
+					var temp = props ? return_state_information_difference(props.abbreviation) : null;
+					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
+						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate difference: ' + temp[0] + '<br />' + r1 + " " + g1 + ' : ' + temp[2] + '<br />' + r2 + " " + g2 + ' : ' + temp[3] :
+						'Hover over a state to learn more!');
+				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 			} else {
+				if (race_gender_inspector === "Single") {
 				this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 					'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
 					'Hover over a county to learn more!');
+				}
+				else {
+					var temp = props ? return_county_information_difference(props.NAME) : null;
+					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
+						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate difference: ' + temp[0] + '<br />' + r1 + ' ' + g1 + ' : ' + temp[2] + '<br />' + r2 + ' ' + g2 + ' : ' + temp[3] :
+						'Hover over a county to learn more!');
+				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.NAME : 'Nowhere');
 			}
 
@@ -347,7 +431,12 @@
 		}
 
 		function style(feature) {
-			var temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
+			var temp;
+			if (race_gender_inspector === "Single") {
+				temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
+			} else {
+				temp = return_state_information_difference(feature.properties.abbreviation)[1];
+			}
 			return {
 				weight: 3,
 				opacity: 1,
@@ -359,7 +448,12 @@
 		};
 
 		function county_style(feature) {
-			var temp = return_county_information(feature.properties.NAME, gender, race)[1];
+			var temp;
+			if (race_gender_inspector === "Single") {
+				temp = return_county_information(feature.properties.NAME, gender, race)[1];
+			} else {
+				temp = return_county_information_difference(feature.properties.NAME)[1];
+			}
 			return {
 				weight: 1,
 				opacity: 1,
@@ -373,7 +467,6 @@
 		function zoomToFeature(e) {
 			var layer = e.target;
 			//map.fitBounds(e.target.getBounds());
-			//map.removeLayer(layer);
 		}
 
 		// for each feature in the geojson file, set the style and add it to the map
@@ -472,8 +565,8 @@
 				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked>Single comparison</label>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
 				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple">Multiple comparison</label>  <br />' +
-				'<div id = "single_selection_dropdown">Gender - <select id="dd_gender" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>' +
-				'<br />' + 'Race - ' + '<select id="dd_race" onchange="change_map()"><option>Overall</option><option>White</option>' +
+				'<div id = "single_selection_dropdown">Gender - <select id="dd_gender_single1" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<br />' + 'Race - ' + '<select id="dd_race_single1" onchange="change_map()"><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select><br />' +
 				'<button type="button">Submit</button></div>' +
 				'<div id = "multiple_selection_dropdown" style="display:none">1st criteria : <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
@@ -483,19 +576,16 @@
 				'2nd criteria : <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
 				'<select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
-				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>'
-
+				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>' +
+				'<button type="button" onclick="execute()">Submit</button></div>'
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
 		};
 
 		window.change_map = function(e) {
 			// Get the select element from the dropdowns for the race/gender interaction
-			var gen = document.getElementById("dd_gender");
-			var rac = document.getElementById("dd_race");
-			// record the values to the global variables
-			gender = gen.value;
-			race = rac.value;
+			gender = document.getElementById("dd_gender_single1").value;
+			race = document.getElementById("dd_race_single1").value;
 			drop_down_operator(true);
 			reload_geojson();
 			reload_geojson_county();
@@ -504,7 +594,27 @@
 			}, 900);
 		};
 
+		function execute() {
+			if (race_gender_inspector === "Multiple") {
+				g1 = document.getElementById("dd_gender_multiple1").value;
+				g2 = document.getElementById("dd_gender_multiple2").value;
+				r1 = document.getElementById("dd_race_multiple1").value;
+				r2 = document.getElementById("dd_race_multiple2").value;
+				if (g1 === g2 && r1 === r2) {
+					// do nothing because no change has been made
+				} else {
+					drop_down_operator(true);
+					reload_geojson();
+					reload_geojson_county();
+					setTimeout(function() {
+						drop_down_operator(false);
+					}, 900);
+				}
+			}
+		}
+
 		window.radio_change = function() {
+			// Based on the radio button selection, display different set of divs to the user
 			var curr_selection;
 			var radio_choice = document.getElementsByName("radio_comp_type");
 			for (var i = 0; i < radio_choice.length; i++) {
@@ -514,19 +624,23 @@
 				}
 			}
 			race_gender_inspector = curr_selection;
-			if(curr_selection === "Multiple"){
+			if (curr_selection === "Multiple") {
 				document.getElementById("single_selection_dropdown").style.display = "none";
 				document.getElementById("multiple_selection_dropdown").style.display = "block";
-			}
-			else {
+			} else {
 				document.getElementById("single_selection_dropdown").style.display = "block";
 				document.getElementById("multiple_selection_dropdown").style.display = "none";
 			}
 		}
 
 		function drop_down_operator(bool_val) {
-			document.getElementById("dd_gender").disabled = bool_val;
-			document.getElementById("dd_race").disabled = bool_val;
+			// disable or enable dropdowns during transitions
+			document.getElementById("dd_gender_single1").disabled = bool_val;
+			document.getElementById("dd_race_single1").disabled = bool_val;
+			document.getElementById("dd_gender_multiple1").disabled = bool_val;
+			document.getElementById("dd_race_multiple1").disabled = bool_val;
+			document.getElementById("dd_gender_multiple2").disabled = bool_val;
+			document.getElementById("dd_race_multiple2").disabled = bool_val;
 		};
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
