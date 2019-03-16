@@ -316,17 +316,17 @@
 				} else {
 					var temp = props ? return_state_information_difference(props.abbreviation) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate difference: ' + temp[0] + '<br />' + r1 + " " + g1 + ' : ' + temp[2] + '<br />' + r2 + " " + g2 + ' : ' + temp[3] :
+						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate difference: ' + temp[0] + '<br />' + r1 + " " + g1 + ' : ' + temp[2] + '<br />' + r2 + " " +
+						g2 + ' : ' + temp[3] :
 						'Hover over a state to learn more!');
 				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 			} else {
 				if (race_gender_inspector === "Single") {
-				this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-					'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
-					'Hover over a county to learn more!');
-				}
-				else {
+					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
+						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
+						'Hover over a county to learn more!');
+				} else {
 					var temp = props ? return_county_information_difference(props.NAME) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate difference: ' + temp[0] + '<br />' + r1 + ' ' + g1 + ' : ' + temp[2] + '<br />' + r2 + ' ' + g2 + ' : ' + temp[3] :
@@ -582,13 +582,22 @@
 			return this._div;
 		};
 
+
+		function reload_based_on_priority() {
+			if (map_type_level === "state") {
+				reload_geojson();
+				reload_geojson_county();
+			} else {
+				reload_geojson_county();
+				reload_geojson();
+			}
+		}
 		window.change_map = function(e) {
 			// Get the select element from the dropdowns for the race/gender interaction
 			gender = document.getElementById("dd_gender_single1").value;
 			race = document.getElementById("dd_race_single1").value;
 			drop_down_operator(true);
-			reload_geojson();
-			reload_geojson_county();
+			reload_based_on_priority();
 			setTimeout(function() {
 				drop_down_operator(false);
 			}, 900);
@@ -604,8 +613,7 @@
 					// do nothing because no change has been made
 				} else {
 					drop_down_operator(true);
-					reload_geojson();
-					reload_geojson_county();
+					reload_based_on_priority();
 					setTimeout(function() {
 						drop_down_operator(false);
 					}, 900);
