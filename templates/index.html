@@ -211,8 +211,10 @@
 			if (value_1 === null || value_2 === null) {
 				return_str = "Insufficient information";
 			} else {
-				mort_rate_difference = value_1 - value_2;
-				return_str = Math.round(mort_rate_difference) + "/100K people";
+				denom = (parseFloat(value_1) + parseFloat(value_2))/2;
+				num = Math.abs(parseFloat(value_1) - parseFloat(value_2));
+				mort_rate_difference = Math.round((num/denom) * 100);
+				return_str = mort_rate_difference + "%";
 			}
 			value_1 = value_1 == null ? "Insufficient information" : value_1;
 			value_2 = value_2 == null ? "Insufficient information" : value_2;
@@ -248,8 +250,10 @@
 			if (value_1 === null || value_2 === null) {
 				return_str = "Insufficient information";
 			} else {
-				mort_rate_difference = value_1 - value_2;
-				return_str = Math.round(mort_rate_difference) + "/100K people";
+				denom = (parseFloat(value_1) + parseFloat(value_2))/2;
+				num = Math.abs(parseFloat(value_1) - parseFloat(value_2));
+				mort_rate_difference = Math.round((num/denom) * 100);
+				return_str = mort_rate_difference + "%";
 			}
 			value_1 = value_1 == null ? "Insufficient information" : value_1;
 			value_2 = value_2 == null ? "Insufficient information" : value_2;
@@ -309,27 +313,33 @@
 		info.update = function(props) {
 			// based on the current layer of the map, display different information in the top right
 			if (map_type_level === "state") {
+			// State level zoom
 				if (race_gender_inspector === "Single") {
+				// Single comparison mode
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
 						'Hover over a state to learn more!');
 				} else {
+				// Multiple comparison mode
 					var temp = props ? return_state_information_difference(props.abbreviation) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate difference: ' + temp[0] + '<br />' + r1 + " " + g1 + ' : ' + temp[2] + '<br />' + r2 + " " +
-						g2 + ' : ' + temp[3] :
+						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Condition 1 - " + r1 + " " + g1 + ' mortality rate: ' + temp[2] + '<br />' + "Condition 2 - " + r2 + " " +
+						g2 + ' mortality rate: ' + temp[3] :
 						'Hover over a state to learn more!');
 				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 			} else {
+			// County level zoom
 				if (race_gender_inspector === "Single") {
+								// Single comparison mode
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
 						'Hover over a county to learn more!');
 				} else {
+				// Multiple comparison mode
 					var temp = props ? return_county_information_difference(props.NAME) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate difference: ' + temp[0] + '<br />' + r1 + ' ' + g1 + ' : ' + temp[2] + '<br />' + r2 + ' ' + g2 + ' : ' + temp[3] :
+						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Condition 1 - " + r1 + ' ' + g1 + ' mortality rate: ' + temp[2] + '<br />' + "Condition 2 - " + r2 + ' ' + g2 + ' mortality rate: ' + temp[3] :
 						'Hover over a county to learn more!');
 				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.NAME : 'Nowhere');
@@ -369,11 +379,13 @@
 		}
 
 		function resetHighlight(e) {
+			// reset the style after the mouse is moved to different state
 			geojson.resetStyle(e.target);
 			info.update();
 		}
 
 		function resetHighlightCounty(e) {
+			// reset the style after the mouse is moved to different county
 			geojson_county.resetStyle(e.target);
 			info.update();
 		}
@@ -409,6 +421,7 @@
 		// only let users add states to the queue, not implemented on county level
 		function onEachFeature(feature, layer) {
 			// state level
+			// this function determines what kind of event driven functionality exists for the layers
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
@@ -419,6 +432,7 @@
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		function onEachCountyFeature(feature, layer) {
 			// county level
+			// this function determines what kind of event driven functionality exists for the layers
 			layer.on({
 				mouseover: highlightCountyFeature,
 				mouseout: resetHighlightCounty
@@ -427,15 +441,20 @@
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		function sleep(ms) {
+			// Way of letting time go by
 			return new Promise(resolve => setTimeout(resolve, ms));
 		}
 
 		function style(feature) {
 			var temp;
 			if (race_gender_inspector === "Single") {
+				// Single mode
 				temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
+				returncolor = return_Color(temp);
 			} else {
+				// Multiple mode
 				temp = return_state_information_difference(feature.properties.abbreviation)[1];
+				returncolor = return_Color(temp);
 			}
 			return {
 				weight: 3,
@@ -443,16 +462,20 @@
 				color: 'white',
 				dashArray: '3',
 				fillOpacity: 0.7,
-				fillColor: return_Color(temp)
+				fillColor: returncolor
 			};
 		};
 
 		function county_style(feature) {
 			var temp;
 			if (race_gender_inspector === "Single") {
+				// Single mode
 				temp = return_county_information(feature.properties.NAME, gender, race)[1];
+				returncolor = return_Color(temp);
 			} else {
+				// Multiple mode
 				temp = return_county_information_difference(feature.properties.NAME)[1];
+				returncolor = return_Color(temp);
 			}
 			return {
 				weight: 1,
@@ -460,7 +483,7 @@
 				color: 'white',
 				dashArray: '3',
 				fillOpacity: 0.5,
-				fillColor: return_Color(temp)
+				fillColor: returncolor
 			};
 		};
 
@@ -501,7 +524,7 @@
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
 					sleep_time = 150;
-					number_of_blinks = 4;
+					number_of_blinks = 2;
 					for (var i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
@@ -532,7 +555,7 @@
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
 					sleep_time = 100;
-					number_of_blinks = 4;
+					number_of_blinks = 2;
 					for (var i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
@@ -561,23 +584,22 @@
 		dropdown.onAdd = function(e) {
 			// add some values to the dropdown
 			this._div = L.DomUtil.create('div', 'info');
-			this._div.innerHTML = '<h4>Race / Gender interaction</h4>' +
+			this._div.innerHTML = '<div style="text-align: center;"> <h4>Race / Gender interaction</h4>' +
 				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked>Single comparison</label>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple">Multiple comparison</label>  <br />' +
-				'<div id = "single_selection_dropdown">Gender - <select id="dd_gender_single1" onchange="change_map()"><option>Overall</option><option>Female</option><option>Male</option></select>' +
-				'<br />' + 'Race - ' + '<select id="dd_race_single1" onchange="change_map()"><option>Overall</option><option>White</option>' +
-				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select><br />' +
-				'<button type="button">Submit</button></div>' +
-				'<div id = "multiple_selection_dropdown" style="display:none">1st criteria : <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple">Multiple comparison</label>  <br /><br />' +
+				'<div id = "single_selection_dropdown" style="text-align: left;">Gender - <select id="dd_gender_single1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<br />' + 'Race - ' + '<select id="dd_race_single1"><option>Overall</option><option>White</option>' +
+				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select><br /></div>' +
+				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left;">1st criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'<select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
+				'Race - <select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select> <br />' +
-				'2nd criteria : <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
-				'&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'<select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
+				'2nd criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Race - <select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>' +
-				'<button type="button" onclick="execute()">Submit</button></div>'
+				'&nbsp;&nbsp;&nbsp;&nbsp;' +
+				'<br /></div><br />' +
+				'<button class="btn" type="button" style="margin: auto" onclick="execute()">Execute</button></div>'
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
 		};
@@ -585,23 +607,16 @@
 
 		function reload_based_on_priority() {
 			if (map_type_level === "state") {
+			// if the current zoom is state, reload state level geojson
 				reload_geojson();
 				reload_geojson_county();
 			} else {
+						// if the current zoom is county, reload state level geojson
 				reload_geojson_county();
 				reload_geojson();
 			}
 		}
-		window.change_map = function(e) {
-			// Get the select element from the dropdowns for the race/gender interaction
-			gender = document.getElementById("dd_gender_single1").value;
-			race = document.getElementById("dd_race_single1").value;
-			drop_down_operator(true);
-			reload_based_on_priority();
-			setTimeout(function() {
-				drop_down_operator(false);
-			}, 900);
-		};
+
 
 		function execute() {
 			if (race_gender_inspector === "Multiple") {
@@ -619,6 +634,15 @@
 					}, 900);
 				}
 			}
+			else {
+				gender = document.getElementById("dd_gender_single1").value;
+				race = document.getElementById("dd_race_single1").value;
+				drop_down_operator(true);
+				reload_based_on_priority();
+				setTimeout(function() {
+					drop_down_operator(false);
+				}, 900);
+			}
 		}
 
 		window.radio_change = function() {
@@ -635,9 +659,11 @@
 			if (curr_selection === "Multiple") {
 				document.getElementById("single_selection_dropdown").style.display = "none";
 				document.getElementById("multiple_selection_dropdown").style.display = "block";
+				reload_based_on_priority();
 			} else {
 				document.getElementById("single_selection_dropdown").style.display = "block";
 				document.getElementById("multiple_selection_dropdown").style.display = "none";
+				reload_based_on_priority();
 			}
 		}
 
