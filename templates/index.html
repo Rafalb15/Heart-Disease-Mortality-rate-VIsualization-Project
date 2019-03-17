@@ -795,22 +795,6 @@
 			this.update();
 			return this._div;
 		};
-		// establish different ranges for the grades of mortality rate
-		// 	partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450],
-		// 	resp_labels = [],
-		// 	from, to;
-		// // define
-		// for (var i = 0; i < partitions.length; i++) {
-		// 	// from is the first range and to is the second
-		// 	from = partitions[i];
-		// 	to = partitions[i + 1];
-		// 	// add to screen
-		// 	resp_labels.push(
-		// 		'<i style="background:' + return_Color(from + 1) + '"></i> ' +
-		// 		from + (to ? '&ndash;' + to : '+'));
-		// }
-		// legend_div.innerHTML = resp_labels.join('<br>');
-		// return legend_div;
 
 		legend.update = function() {
 			if (race_gender_inspector === "Multiple") {
