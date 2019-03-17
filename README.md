@@ -25,5 +25,5 @@
 ~~allow a comparison mode between race and genders (diverging color map)~~ <br />
 ~~----> clean up styling~~<br />
 ~~----> show percentage change difference instead of absolute difference~~<br />
-----> dynamically update legend<br />
+~~----> dynamically update legend~~<br />
 #### county data is made available by US census, data downloaded from http://eric.clst.org/tech/usgeojson/ <br />

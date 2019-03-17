@@ -132,17 +132,73 @@
 
 		// get color depending on population density value
 		function return_Color(d) {
-			return d > 450 ? '#210009' :
-				d > 400 ? '#560019' :
-				d > 350 ? '#800026' :
-				d > 300 ? '#BD0026' :
-				d > 250 ? '#E31A1C' :
-				d > 200 ? '#FC4E2A' :
-				d > 150 ? '#FD8D3C' :
-				d > 100 ? '#FEB24C' :
-				d > 50 ? '#FED976' :
-				'#FFEDA0';
+			var color;
+			if (race_gender_inspector === "Single"){
+			switch (true) {
+				case (d > 450):
+					color = '#210009';
+					break;
+				case (d > 400):
+					color = '#560019';
+					break;
+				case (d > 350):
+					color = '#800026';
+					break;
+				case (d > 300):
+					color = '#BD0026';
+					break;
+				case (d > 250):
+					color = '#E31A1C';
+					break;
+				case (d > 200):
+					color = '#FC4E2A';
+					break;
+				case (d > 150):
+					color = '#FD8D3C';
+					break;
+				case (d > 100):
+					color = '#FEB24C';
+					break;
+				case (d > 50):
+					color = '#FED976';
+					break;
+				default:
+					color = '#FFEDA0';
+					break;
+			};
 		}
+			else{
+				switch (true) {
+					case (d > 200):
+						color = '#800026';
+						break;
+					case (d > 150):
+						color = '#BD0026';
+						break;
+					case (d > 125):
+						color = '#E31A1C';
+						break;
+					case (d > 100):
+						color = '#FC4E2A';
+						break;
+					case (d > 75):
+						color = '#FD8D3C';
+						break;
+					case (d > 50):
+						color = '#FEB24C';
+						break;
+					case (d > 25):
+						color = '#FED976';
+						break;
+					default:
+						color = '#FFEDA0';
+						break;
+				};
+
+			}
+			return color;
+		}
+
 
 		function return_state_information(state_name, gender, race) {
 			// return information about the state's heart disease mortality rate
@@ -211,9 +267,9 @@
 			if (value_1 === null || value_2 === null) {
 				return_str = "Insufficient information";
 			} else {
-				denom = (parseFloat(value_1) + parseFloat(value_2))/2;
+				denom = (parseFloat(value_1) + parseFloat(value_2)) / 2;
 				num = Math.abs(parseFloat(value_1) - parseFloat(value_2));
-				mort_rate_difference = Math.round((num/denom) * 100);
+				mort_rate_difference = Math.round((num / denom) * 100);
 				return_str = mort_rate_difference + "%";
 			}
 			value_1 = value_1 == null ? "Insufficient information" : value_1;
@@ -250,9 +306,9 @@
 			if (value_1 === null || value_2 === null) {
 				return_str = "Insufficient information";
 			} else {
-				denom = (parseFloat(value_1) + parseFloat(value_2))/2;
+				denom = (parseFloat(value_1) + parseFloat(value_2)) / 2;
 				num = Math.abs(parseFloat(value_1) - parseFloat(value_2));
-				mort_rate_difference = Math.round((num/denom) * 100);
+				mort_rate_difference = Math.round((num / denom) * 100);
 				return_str = mort_rate_difference + "%";
 			}
 			value_1 = value_1 == null ? "Insufficient information" : value_1;
@@ -313,33 +369,35 @@
 		info.update = function(props) {
 			// based on the current layer of the map, display different information in the top right
 			if (map_type_level === "state") {
-			// State level zoom
+				// State level zoom
 				if (race_gender_inspector === "Single") {
-				// Single comparison mode
+					// Single comparison mode
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
 						'Hover over a state to learn more!');
 				} else {
-				// Multiple comparison mode
+					// Multiple comparison mode
 					var temp = props ? return_state_information_difference(props.abbreviation) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Condition 1 - " + r1 + " " + g1 + ' mortality rate: ' + temp[2] + '<br />' + "Condition 2 - " + r2 + " " +
+						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Condition 1 - " + r1 + " " + g1 +
+						' mortality rate: ' + temp[2] + '<br />' + "Condition 2 - " + r2 + " " +
 						g2 + ' mortality rate: ' + temp[3] :
 						'Hover over a state to learn more!');
 				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 			} else {
-			// County level zoom
+				// County level zoom
 				if (race_gender_inspector === "Single") {
-								// Single comparison mode
+					// Single comparison mode
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
 						'Hover over a county to learn more!');
 				} else {
-				// Multiple comparison mode
+					// Multiple comparison mode
 					var temp = props ? return_county_information_difference(props.NAME) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Condition 1 - " + r1 + ' ' + g1 + ' mortality rate: ' + temp[2] + '<br />' + "Condition 2 - " + r2 + ' ' + g2 + ' mortality rate: ' + temp[3] :
+						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Condition 1 - " + r1 + ' ' + g1 + ' mortality rate: ' + temp[2] + '<br />' + "Condition 2 - " + r2 + ' ' + g2 +
+						' mortality rate: ' + temp[3] :
 						'Hover over a county to learn more!');
 				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.NAME : 'Nowhere');
@@ -585,12 +643,14 @@
 			// add some values to the dropdown
 			this._div = L.DomUtil.create('div', 'info');
 			this._div.innerHTML = '<div style="text-align: center;"> <h4>Race / Gender interaction</h4>' +
-				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked>Single comparison</label>' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked><b>Single comparison</b></label>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple">Multiple comparison</label>  <br /><br />' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple"><b>Multiple comparison</b></label>  <br /><br />' +
+
 				'<div id = "single_selection_dropdown" style="text-align: left;">Gender - <select id="dd_gender_single1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'<br />' + 'Race - ' + '<select id="dd_race_single1"><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select><br /></div>' +
+
 				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left;">1st criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
 				'Race - <select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
@@ -599,7 +659,8 @@
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
 				'<br /></div><br />' +
-				'<button class="btn" type="button" style="margin: auto" onclick="execute()">Execute</button></div>'
+
+				'<button class="btn" type="button" style="margin: auto" onclick="execute()">Update Map</button><br /></div>'
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
 		};
@@ -607,11 +668,11 @@
 
 		function reload_based_on_priority() {
 			if (map_type_level === "state") {
-			// if the current zoom is state, reload state level geojson
+				// if the current zoom is state, reload state level geojson
 				reload_geojson();
 				reload_geojson_county();
 			} else {
-						// if the current zoom is county, reload state level geojson
+				// if the current zoom is county, reload state level geojson
 				reload_geojson_county();
 				reload_geojson();
 			}
@@ -633,8 +694,7 @@
 						drop_down_operator(false);
 					}, 900);
 				}
-			}
-			else {
+			} else {
 				gender = document.getElementById("dd_gender_single1").value;
 				race = document.getElementById("dd_race_single1").value;
 				drop_down_operator(true);
@@ -659,12 +719,12 @@
 			if (curr_selection === "Multiple") {
 				document.getElementById("single_selection_dropdown").style.display = "none";
 				document.getElementById("multiple_selection_dropdown").style.display = "block";
-				reload_based_on_priority();
+				legend.update();
 			} else {
 				document.getElementById("single_selection_dropdown").style.display = "block";
 				document.getElementById("multiple_selection_dropdown").style.display = "none";
-				reload_based_on_priority();
 			}
+			setTimeout(reload_based_on_priority(), 0);
 		}
 
 		function drop_down_operator(bool_val) {
@@ -731,28 +791,58 @@
 
 		legend.onAdd = function(map) {
 			// create a div with legend styling
-			var legend_div = L.DomUtil.create('div', 'info legend'),
-				// establish different ranges for the grades of mortality rate
-				partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450],
-				resp_labels = [],
-				from, to;
-			// define
-			for (var i = 0; i < partitions.length; i++) {
-				// from is the first range and to is the second
-				from = partitions[i];
-				to = partitions[i + 1];
-				// add to screen
-				resp_labels.push(
-					'<i style="background:' + return_Color(from + 1) + '"></i> ' +
-					from + (to ? '&ndash;' + to : '+'));
+			this._div = L.DomUtil.create('div', 'info legend');
+			this.update();
+			return this._div;
+		};
+		// establish different ranges for the grades of mortality rate
+		// 	partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450],
+		// 	resp_labels = [],
+		// 	from, to;
+		// // define
+		// for (var i = 0; i < partitions.length; i++) {
+		// 	// from is the first range and to is the second
+		// 	from = partitions[i];
+		// 	to = partitions[i + 1];
+		// 	// add to screen
+		// 	resp_labels.push(
+		// 		'<i style="background:' + return_Color(from + 1) + '"></i> ' +
+		// 		from + (to ? '&ndash;' + to : '+'));
+		// }
+		// legend_div.innerHTML = resp_labels.join('<br>');
+		// return legend_div;
+
+		legend.update = function() {
+			if (race_gender_inspector === "Multiple") {
+				resp_labels = [];
+				partitions = [0, 25, 50, 75, 100, 125, 150];
+				for (var i = 0; i < partitions.length; i++) {
+					// from is the first range and to is the second
+					from = partitions[i];
+					to = partitions[i + 1];
+					// add to screen
+					resp_labels.push(
+						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
+						from + (to ? '&ndash;' + to + "%" : '%+'));
+				}
+				this._div.innerHTML = '<h4>Mortality rate % difference</h4>' + resp_labels.join('<br>');
+			} else {
+				resp_labels = [];
+				partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450];
+				for (var i = 0; i < partitions.length; i++) {
+					// from is the first range and to is the second
+					from = partitions[i];
+					to = partitions[i + 1];
+					// add to screen
+					resp_labels.push(
+						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
+						from + (to ? '&ndash;' + to + "" : '+'));
+				}
+				this._div.innerHTML = '<h4>Mortality rate</h4>' + resp_labels.join('<br>');
 			}
-			legend_div.innerHTML = resp_labels.join('<br>');
-			return legend_div;
 		};
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 		// add legend to map
 		legend.addTo(map);
 		// add dropdown to the map
