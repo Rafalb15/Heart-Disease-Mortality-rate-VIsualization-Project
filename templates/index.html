@@ -645,22 +645,28 @@
 			this._div.innerHTML = '<div style="text-align: center;"> <h4>Race / Gender interaction</h4>' +
 				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked><b>Single comparison</b></label>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple"><b>Multiple comparison</b></label>  <br /><br />' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple"><b>Multiple comparison</b></label><br />' +
 
-				'<div id = "single_selection_dropdown" style="text-align: left;">Gender - <select id="dd_gender_single1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
-				'<br />' + 'Race - ' + '<select id="dd_race_single1"><option>Overall</option><option>White</option>' +
-				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select><br /></div>' +
+				'<div id = "single_selection_dropdown" style="text-align: left; padding-top: 5px; padding-bottom: 5px">' +
+					'<div style="padding-left: 5px; padding-bottom: 5px">Gender - <select id="dd_gender_single1"><option>Overall</option><option>Female</option><option>Male</option></select></div>' +
+					'<div style="padding-left: 5px; padding-bottom: 5px">Race - ' + '<select id="dd_race_single1"><option>Overall</option><option>White</option>' +
+					'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
+				'</div>' +
 
-				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left;">1st criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
-				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'Race - <select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
-				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select> <br />' +
-				'2nd criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Race - <select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
-				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select>' +
-				'&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'<br /></div><br />' +
+				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left; padding-top: 5px; padding-bottom: 5px">' +
+					'<div style="padding-left: 5px; padding-bottom: 5px">1st criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+					'Race - <select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
+					'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 
-				'<button class="btn" type="button" style="margin: auto" onclick="execute()">Update Map</button><br /></div>'
+					'<div style="padding-left: 5px; padding-bottom: 5px">2nd criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+					'Race - <select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
+					'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
+				'</div>' +
+
+				'<div style="padding-bottom: 5px"><button class="btn" type="button" style="margin: auto" onclick="execute()">Update Map</button></div>' +
+				'</div>'
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
 		};
