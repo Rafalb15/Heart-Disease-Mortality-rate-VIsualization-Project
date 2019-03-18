@@ -51,6 +51,37 @@
 
 
 
+		<style type="text/css">
+		/* copied from Dennis above - Jon */
+		#tooltip2 {
+			position: absolute;
+			width: 200px;
+			height: auto;
+			padding: 10px;
+			background-color: white;
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+			-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			pointer-events: none;
+		}
+
+		#tooltip2.hidden {
+			display: none;
+		}
+
+		#tooltip2 p {
+			margin: 0;
+			font-family: sans-serif;
+			font-size: 16px;
+			line-height: 20px;
+		}
+	</style>
+
+
+
 	<style>#map { width: 75%; height: 60%; }
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
@@ -75,6 +106,15 @@
 	</div>
 
 	<div id ="graphButtons"><button type="button" id="refreshGraph">Refresh Graph</button><button type="button" id = "sortGraph">sort graph</button></div>
+	<!-- #################################### bottomest? of page ################################################################### -->
+	<!-- stolen from Dennis - Jon -->
+
+		<div id="tooltip2" class="hidden">
+		<p><strong><span id="tooltipLabel">Important Label Heading</span></strong></p>
+		<p><span id="value">100</span></p>
+	</div>
+
+	<div id ="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id = "selectRace">Race</button></div>
 
 
 	<!-- #################################### SCRIPTS ############################################################################## -->
@@ -730,6 +770,202 @@
 					.append("g");
 
 		update_bars(county_data_of_state);
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		var width = Math.round(body.clientWidth*0.7);
+		var height = Math.round(body.clientHeight*0.3);
+
+		// kludgy functions
+		function get_state_data_overall(state_name){
+			var data = [];
+			for(let j = 0; j < state_name.length; j++){
+				for(let i = 0; i < json_data.length; i++){
+					if(json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall"){
+						data.push({state: json_data[i][10], mort_rate: json_data[i][15], gender: json_data[i][21], race: json_data[i][23]});
+					}
+				}
+			}
+			return data;
+		};
+
+		function get_state_data_gender(state_name){
+			var data = [];
+			for(let j = 0; j < state_name.length; j++){
+				for(let i = 0; i < json_data.length; i++){
+					if(json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] === "Overall"){
+						data.push({state: json_data[i][10], mort_rate: json_data[i][15], gender: json_data[i][21], race: json_data[i][23]});
+					}
+				}
+			}
+			return data;
+		};
+
+		function get_state_data_race(state_name){
+			var data = [];
+			for(let j = 0; j < state_name.length; j++){
+				for(let i = 0; i < json_data.length; i++){
+					if(json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] != "Overall"){
+						data.push({state: json_data[i][10], mort_rate: json_data[i][15], gender: json_data[i][21], race: json_data[i][23]});
+					}
+				}
+			}
+			return data;
+		};
+
+		function update_grouped_barchart(state_data, strata){
+			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
+			var data = state_data;
+
+			var margin = {top: 20, right: 20, bottom: 30, left: 40};
+
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w + margin.left + margin.right)
+						.attr("height", h + margin.top + margin.bottom);
+
+			
+
+			var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+			var x = d3.scaleBand().rangeRound([0, w]).padding(0.1)
+			var y = d3.scaleLinear().rangeRound([h, 0]);
+
+			var g = svg.append("g")
+			           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");;
+
+			var ymaxdomain = d3.max(data, function(d) {
+				return d.mort_rate;
+			});
+
+			x.domain(data.map(function(d) {
+				return d.state
+			}));
+			
+			y.domain([0, ymaxdomain]);
+
+			var x1 = d3.scaleBand()
+					   .rangeRound([0, x.bandwidth()])
+					   .padding(0.05)
+					   .domain(data.map(function(d) {
+				return d[strata];
+			}));
+
+			color.domain(data.map(function(d) {
+				return d[strata];
+			}));
+
+			var groups = g.selectAll("rect")
+			.data(data)
+			.enter()
+			.append("g")
+			.attr("transform", function(d) {
+				return "translate(" + x(d.state) + ",0)";
+			})
+
+			var bars = groups.selectAll("rect")
+			.data(function(d) {
+				return [d]
+			})
+			.enter()
+			.append("rect")
+			.attr("x", function(d, i) {
+				return x1(d[strata])
+			})
+			.attr("y", function(d) {
+				return y(d.mort_rate);
+			})
+			.attr("width", x1.bandwidth())
+			.attr("height", function(d) {
+				return h - y(d.mort_rate);
+			})
+			.attr("fill", function(d) {
+				return color(d[strata])
+			})
+
+			g.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(0," + h + ")")
+			.call(d3.axisBottom(x));
+
+			g.append("g")
+			.attr("class", "axis")
+			.call(d3.axisLeft(y).ticks(null, "s"))
+			.append("text")
+			.attr("x", 2)
+			.attr("y", y(y.ticks().pop()) + 0.5)
+			.attr("dy", "0.32em")
+			.attr("fill", "#000")
+			.attr("font-weight", "bold")
+			.attr("text-anchor", "start")
+			.text("mort_rate");
+
+			// remove old bars
+			bars.exit().remove();
+
+		};
+
+		d3.select("#groupedBarChartButtons")
+		.select("#selectOverall")
+		.on("click", function() {
+			if(selection_list.length > 0){
+				//New values for dataset
+				state_data = get_state_data_overall(selection_list);
+				update_grouped_barchart(state_data,"");
+			}
+		});
+
+		d3.select("#groupBarChartButtons")
+		.select("#selectGender")
+		.on("click", function() {
+			if(selection_list.length > 0){
+				//New values for dataset
+				state_data = get_state_data_gender(selection_list);
+				update_grouped_barchart(state_data,"gender");
+			}
+		});
+
+		d3.select("#groupedBarChartButtons")
+		.select("#selectRace")
+		.on("click", function() {
+			if(selection_list.length > 0){
+				//New values for dataset
+				state_data = get_state_data_race(selection_list);
+				update_grouped_barchart(state_data,"race");
+			}
+		});
+
+		var state_data = get_state_data_race("Massachusetts");
+
+		// returns an array of d3 scales to use with the county_data_of_state dataset
+		var xScale = d3.scaleBand()
+					.domain(d3.range(state_data))
+					.rangeRound([0, w])
+					.paddingInner(0.05);
+
+		var yScale = d3.scaleLinear()
+						.domain([0, d3.max(state_data, function(d) { return d.mort_rate; })])
+						.range([15, h]);
+
+		var colorScale = d3.scaleLinear()
+						.domain([0, d3.max(state_data, function(d) { return d.mort_rate; })])
+						.range([0,255]);
+
+
+
+		var svg2 = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h)
+					.append("g");
+
+		update_bars(state_data);
+
+
+
 	</script>
 
 </body>
