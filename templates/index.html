@@ -205,29 +205,35 @@
 		}
 			else{
 				switch (true) {
-					case (d > 200):
-						color = '#800026';
+					case (d >= 150):
+						color = '#d73027';
 						break;
-					case (d > 150):
-						color = '#BD0026';
+					case (100 <= d && d < 150):
+						color = '#f46d43';
 						break;
-					case (d > 125):
-						color = '#E31A1C';
+					case (50 <= d && d < 100):
+						color = '#fdae61';
 						break;
-					case (d > 100):
-						color = '#FC4E2A';
+					case (0 < d && d < 50):
+						color = '#fee090';
 						break;
-					case (d > 75):
-						color = '#FD8D3C';
+					case (d == 0):
+						color = '#BEBEBE';
 						break;
-					case (d > 50):
-						color = '#FEB24C';
+					case (-50 < d && d < 0):
+						color = '#abd9e9';
 						break;
-					case (d > 25):
-						color = '#FED976';
+					case (-100 < d && d <= 50):
+						color = '#74add1';
 						break;
+					case (-150 < d && d <= -100):
+						color = '#4575b4';
+						break;
+					case (d <= -150):
+							color = '#313695';
+							break;
 					default:
-						color = '#FFEDA0';
+						color = '#BEBEBE';
 						break;
 				};
 
@@ -304,7 +310,7 @@
 				return_str = "Insufficient information";
 			} else {
 				denom = (parseFloat(value_1) + parseFloat(value_2)) / 2;
-				num = Math.abs(parseFloat(value_1) - parseFloat(value_2));
+				num = parseFloat(value_1) - parseFloat(value_2);
 				mort_rate_difference = Math.round((num / denom) * 100);
 				return_str = mort_rate_difference + "%";
 			}
@@ -343,7 +349,7 @@
 				return_str = "Insufficient information";
 			} else {
 				denom = (parseFloat(value_1) + parseFloat(value_2)) / 2;
-				num = Math.abs(parseFloat(value_1) - parseFloat(value_2));
+				num = parseFloat(value_1) - parseFloat(value_2);
 				mort_rate_difference = Math.round((num / denom) * 100);
 				return_str = mort_rate_difference + "%";
 			}
@@ -415,9 +421,9 @@
 					// Multiple comparison mode
 					var temp = props ? return_state_information_difference(props.abbreviation) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Condition 1 - " + r1 + " " + g1 +
-						' mortality rate: ' + temp[2] + '<br />' + "Condition 2 - " + r2 + " " +
-						g2 + ' mortality rate: ' + temp[3] :
+						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Lookup criteria 1 : Race(" + r1 + ") Gender(" + g1 +
+						') mortality rate: ' + temp[2] + '<br />' + "Lookup criteria 2 : Race(" + r2 + ") Gender(" +
+						g2 + ') mortality rate: ' + temp[3] :
 						'Hover over a state to learn more!');
 				}
 				document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
@@ -679,9 +685,9 @@
 			// add some values to the dropdown
 			this._div = L.DomUtil.create('div', 'info');
 			this._div.innerHTML = '<div style="text-align: center;"> <h4>Race / Gender interaction</h4>' +
-				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked><b>Single comparison</b></label>' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Single" checked><b>Single mode</b></label>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple"><b>Multiple comparison</b></label><br />' +
+				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple"><b>Multiple mode</b></label><br />' +
 
 				'<div id = "single_selection_dropdown" style="text-align: left; padding-top: 5px; padding-bottom: 5px">' +
 					'<div style="padding-left: 5px; padding-bottom: 5px">Gender - <select id="dd_gender_single1"><option>Overall</option><option>Female</option><option>Male</option></select></div>' +
@@ -690,12 +696,12 @@
 				'</div>' +
 
 				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left; padding-top: 5px; padding-bottom: 5px">' +
-					'<div style="padding-left: 5px; padding-bottom: 5px">1st criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+					'<div style="padding-left: 5px; padding-bottom: 5px">1st lookup criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
 					'Race - <select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
 					'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 
-					'<div style="padding-left: 5px; padding-bottom: 5px">2nd criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+					'<div style="padding-left: 5px; padding-bottom: 5px">2nd lookup criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
 					'Race - <select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
 					'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
@@ -842,16 +848,20 @@
 		legend.update = function() {
 			if (race_gender_inspector === "Multiple") {
 				resp_labels = [];
-				partitions = [0, 25, 50, 75, 100, 125, 150];
-				for (var i = 0; i < partitions.length; i++) {
-					// from is the first range and to is the second
+				partitions = [-150, -100, -50, 0, 50, 100, 150];
+				resp_labels.push('<i style="background:' + return_Color(-151) + '"></i> ' + '-150% or more');
+				for (var i = 0; i < partitions.length - 1; i++) {
 					from = partitions[i];
 					to = partitions[i + 1];
+					if (i == 3){
+						resp_labels.push('<i style="background:' + return_Color(0) + '"></i> ' + '0% or no data');
+					}
 					// add to screen
 					resp_labels.push(
 						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
-						from + (to ? '&ndash;' + to + "%" : '%+'));
+						from + ' to ' + to + '%');
 				}
+				resp_labels.push('<i style="background:' + return_Color(151) + '"></i> ' + '150% or more');
 				this._div.innerHTML = '<h4>Mortality rate % difference</h4>' + resp_labels.join('<br>');
 			} else {
 				resp_labels = [];
@@ -863,7 +873,7 @@
 					// add to screen
 					resp_labels.push(
 						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
-						from + (to ? '&ndash;' + to + "" : '+'));
+						from + (to ? ' to ' + to + "" : '+'));
 				}
 				this._div.innerHTML = '<h4>Mortality rate</h4>' + resp_labels.join('<br>');
 			}
@@ -1101,7 +1111,7 @@
 						.attr("width", w + margin.left + margin.right)
 						.attr("height", h + margin.top + margin.bottom);
 
-			
+
 
 			var color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -1118,7 +1128,7 @@
 			x.domain(data.map(function(d) {
 				return d.state
 			}));
-			
+
 			y.domain([0, ymaxdomain]);
 
 			var x1 = d3.scaleBand()
@@ -1236,7 +1246,7 @@
 					.attr("height", h)
 					.append("g");
 
-		update_bars(state_data);
+		//update_bars(state_data);
 
 
 
