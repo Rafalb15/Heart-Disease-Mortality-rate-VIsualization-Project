@@ -592,6 +592,12 @@
 			}
 			// update the queue with the selection
 			queue.update();
+			// update Dennis's graph based on the selection
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////
+			county_data_of_state = get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race);
+			update_bars(get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race));
+			sortOrder = false;
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// only let users add states to the queue, not implemented on county level
@@ -869,6 +875,13 @@
 				setTimeout(function() {
 					drop_down_operator(false);
 				}, 900);
+				if (selection_list.length > 0) {
+					//New values for dataset
+					var state_abbreviation = get_state_abbreviation(selection_list[0]);
+					county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
+					update_bars(county_data_of_state);
+					sortOrder = false;
+				}
 			}
 		}
 
@@ -1007,6 +1020,9 @@
 		queue.addTo(map);
 		// disable double click from zooming in the map
 		map.doubleClickZoom.disable();
+		// add MA to the queue
+		selection_list.push("Massachusetts");
+		queue.update();
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		var body = document.getElementsByTagName('body')[0]
