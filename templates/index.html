@@ -11,6 +11,7 @@
 	<script src="/static/leaflet.js" crossorigin=""></script>
 	<!-- integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" -->
 	<script src="/static/d3.js"></script>
+	<script src='//js.zapjs.com/js/download.js'></script>
 
 
 	<style>
@@ -124,6 +125,8 @@
 	<!-- this is the data from http://eric.clst.org/tech/usgeojson/ -->
 	<script type="text/javascript" src="/static/gz_2010_us_050_00_20m.js"></script>
 
+	<script type="text/javascript" src="/static/cache.js"></script>
+
 
 	<script type="text/javascript">
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -148,7 +151,9 @@
 		var race_gender_inspector = "Single"
 		// cache is used to store the already retrieved mort rate values for various criterias
 		// avoiding having to search through the whole data, thus saving time
-		var cache = [];
+		//var cache = [];
+		// Now try to get the data from cache instead of reading from large array
+		var cache = cache_contents;
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
 		// selecting additional state will override previous selections
 		var selection_list = [];
@@ -169,6 +174,8 @@
 			}
 
 		}
+
+
 
 		// Return color HEX color based on d value
 		// Single map mode has a sequential map style
@@ -254,6 +261,13 @@
 			}
 		}
 
+
+
+		function save_cache_to_file() {
+			var cache_as_json = JSON.stringify(cache);
+			download(cache_as_json, "cache_contents.txt", "text/plain");
+		}
+
 		// Add values to cache
 		// Cache
 		// Cache[0] = {key : key_phrase , value = {} }
@@ -300,6 +314,30 @@
 				}
 			}
 			return return_val;
+		}
+
+		function populate_cache() {
+			// helper function to iterate through all of the options in the multiple dropdown Screven
+			// used to generate cache data
+			let temp_g1 = document.getElementById('dd_gender_multiple1').options;
+			let temp_r1 = document.getElementById('dd_race_multiple1').options;
+			let temp_g2 = document.getElementById('dd_gender_multiple2').options;
+			let temp_r2 = document.getElementById('dd_race_multiple2').options;
+			let i = 0;
+			for (let a = 0; a < temp_g1.length; a++){
+				for (let b = 0; b < temp_r1.length; b++){
+					for (let c = 0; c < temp_g2.length; c++){
+						for (let d = 0; d < temp_r2.length; d++){
+								g1 = temp_g1[a].value;
+								r1 = temp_r1[b].value;
+								g2 = temp_g2[c].value;
+								r2 = temp_r2[d].value;
+								execute();
+								console.log(cache.length);
+						}
+					}
+				}
+			}
 		}
 
 		function return_state_information(state_name, gender, race) {
@@ -636,7 +674,7 @@
 				// Try to get a value from cache
 				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.abbreviation);
 				if (cache_lookup === undefined) {
-					//console.log("no cache");
+					//console.log(feature.properties.abbreviation + " Not available in cache");
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
 					temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
@@ -652,7 +690,7 @@
 				// Try to get a value from cache
 				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation);
 				if (cache_lookup === undefined) {
-					//console.log("no cache");
+					//console.log(feature.properties.abbreviation + " Not available in cache");
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
 					temp = return_state_information_difference(feature.properties.abbreviation)[1];
@@ -857,24 +895,21 @@
 
 
 		function execute() {
+			// save the choices from the dropdowns and go forward with the animation
+			save_dropdown_options();
 			if (race_gender_inspector === "Multiple") {
-				g1 = document.getElementById("dd_gender_multiple1").value;
-				g2 = document.getElementById("dd_gender_multiple2").value;
-				r1 = document.getElementById("dd_race_multiple1").value;
-				r2 = document.getElementById("dd_race_multiple2").value;
 				drop_down_operator(true);
 				reload_based_on_priority();
 				setTimeout(function() {
 					drop_down_operator(false);
-				}, 900);
+				}, 500);
 			} else {
-				gender = document.getElementById("dd_gender_single1").value;
-				race = document.getElementById("dd_race_single1").value;
+				// save the choices from the dropdowns and go forward with the animation
 				drop_down_operator(true);
 				reload_based_on_priority();
 				setTimeout(function() {
 					drop_down_operator(false);
-				}, 900);
+				}, 500);
 				if (selection_list.length > 0) {
 					//New values for dataset
 					var state_abbreviation = get_state_abbreviation(selection_list[0]);
@@ -887,14 +922,19 @@
 
 		window.radio_change = function() {
 			// Based on the radio button selection, display different set of divs to the user
+			// first, get the radio button value to determine where the user has clicked
 			var curr_selection;
 			var radio_choice = document.getElementsByName("radio_comp_type");
 			for (var i = 0; i < radio_choice.length; i++) {
 				if (radio_choice[i].checked) {
 					curr_selection = radio_choice[i].value;
+					// once the current selection is found, then break out from the loop and save the value
 					break;
 				}
 			}
+			save_dropdown_options();
+			// When the user changes selection using the radio button, save user's choices and then
+			// change the radio button options
 			race_gender_inspector = curr_selection;
 			if (curr_selection === "Multiple") {
 				document.getElementById("single_selection_dropdown").style.display = "none";
@@ -910,6 +950,7 @@
 
 		function drop_down_operator(bool_val) {
 			// disable or enable dropdowns during transitions
+			// this will block the user from selecting other options while the animations are in play
 			document.getElementById("dd_gender_single1").disabled = bool_val;
 			document.getElementById("dd_race_single1").disabled = bool_val;
 			document.getElementById("dd_gender_multiple1").disabled = bool_val;
@@ -917,6 +958,17 @@
 			document.getElementById("dd_gender_multiple2").disabled = bool_val;
 			document.getElementById("dd_race_multiple2").disabled = bool_val;
 		};
+
+		function save_dropdown_options() {
+			// for all of the dropdowns, save the current selections into a global variable to be
+			// used in the animation
+			gender = document.getElementById("dd_gender_single1").value;
+			race = document.getElementById("dd_race_single1").value;
+			g1 = document.getElementById("dd_gender_multiple1").value;
+			g2 = document.getElementById("dd_gender_multiple2").value;
+			r1 = document.getElementById("dd_race_multiple1").value;
+			r2 = document.getElementById("dd_race_multiple2").value;
+		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
