@@ -1091,25 +1091,14 @@
 
 		function update_grouped_barchart(state_data, strata){
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
-			var data = state_data;
-
-			var margin = {top: 20, right: 20, bottom: 30, left: 40};
-
-			//Create SVG element
-			var svg = d3.select("body")
-						.append("svg")
-						.attr("width", w + margin.left + margin.right)
-						.attr("height", h + margin.top + margin.bottom);
-
-			
+			var data = state_data;		
 
 			var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 			var x = d3.scaleBand().rangeRound([0, w]).padding(0.1)
 			var y = d3.scaleLinear().rangeRound([h, 0]);
-
-			var g = svg.append("g")
-			           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");;
+			var g = svg2.append("g")
+			           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");			
 
 			var ymaxdomain = d3.max(data, function(d) {
 				return d.mort_rate;
@@ -1160,11 +1149,13 @@
 				return color(d[strata])
 			})
 
+			// add x-axis	
 			g.append("g")
 			.attr("class", "axis")
 			.attr("transform", "translate(0," + h + ")")
 			.call(d3.axisBottom(x));
 
+			// add y-axis
 			g.append("g")
 			.attr("class", "axis")
 			.call(d3.axisLeft(y).ticks(null, "s"))
@@ -1212,29 +1203,13 @@
 			}
 		});
 
-		var state_data = get_state_data_race("Massachusetts");
+		var margin = {top: 20, right: 20, bottom: 30, left: 40};
 
-		// returns an array of d3 scales to use with the county_data_of_state dataset
-		var xScale = d3.scaleBand()
-					.domain(d3.range(state_data))
-					.rangeRound([0, w])
-					.paddingInner(0.05);
-
-		var yScale = d3.scaleLinear()
-						.domain([0, d3.max(state_data, function(d) { return d.mort_rate; })])
-						.range([15, h]);
-
-		var colorScale = d3.scaleLinear()
-						.domain([0, d3.max(state_data, function(d) { return d.mort_rate; })])
-						.range([0,255]);
-
-
-
+		//Create SVG element
 		var svg2 = d3.select("body")
-					.append("svg")
-					.attr("width", w)
-					.attr("height", h)
-					.append("g");
+		.append("svg")
+		.attr("width", w + margin.left + margin.right)
+		.attr("height", h + margin.top + margin.bottom);
 
 		update_bars(state_data);
 
