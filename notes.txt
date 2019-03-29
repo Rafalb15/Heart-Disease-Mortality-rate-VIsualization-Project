@@ -2,5 +2,3 @@ look at us-states.js and add data
 
 must start up a python server
 python -m http.server 8000
-
-stateToAbbr.js borrowed from https://gist.github.com/calebgrove/c285a9510948b633aa47
