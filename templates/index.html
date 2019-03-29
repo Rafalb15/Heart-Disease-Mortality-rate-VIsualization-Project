@@ -82,7 +82,7 @@
 		}
 	</style>
 
-	<style>#map { width: 100%; height: 80%; }
+	<style>#map { width: 80%; height: 60%; }
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
 </style>
@@ -93,7 +93,10 @@
 <body data-gr-c-s-loaded="true">
 	<!-- #################################### TOP OF PAGE ############################################################################## -->
 	<div>
-		<h4>US Heart Disease Mortality rate</h4>
+		<h2>US Heart Disease Mortality rate</h2>
+	</div>
+		<p>State/county information is read in from a cache file (cache.js)</p>
+	<div>
 	</div>
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
@@ -137,7 +140,7 @@
 		var geojson_county;
 		var selection_count = 0;
 		var selection_max = 2;
-		var zoom_state_county_split = 6.0;
+		var zoom_state_county_split = 5.0;
 		var map_type_level = "state";
 		var current_zoom = 4;
 		// default values for race and gender
@@ -332,12 +335,13 @@
 								r1 = temp_r1[b].value;
 								g2 = temp_g2[c].value;
 								r2 = temp_r2[d].value;
-								execute();
+								reload_based_on_priority();
 								console.log(cache.length);
 						}
 					}
 				}
 			}
+			//save_cache_to_file();
 		}
 
 		function return_state_information(state_name, gender, race) {
@@ -360,12 +364,12 @@
 			return [return_str, mort_rate_val];
 		};
 
-		function return_county_information(county, gender, race) {
+		function return_county_information(county, state, gender, race) {
 			// return information about the state's heart disease mortality rate
 			let mort_rate_val = 0;
 			for (let i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
-				if (json_data[i][10].includes(county) && json_data[i][11] === "County" && json_data[i][21] === gender && json_data[i][23] === race) {
+				if (json_data[i][9] === state && json_data[i][10].includes(county) && json_data[i][11] === "County" && json_data[i][21] === gender && json_data[i][23] === race) {
 					// GeographicalLevel = "State"
 					mort_rate_val = json_data[i][15];
 					break;
@@ -419,7 +423,7 @@
 
 
 
-		function return_county_information_difference(county) {
+		function return_county_information_difference(county, state) {
 			// variables that will be used
 			let mort_rate_difference = 0;
 			// value_1` and value_2 are undefined at this point, will be used to know when to break out of loop
@@ -427,7 +431,7 @@
 			let value_2;
 			for (let i = 0; i < json_data.length; i++) {
 				// iterate through the json array and look for the specific county
-				if (json_data[i][10].includes(county) && json_data[i][11] === "County") {
+				if (json_data[i][9] === state && json_data[i][10].includes(county) && json_data[i][11] === "County") {
 					// once the county is correct, then look whether the gender and race for value 1 matches
 					if (json_data[i][21] === g1 && json_data[i][23] === r1) {
 						value_1 = json_data[i][15];
@@ -535,11 +539,11 @@
 				if (race_gender_inspector === "Single") {
 					// Single comparison mode
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
+						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, props.STATE,  gender, race)[0] :
 						'Hover over a county to learn more!');
 				} else {
 					// Multiple comparison mode
-					var temp = props ? return_county_information_difference(props.NAME) : null;
+					var temp = props ? return_county_information_difference(props.NAME, props.STATE) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 +
 						') mortality rate: ' + temp[2] + '<br />' + "Lookup criteria 2 : Gender(" + g2 + ") Race(" +
@@ -717,13 +721,13 @@
 			if (race_gender_inspector === "Single") {
 				// Single mode
 				// Try to get a value from cache
-				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME);
+				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME+feature.properties.STATE);
 				if (cache_lookup === undefined) {
 					//console.log("no cache");
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
-					temp = return_county_information(feature.properties.NAME, gender, race)[1];
-					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME, temp);
+					temp = return_county_information(feature.properties.NAME, feature.properties.STATE, gender, race)[1];
+					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME+feature.properties.STATE, temp);
 				} else {
 					// get the value from the cache
 					temp = cache_lookup;
@@ -733,13 +737,13 @@
 			} else {
 				// Multiple mode
 				//temp = return_county_information_difference(feature.properties.NAME)[1];
-				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME);
+				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME+feature.properties.STATE);
 				if (cache_lookup === undefined) {
 					//console.log("no cache");
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
-					temp = return_county_information_difference(feature.properties.NAME)[1];
-					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME, temp);
+					temp = return_county_information_difference(feature.properties.NAME, feature.properties.STATE)[1];
+					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME+feature.properties.STATE, temp);
 				} else {
 					// get the value from the cache
 					temp = cache_lookup;
@@ -770,18 +774,16 @@
 				onEachFeature: onEachCountyFeature
 			})
 		}
-
 		// load the data asynchrously
 		setTimeout(load_county_data, 0);
-
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
 		//
 		function reload_geojson() {
 			geojson.eachLayer(async function(layer) {
 				// get the current color of the respective layer
-				var existing_color = layer.options.fillColor;
-				var return_style;
+				let existing_color = layer.options.fillColor;
+				let return_style;
 
 				// get the new color based on the selection of the data
 				return_style = style(layer.feature);
@@ -790,15 +792,17 @@
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					sleep_time = 150;
-					number_of_blinks = 2;
-					for (var i = 0; i < number_of_blinks; i++) {
+					let sleep_time = 100;
+					let number_of_blinks = 3;
+					for (let i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
+							//fillColor: return_style.fillColor
 						});
 						await sleep(sleep_time);
 						layer.setStyle({
 							color: 'white'
+							//fillColor: existing_color
 						});
 						i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
 					}
@@ -812,18 +816,19 @@
 			geojson_county.eachLayer(async function(layer) {
 				// get the current color of the respective layer
 				// get the new color based on the selection of the data
-				var existing_color = layer.options.fillColor;
-				var return_style;
+				let existing_color = layer.options.fillColor;
+				let return_style;
 				// get the new color based on the selection of the data
 				return_style = county_style(layer.feature);
+
 				//console.log('State: ' + layer.feature.properties.name + ' Existing fill color' + existing_color + ' - ' + return_style.fillColor);
 				if (existing_color != return_style.fillColor) {
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					sleep_time = 100;
-					number_of_blinks = 2;
-					for (var i = 0; i < number_of_blinks; i++) {
+					let sleep_time = 20;
+					let number_of_blinks = 1;
+					for (let i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
 						});
