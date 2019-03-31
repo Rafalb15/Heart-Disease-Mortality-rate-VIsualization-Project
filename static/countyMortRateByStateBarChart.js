@@ -71,7 +71,10 @@ class CountyMortRateByStateBarChart {
 
     // switch between sorting alphabetically and by mort rate
     sort_bars() {
-        sortOrder = !sortOrder;
+        let sortOrder = !this.sortOrder;
+        let svg = this.svg;
+        let xScale = this.xScale;
+        this.sortOrder = sortOrder;
         svg.selectAll("rect")
             .sort(function(a, b) {
                 if (sortOrder) {
