@@ -480,9 +480,9 @@
 		// setview 4 zoom and coordinates to middle of United States
 		var map = L.map('map', {
 			// wheel mouse zoom options to enable a smoooth zooming function
-			zoomDelta: 0.25,
+			zoomDelta: 0.50,
 			zoomSnap: 0,
-			wheelPxPerZoomLevel: 200
+			wheelPxPerZoomLevel: 50
 			// setView defines the center of the map
 		}).setView([37.8, -98], current_zoom).setMaxBounds(mybounds);
 
@@ -574,6 +574,7 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		function highlightFeature(e) {
 			let layer = e.target;
+			stateMortRateByDensityScatter.highlight_state_selection(layer.feature.properties.name);
 			layer.setStyle({
 				weight: 6,
 				color: 'white',
@@ -589,6 +590,7 @@
 
 		function highlightCountyFeature(e) {
 			let layer = e.target;
+			countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
 			layer.setStyle({
 				weight: 6,
 				color: 'white',
@@ -614,14 +616,14 @@
 			info.update();
 		}
 
-		function zoomToFeature(e) {
+		function zoomToCounty(e) {
 			let layer = e.target;
-			//map.fitBounds(e.target.getBounds());
+			map.fitBounds(e.target.getBounds());
+			resetHighlight(e);
 		}
 
 		// this is what happens when a state is clicked on
 		function click_event_handler(e) {
-			zoomToFeature(e);
 			let layer = e.target;
 			state = e.target.feature.properties.name;
 			layer.setStyle({
@@ -662,7 +664,8 @@
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
-				click: click_event_handler
+				click: click_event_handler,
+				dblclick: zoomToCounty
 			});
 		}
 
@@ -1015,7 +1018,7 @@
 				} else {
 					clearInterval(fadeEffect);
 				}
-			}, 20);
+			}, 30);
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

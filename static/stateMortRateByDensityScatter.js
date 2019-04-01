@@ -30,6 +30,19 @@ class StateMortRatebyDensity {
             .text("100");
     }
 
+    highlight_state_selection(state) {
+      // define color changer based on svg's colorscale
+      let color_changer = this.colorScale;
+      // go through all of the values and look match up the map selection and the bars
+      this.svg.selectAll("circle").each(function(d, i) {
+        // the bar that is howevered over in the map will be yellow
+        if (state == d.stateName) {
+          d3.select(this).attr("fill", "yellow").attr("r", 10);
+        } else {
+          d3.select(this).attr("fill", "red").attr("r", 5);}
+      });
+    }
+
     update_scatter(){
         let data = get_state_mort_rate_by_density_data();
         let padding = this.padding;
@@ -87,7 +100,7 @@ class StateMortRatebyDensity {
         svg.append("g")
             .attr("class", "y axis")
             .attr("transform", "translate(" + padding + ",0)")
-            .call(yAxis); 
+            .call(yAxis);
     }
 }
 
@@ -95,7 +108,7 @@ addLoadEvent(function(e){
     let div = d3.select("#stateMortRateByDensity");
     let tooltip = div.append("div")
         .attr("id", "tooltip")
-        .classed("hidden", true);            
+        .classed("hidden", true);
     let scatter = div.append("div");
     let w = Math.round(document.body.clientWidth * 0.7);
     let h = Math.round(document.body.clientHeight * 0.3);
