@@ -1,5 +1,4 @@
 // County Data By State Bar Chart -DS
-console.log("blah");
 
 class CountyMortRateByStateBarChart {
     constructor(w, h, xScale, yScale, colorScale, svg, county_data_of_state) {

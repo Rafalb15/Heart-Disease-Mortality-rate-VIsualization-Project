@@ -2,11 +2,12 @@
 
 class StateMortRatebyDensity {
     constructor(w, h, container, tooltip){
-        this.w = w;
-        this.h = h;
         this.container = container;
         this.tooltip = tooltip;
         this.padding = 30;
+        this.svg = container.append("svg")
+            .attr("width", w)
+            .attr("height", h);
         this.setup_tooltip(tooltip);
         this.update_scatter();
     }
@@ -30,28 +31,25 @@ class StateMortRatebyDensity {
     }
 
     update_scatter(){
-        this.data = get_state_mort_rate_by_density_data();
+        let data = get_state_mort_rate_by_density_data();
         let padding = this.padding;
-        let data = this.data;
         let tooltip = this.tooltip;
-        this.xScale = d3.scaleLinear()
+        let svg = this.svg;
+        let h = svg.attr("height");
+        let w = svg.attr("width");
+        let xScale = d3.scaleLinear()
             .domain([0, d3.max(data, function(d){return d.density;})])
             .range([padding, w-padding*2]);
-        this.yScale = d3.scaleLinear()
+        let yScale = d3.scaleLinear()
             .domain([d3.min(data, function(d){return d.mort_rate;}), d3.max(data, function(d){return d.mort_rate;})])
             .range([h-padding, padding]);
-        let xScale = this.xScale;
-        let yScale = this.yScale;
-        this.svg = this.container.append("svg")
-            .attr("width", w)
-            .attr("height", h);
-        let svg = this.svg;
         let xAxis = d3.axisBottom()
             .scale(xScale)
             .ticks(5);
         let yAxis = d3.axisLeft()
             .scale(yScale)
             .ticks(5);
+        // make some circles
         svg.selectAll("circle")
             .data(data)
             .enter()
@@ -82,11 +80,11 @@ class StateMortRatebyDensity {
                 tooltip.classed("hidden", true);
             })
             //.attr("r", function(d){return aScale(d.mort_rate);})
-        this.svg.append("g")
+        svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0, " + (h-padding) + ")")
             .call(xAxis);
-        this.svg.append("g")
+        svg.append("g")
             .attr("class", "y axis")
             .attr("transform", "translate(" + padding + ",0)")
             .call(yAxis); 
@@ -109,6 +107,7 @@ function get_state_mort_rate_by_density_data(){
     for(let i = 0; i < json_data.length; i++){
         if(json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall"){
             let state_abbreviation = json_data[i][9];
+            // Washington DC is lying too far out
             if(state_abbreviation !== "DC"){
                 for(let j=0; j<statesData.features.length; j++){
                     let state = statesData.features[j].properties
