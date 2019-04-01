@@ -48,6 +48,7 @@ class CountyMortRateByStateBarChart {
     colorScale.domain([0, d3.max(county_data_of_state, function(d) {
       return d.mort_rate;
     })]);
+
     //Update all rects
     let bars = svg.selectAll("rect").data(county_data_of_state);
     bars.enter().append("rect")
@@ -85,6 +86,7 @@ class CountyMortRateByStateBarChart {
       });
     // remove old bars
     bars.exit().remove();
+
   }
 
   // switch between sorting alphabetically and by mort rate
@@ -152,6 +154,14 @@ addLoadEvent(function() {
       return d.mort_rate;
     })])
     .range([15, h]);
+
+    let xAxis = d3.axisBottom()
+        .scale(xScale)
+        .ticks(50);
+    let yAxis = d3.axisLeft()
+        .scale(yScale)
+        .ticks(50);
+
   // let xAxis = d3.svg.axis()
   //   .scale(xScale)
   //   .orient('bottom');
@@ -164,6 +174,15 @@ addLoadEvent(function() {
     .attr("width", w)
     .attr("height", h)
     .append("g");
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0, " + (h-50) + ")")
+        .call(xAxis);
+    svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(" + 50 + ",0)")
+        .call(yAxis);
 
   countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, xScale, yScale, colorScale, svg, county_data_of_state);
 
