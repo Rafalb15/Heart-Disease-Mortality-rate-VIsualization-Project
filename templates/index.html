@@ -12,6 +12,7 @@
 	<!-- integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" -->
 	<script src="/static/d3.js"></script>
 	<script src='//js.zapjs.com/js/download.js'></script>
+	<script src="static/setupFunctions.js"></script>
 
 
 	<style>
@@ -19,6 +20,10 @@
 		body {
 			height: 100%;
 			margin: 10;
+		}
+
+		.graph {
+			margin-top: 8px
 		}
 	</style>
 
@@ -100,18 +105,12 @@
 	</div>
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
-	<div id="bottomofpage">
+	<div id="countyMortRateByState" class="graph">
 		<script src="/static/countyMortRateByStateBarChart.js"></script>
 	</div>
-	<!-- #################################### bottomer? of page ############################################################################## -->
-	<!-- copied from lab 6 - Dennis Shen -->
-	<!--
-	<div id="tooltip" class="hidden">
-		<p><strong><span id="tooltipLabel">Important Label Heading</span></strong></p>
-		<p><span id="value">100</span></p>
+	<div id="stateMortRateByDensity" class="graph">
+		<script src="/static/stateMortRateByDensityScatter.js"></script>
 	</div>
-	<div id="graphButtons"><button type="button" id="refreshGraph">Refresh Graph</button><button type="button" id="sortGraph">sort graph</button></div>
-	-->
 	<!-- #################################### bottomest? of page ################################################################### -->
 	<!-- stolen from Dennis - Jon -->
 	
@@ -165,6 +164,8 @@
 		var selection_list = [];
 		// used to store the object which holds all information and functions to deal with the countyMortRateByStateBarChart - DS
 		var countyMortRateByStateBarChart;
+		// used to store the object which holds object dealing with stateMortRatebyDensityScatter - DS
+		var stateMortRateByDensityScatter;
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 

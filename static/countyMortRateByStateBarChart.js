@@ -1,4 +1,5 @@
 // County Data By State Bar Chart -DS
+console.log("blah");
 
 class CountyMortRateByStateBarChart {
     constructor(w, h, xScale, yScale, colorScale, svg, county_data_of_state) {
@@ -49,8 +50,6 @@ class CountyMortRateByStateBarChart {
                 return "rgb(0, 0, " + Math.round(colorScale(d.mort_rate)) + ")";
             })
             .on("mouseover", function (d) {
-                //Get this bar's x/y values, then augment for the tooltip
-                var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
                 //Update the tooltip position and value
                 d3.select("#tooltip")
                     .style("left", (w + 10) + "px")
@@ -84,7 +83,7 @@ class CountyMortRateByStateBarChart {
                 }
             })
             .transition("sort_bars")
-            .delay(300)
+            .delay(200)
             .duration(1500)
             .attr("x", function(d, i) {
                 return xScale(i);
@@ -92,9 +91,9 @@ class CountyMortRateByStateBarChart {
     }
 }
 
-window.onload = function(e){
+addLoadEvent(function(){
     
-    let div = d3.select("#bottomofpage");
+    let div = d3.select("#countyMortRateByState");
 
     let tooltip = div.append("div")
         .attr("id", "tooltip")
@@ -160,22 +159,11 @@ window.onload = function(e){
     });
     
     countyMortRateByStateBarChart.update_bars(county_data_of_state);
-}
-
-function get_state_abbreviation(state_name) {
-    for (let i = 0; i < json_data.length; i++) {
-        if (json_data[i][10] === state_name && json_data[i][11] == "State") {
-            return json_data[i][9];
-        }
-    }
-    let str = "could not find state with name " + state_name;
-    console.log(str);
-    return str;
-}
+});
 
 // a list that contains the name, state vs county type and mortality rate
 function get_county_data_of_state(state_abbreviation, gender, race) {
-    var data = [];
+    let data = [];
     for (let i = 0; i < json_data.length; i++) {
         if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race) {
             data.push({
