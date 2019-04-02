@@ -923,7 +923,7 @@
  			if (race_gender_inspector === "Single") {
 				// save the choices from the dropdowns and go forward with the animation
 				if (selection_list.length > 0) {
-					let state_abbreviation = get_state_abbreviation(selection_list[0]);
+					let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
 					let county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
 					countyMortRateByStateBarChart.update_bars(county_data_of_state);
 				}
