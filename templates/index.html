@@ -19,13 +19,32 @@
 		html,
 		body {
 			height: 100%;
-			margin: 10;
+			margin: 20;
 		}
 
 		.graph {
 			margin-top: 8px
 		}
 	</style>
+
+	<style>
+	.grow {
+  /* padding: 5px 5px 5px 5px; */
+  border-radius: 10px;
+  height: 55px;
+  width: 100%;
+  /* margin: 5px 1% 5px 1%; */
+  float: left;
+  position: relative;
+  transition: height 0.5s;
+  -webkit-transition: height 0.5s;
+  /* text-align: center; */
+  overflow: hidden;
+}
+.grow:hover {
+  height: 145px;
+}
+</style>
 
 	<style type="text/css">
 		/* copied from lab 6 - Dennis */
@@ -87,7 +106,7 @@
 		}
 	</style>
 
-	<style>#map { width: 80%; height: 60%; }
+	<style>#map { width: 100%; height: 50%}
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
 </style>
@@ -97,11 +116,19 @@
 
 <body data-gr-c-s-loaded="true">
 	<!-- #################################### TOP OF PAGE ############################################################################## -->
-	<div>
-		<h2>US Heart Disease Mortality rate</h2>
-	</div>
-	<p>State/county information is read in from a cache file (cache.js)</p>
-	<div>
+	<div class="grow" style="text-align: center">
+		<h1>US Heart Disease Mortality rate</h1>
+		<h5>Data is age-adjusted, spatially smoothed, and averaged over 3 years. Data is seperated by 5 race classes and 2 gender classes</h5>
+	</div >
+
+	<div class="grow" style="color:grey; font-size:14px">
+		<h5>Hover over to learn about map functionality</h5>
+		<!-- <p>Hover over to learn about map functionality</p> -->
+		<li>Zooming in/out on the map will expose the county or state layer depending on the zoom level</li>
+		<li>Hovering over state highlights the corresponding mark in scatterplot, while also providing information in top right of map</li>
+		<li>Hovering over county highlights the corresponding mark in bar chart, while also providing information in top right of map</li>
+		<li>Single click over state adds state to queue for further analysis, max states in queue is 2</li>
+		<li>Double click over state zooms to state's bounds and switches to county layer</li>
 	</div>
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
