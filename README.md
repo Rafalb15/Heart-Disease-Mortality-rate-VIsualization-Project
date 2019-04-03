@@ -27,4 +27,5 @@
 ~~----> show percentage change difference instead of absolute difference~~<br />
 ~~----> dynamically update legend~~<br />
 ~~---> fix county lookup~~<br />
+---> Clean up graphs<br />
 #### county data is made available by US census, data downloaded from http://eric.clst.org/tech/usgeojson/ <br />

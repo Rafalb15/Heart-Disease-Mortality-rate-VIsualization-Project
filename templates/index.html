@@ -28,23 +28,37 @@
 	</style>
 
 	<style>
-	.grow {
-  /* padding: 5px 5px 5px 5px; */
-  border-radius: 10px;
-  height: 55px;
-  width: 100%;
-  /* margin: 5px 1% 5px 1%; */
-  float: left;
-  position: relative;
-  transition: height 0.5s;
-  -webkit-transition: height 0.5s;
-  /* text-align: center; */
-  overflow: hidden;
-}
-.grow:hover {
-  height: 145px;
-}
-</style>
+		.grow_title {
+			border-radius: 10px;
+			height: 35px;
+			width: 100%;
+			float: left;
+			position: relative;
+			transition: height 0.5s;
+			-webkit-transition: height 0.5s;
+			text-align: center;
+			overflow: hidden;
+		}
+
+		.grow_title:hover {
+			height: 60px;
+		}
+
+		.grow_map_info {
+			border-radius: 10px;
+			height: 30px;
+			width: 100%;
+			float: left;
+			position: relative;
+			transition: height 0.5s;
+			-webkit-transition: height 0.5s;
+			overflow: hidden;
+		}
+
+		.grow_map_info:hover {
+			height: 130px;
+		}
+	</style>
 
 	<style type="text/css">
 		/* copied from lab 6 - Dennis */
@@ -116,13 +130,15 @@
 
 <body data-gr-c-s-loaded="true">
 	<!-- #################################### TOP OF PAGE ############################################################################## -->
-	<div class="grow" style="text-align: center">
-		<h1>US Heart Disease Mortality rate</h1>
-		<h5>Data is age-adjusted, spatially smoothed, and averaged over 3 years. Data is seperated by 5 race classes and 2 gender classes</h5>
-	</div >
-
-	<div class="grow" style="color:grey; font-size:14px">
-		<h5>Hover over to learn about map functionality</h5>
+	<div style="width:100%; ">
+		<div class="grow_title">
+			<h1 style="padding:0px; margin:0px">US Heart Disease Mortality rate</h1>
+			<h5 style="padding:0px; margin:0px">Data is age-adjusted, spatially smoothed, and averaged over 3 years. Data is seperated by 5 race classes and 2 gender classes</h5>
+		</div>
+	</div>
+	<!-- ##################################################### MAP Functionality div ############################################################################ -->
+	<div class="grow_map_info" style="color:grey; font-size:14px">
+		<h5 style="padding:10px; margin:0px">Hover over to learn about map functionality</h5>
 		<!-- <p>Hover over to learn about map functionality</p> -->
 		<li>Zooming in/out on the map will expose the county or state layer depending on the zoom level</li>
 		<li>Hovering over state highlights the corresponding mark in scatterplot, while also providing information in top right of map</li>
@@ -130,6 +146,7 @@
 		<li>Single click over state adds state to queue for further analysis, max states in queue is 2</li>
 		<li>Double click over state zooms to state's bounds and switches to county layer</li>
 	</div>
+	<!-- ##################################################### MAP ############################################################################ -->
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
 	<div id="countyMortRateByState" class="graph">
@@ -250,8 +267,8 @@
 						color = '#FED976';
 						break;
 					case (d == null):
-							color = '#BEBEBE';
-							break;
+						color = '#BEBEBE';
+						break;
 					default:
 						color = '#FFEDA0';
 						break;
@@ -947,7 +964,7 @@
 			setTimeout(function() {
 				drop_down_operator(false);
 			}, 500);
- 			if (race_gender_inspector === "Single") {
+			if (race_gender_inspector === "Single") {
 				// save the choices from the dropdowns and go forward with the animation
 				if (selection_list.length > 0) {
 					let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
@@ -976,7 +993,7 @@
 			if (race_gender_inspector === "Multiple") {
 				document.getElementById("single_selection_dropdown").style.display = "none";
 				document.getElementById("multiple_selection_dropdown").style.display = "block";
-			} else if (race_gender_inspector === "Single"){
+			} else if (race_gender_inspector === "Single") {
 				document.getElementById("single_selection_dropdown").style.display = "block";
 				document.getElementById("multiple_selection_dropdown").style.display = "none";
 			}
@@ -985,25 +1002,25 @@
 		}
 
 		function drop_down_operator(bool_val) {
-					// disable or enable dropdowns during transitions
-					// this will block the user from selecting other options while the animations are in play
-					document.getElementById("dd_gender_single1").disabled = bool_val;
-					document.getElementById("dd_race_single1").disabled = bool_val;
-					document.getElementById("dd_gender_multiple1").disabled = bool_val;
-					document.getElementById("dd_race_multiple1").disabled = bool_val;
-					document.getElementById("dd_gender_multiple2").disabled = bool_val;
-					document.getElementById("dd_race_multiple2").disabled = bool_val;
+			// disable or enable dropdowns during transitions
+			// this will block the user from selecting other options while the animations are in play
+			document.getElementById("dd_gender_single1").disabled = bool_val;
+			document.getElementById("dd_race_single1").disabled = bool_val;
+			document.getElementById("dd_gender_multiple1").disabled = bool_val;
+			document.getElementById("dd_race_multiple1").disabled = bool_val;
+			document.getElementById("dd_gender_multiple2").disabled = bool_val;
+			document.getElementById("dd_race_multiple2").disabled = bool_val;
 		};
 
 		function save_dropdown_options() {
-					// for all of the dropdowns, save the current selections into a global variable to be
-					// used in the animation
-					gender = document.getElementById("dd_gender_single1").value;
-					race = document.getElementById("dd_race_single1").value;
-					g1 = document.getElementById("dd_gender_multiple1").value;
-					g2 = document.getElementById("dd_gender_multiple2").value;
-					r1 = document.getElementById("dd_race_multiple1").value;
-					r2 = document.getElementById("dd_race_multiple2").value;
+			// for all of the dropdowns, save the current selections into a global variable to be
+			// used in the animation
+			gender = document.getElementById("dd_gender_single1").value;
+			race = document.getElementById("dd_race_single1").value;
+			g1 = document.getElementById("dd_gender_multiple1").value;
+			g2 = document.getElementById("dd_gender_multiple2").value;
+			r1 = document.getElementById("dd_race_multiple1").value;
+			r2 = document.getElementById("dd_race_multiple2").value;
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1045,7 +1062,7 @@
 				} else {
 					clearInterval(fadeEffect);
 				}
-			}, 30);
+			}, 100);
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1060,42 +1077,42 @@
 		});
 
 		legend.onAdd = function(map) {
-					// create a div with legend styling
-					this._div = L.DomUtil.create('div', 'info legend');
-					this.update();
-					return this._div;
+			// create a div with legend styling
+			this._div = L.DomUtil.create('div', 'info legend');
+			this.update();
+			return this._div;
 		};
 
 		legend.update = function() {
 			if (race_gender_inspector === "Multiple") {
-						resp_labels = [];
-						partitions = [-150, -100, -50, 0, 50, 100, 150];
-						resp_labels.push('<i style="background:' + return_Color(-151) + '"></i> ' + '-150% or more');
-						for (let i = 0; i < partitions.length - 1; i++) {
-							from = partitions[i];
-							to = partitions[i + 1];
-							if (i == 3) {
-								resp_labels.push('<i style="background:' + return_Color(0) + '"></i> ' + '0% or no data');
-							}
-							resp_labels.push(
-								'<i style="background:' + return_Color(from + 1) + '"></i> ' +
-								from + ' to ' + to + '%');
-						}
-						resp_labels.push('<i style="background:' + return_Color(151) + '"></i> ' + '150% or more');
-						this._div.innerHTML = '<h4>Mortality rate % difference</h4>' + resp_labels.join('<br>');
+				resp_labels = [];
+				partitions = [-150, -100, -50, 0, 50, 100, 150];
+				resp_labels.push('<i style="background:' + return_Color(-151) + '"></i> ' + '-150% or more');
+				for (let i = 0; i < partitions.length - 1; i++) {
+					from = partitions[i];
+					to = partitions[i + 1];
+					if (i == 3) {
+						resp_labels.push('<i style="background:' + return_Color(0) + '"></i> ' + '0% or no data');
+					}
+					resp_labels.push(
+						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
+						from + ' to ' + to + '%');
+				}
+				resp_labels.push('<i style="background:' + return_Color(151) + '"></i> ' + '150% or more');
+				this._div.innerHTML = '<h4>Mortality rate % difference</h4>' + resp_labels.join('<br>');
 			} else if (race_gender_inspector === "Single") {
-						resp_labels = [];
-						partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450];
-						resp_labels.push('<i style="background:' + return_Color(null) + '"></i> ' + 'Insufficient Data');
-						for (let i = 0; i < partitions.length; i++) {
-							// from is the first range and to is the second
-							from = partitions[i];
-							to = partitions[i + 1];
-							resp_labels.push(
-								'<i style="background:' + return_Color(from + 1) + '"></i> ' +
-								from + (to ? ' to ' + to + "" : '+'));
-						}
-						this._div.innerHTML = '<h4>Mortality rate</h4>' + resp_labels.join('<br>');
+				resp_labels = [];
+				partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450];
+				resp_labels.push('<i style="background:' + return_Color(null) + '"></i> ' + 'Insufficient Data');
+				for (let i = 0; i < partitions.length; i++) {
+					// from is the first range and to is the second
+					from = partitions[i];
+					to = partitions[i + 1];
+					resp_labels.push(
+						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
+						from + (to ? ' to ' + to + "" : '+'));
+				}
+				this._div.innerHTML = '<h4>Mortality rate</h4>' + resp_labels.join('<br>');
 			}
 		};
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
