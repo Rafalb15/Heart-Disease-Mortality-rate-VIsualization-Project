@@ -1201,6 +1201,9 @@
 		function update_grouped_barchart(state_data, strata) {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
 
+
+			svg2.selectAll("*").remove()
+
 			var data = state_data;
 			var color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -1243,8 +1246,10 @@
 				.data(function(d) {
 					return [d]
 				})
-				.enter()
+
+			bars.enter()
 				.append("rect")
+				.merge(bars)
 				.attr("x", function(d, i) {
 					return x1(d[strata])
 				})
@@ -1278,9 +1283,6 @@
 				.attr("text-anchor", "start")
 				.text("mort_rate");
 
-			// remove old bars
-			bars.exit().remove();
-
 		};
 
 		d3.select("#groupedBarChartButtons")
@@ -1293,7 +1295,7 @@
 				}
 			});
 
-		d3.select("#groupBarChartButtons")
+		d3.select("#groupedBarChartButtons")
 			.select("#selectGender")
 			.on("click", function() {
 				if (selection_list.length > 0) {
@@ -1322,9 +1324,9 @@
 
 		//Create SVG element
 		var svg2 = d3.select("body")
-			.append("svg")
-			.attr("width", w + margin.left + margin.right)
-			.attr("height", h + margin.top + margin.bottom);
+		.append("svg")
+		.attr("width", w + margin.left + margin.right)
+		.attr("height", h + margin.top + margin.bottom);
 	</script>
 
 </body>
