@@ -12,13 +12,51 @@
 	<!-- integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" -->
 	<script src="/static/d3.js"></script>
 	<script src='//js.zapjs.com/js/download.js'></script>
+	<script src="static/setupFunctions.js"></script>
 
 
 	<style>
 		html,
 		body {
 			height: 100%;
-			margin: 10;
+			margin: 20;
+		}
+
+		.graph {
+			margin-top: 8px
+		}
+	</style>
+
+	<style>
+		.grow_title {
+			border-radius: 10px;
+			height: 35px;
+			width: 100%;
+			float: left;
+			position: relative;
+			transition: height 0.5s;
+			-webkit-transition: height 0.5s;
+			text-align: center;
+			overflow: hidden;
+		}
+
+		.grow_title:hover {
+			height: 60px;
+		}
+
+		.grow_map_info {
+			border-radius: 10px;
+			height: 30px;
+			width: 100%;
+			float: left;
+			position: relative;
+			transition: height 0.5s;
+			-webkit-transition: height 0.5s;
+			overflow: hidden;
+		}
+
+		.grow_map_info:hover {
+			height: 140px;
 		}
 	</style>
 
@@ -82,7 +120,7 @@
 		}
 	</style>
 
-	<style>#map { width: 100%; height: 80%; }
+	<style>#map { width: 100%; height: 50%}
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
 </style>
@@ -92,20 +130,32 @@
 
 <body data-gr-c-s-loaded="true">
 	<!-- #################################### TOP OF PAGE ############################################################################## -->
-	<div>
-		<h4>US Heart Disease Mortality rate</h4>
+	<div style="width:100%; ">
+		<div class="grow_title">
+			<h1 style="padding:0px; margin:0px">US Heart Disease Mortality rate</h1>
+			<h5 style="padding:0px; margin:0px">Data is age-adjusted, spatially smoothed, and averaged over 3 years. Data is seperated by 5 race classes and 2 gender classes</h5>
+		</div>
 	</div>
+	<!-- ##################################################### MAP Functionality div ############################################################################ -->
+	<div class="grow_map_info" style="color:grey; font-size:13px; padding:5px; margin:0px">
+		<h5 >Hover over to learn about map functionality</h5>
+		<!-- <p>Hover over to learn about map functionality</p> -->
+		<li>Zooming in/out on the map will expose the county or state layer, depending on the zoom level</li>
+		<li>Hovering over state highlights the corresponding mark in scatterplot, also providing information in top right of map</li>
+		<li>Hovering over county highlights the corresponding mark in bar chart, also providing information in top right of map</li>
+		<li>Single click on state adds state to queue for further analysis, max states in queue is 2</li>
+		<li>Double click on state zooms to state's bounds and switches to county layer</li>
+		<li>Double click on county zooms out to state layer</li>
+	</div>
+	<!-- ##################################################### MAP ############################################################################ -->
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
-	<div id="bottomofpage"></div>
-	<!-- #################################### bottomer? of page ############################################################################## -->
-	<!-- copied from lab 6 - Dennis Shen -->
-	<div id="tooltip" class="hidden">
-		<p><strong><span id="tooltipLabel">Important Label Heading</span></strong></p>
-		<p><span id="value">100</span></p>
+	<div id="countyMortRateByState" class="graph">
+		<script src="/static/countyMortRateByStateBarChart.js"></script>
 	</div>
-	<div id="graphButtons"><button type="button" id="refreshGraph">Refresh Graph</button><button type="button" id="sortGraph">sort graph</button></div>
-
+	<div id="stateMortRateByDensity" class="graph">
+		<script src="/static/stateMortRateByDensityScatter.js"></script>
+	</div>
 	<!-- #################################### bottomest? of page ################################################################### -->
 	<!-- stolen from Dennis - Jon -->
 
@@ -135,9 +185,8 @@
 		var json_data = heart_disease_data.data;
 		var geojson;
 		var geojson_county;
-		var selection_count = 0;
-		var selection_max = 2;
-		var zoom_state_county_split = 6.0;
+
+		var zoom_state_county_split = 5.0;
 		var map_type_level = "state";
 		var current_zoom = 4;
 		// default values for race and gender
@@ -157,12 +206,20 @@
 		// contains the list of states that have been clicked on, only two states are allowed to be selected at a timeout
 		// selecting additional state will override previous selections
 		var selection_list = [];
+		// add MA to the queue
+		selection_list.push("Massachusetts");
+		var selection_count = selection_list.length;
+		var selection_max = 2;
+		// used to store the object which holds all information and functions to deal with the countyMortRateByStateBarChart - DS
+		var countyMortRateByStateBarChart;
+		// used to store the object which holds object dealing with stateMortRatebyDensityScatter - DS
+		var stateMortRateByDensityScatter;
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 		function return_avg(array) {
 			// find the average from a list, return the average only if the length of the array is more than 0
-			var sum, avg = 0;
+			let sum, avg = 0;
 			if (array.length != 0) {
 				sum = array.reduce(function(a, b) {
 					return a + b;
@@ -176,12 +233,11 @@
 		}
 
 
-
 		// Return color HEX color based on d value
 		// Single map mode has a sequential map style
 		// Multiple map mode has a diverging map style
 		function return_Color(d) {
-			var color;
+			let color;
 			if (race_gender_inspector === "Single") {
 				switch (true) {
 					case (d > 450):
@@ -210,6 +266,9 @@
 						break;
 					case (d > 50):
 						color = '#FED976';
+						break;
+					case (d == null):
+						color = '#BEBEBE';
 						break;
 					default:
 						color = '#FFEDA0';
@@ -264,7 +323,7 @@
 
 
 		function save_cache_to_file() {
-			var cache_as_json = JSON.stringify(cache);
+			let cache_as_json = JSON.stringify(cache);
 			download(cache_as_json, "cache_contents.txt", "text/plain");
 		}
 
@@ -324,20 +383,21 @@
 			let temp_g2 = document.getElementById('dd_gender_multiple2').options;
 			let temp_r2 = document.getElementById('dd_race_multiple2').options;
 			let i = 0;
-			for (let a = 0; a < temp_g1.length; a++){
-				for (let b = 0; b < temp_r1.length; b++){
-					for (let c = 0; c < temp_g2.length; c++){
-						for (let d = 0; d < temp_r2.length; d++){
-								g1 = temp_g1[a].value;
-								r1 = temp_r1[b].value;
-								g2 = temp_g2[c].value;
-								r2 = temp_r2[d].value;
-								execute();
-								console.log(cache.length);
+			for (let a = 0; a < temp_g1.length; a++) {
+				for (let b = 0; b < temp_r1.length; b++) {
+					for (let c = 0; c < temp_g2.length; c++) {
+						for (let d = 0; d < temp_r2.length; d++) {
+							g1 = temp_g1[a].value;
+							r1 = temp_r1[b].value;
+							g2 = temp_g2[c].value;
+							r2 = temp_r2[d].value;
+							reload_based_on_priority();
+							console.log(cache.length);
 						}
 					}
 				}
 			}
+			//save_cache_to_file();
 		}
 
 		function return_state_information(state_name, gender, race) {
@@ -360,12 +420,12 @@
 			return [return_str, mort_rate_val];
 		};
 
-		function return_county_information(county, gender, race) {
+		function return_county_information(county, state, gender, race) {
 			// return information about the state's heart disease mortality rate
 			let mort_rate_val = 0;
 			for (let i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
-				if (json_data[i][10].includes(county) && json_data[i][11] === "County" && json_data[i][21] === gender && json_data[i][23] === race) {
+				if (json_data[i][9] === state && json_data[i][10].includes(county) && json_data[i][11] === "County" && json_data[i][21] === gender && json_data[i][23] === race) {
 					// GeographicalLevel = "State"
 					mort_rate_val = json_data[i][15];
 					break;
@@ -419,7 +479,7 @@
 
 
 
-		function return_county_information_difference(county) {
+		function return_county_information_difference(county, state) {
 			// variables that will be used
 			let mort_rate_difference = 0;
 			// value_1` and value_2 are undefined at this point, will be used to know when to break out of loop
@@ -427,7 +487,7 @@
 			let value_2;
 			for (let i = 0; i < json_data.length; i++) {
 				// iterate through the json array and look for the specific county
-				if (json_data[i][10].includes(county) && json_data[i][11] === "County") {
+				if (json_data[i][9] === state && json_data[i][10].includes(county) && json_data[i][11] === "County") {
 					// once the county is correct, then look whether the gender and race for value 1 matches
 					if (json_data[i][21] === g1 && json_data[i][23] === r1) {
 						value_1 = json_data[i][15];
@@ -465,9 +525,9 @@
 		// setview 4 zoom and coordinates to middle of United States
 		var map = L.map('map', {
 			// wheel mouse zoom options to enable a smoooth zooming function
-			zoomDelta: 0.25,
+			zoomDelta: 0.50,
 			zoomSnap: 0,
-			wheelPxPerZoomLevel: 200
+			wheelPxPerZoomLevel: 50
 			// setView defines the center of the map
 		}).setView([37.8, -98], current_zoom).setMaxBounds(mybounds);
 
@@ -521,7 +581,7 @@
 						'Hover over a state to learn more!');
 				} else {
 					// Multiple comparison mode
-					var temp = props ? return_state_information_difference(props.abbreviation) : null;
+					let temp = props ? return_state_information_difference(props.abbreviation) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Lookup criteria 1 : Gender(" + g1 +
 						") Race(" + r1 +
@@ -535,11 +595,11 @@
 				if (race_gender_inspector === "Single") {
 					// Single comparison mode
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, gender, race)[0] :
+						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, props.STATE, gender, race)[0] :
 						'Hover over a county to learn more!');
 				} else {
 					// Multiple comparison mode
-					var temp = props ? return_county_information_difference(props.NAME) : null;
+					let temp = props ? return_county_information_difference(props.NAME, props.STATE) : null;
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
 						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 +
 						') mortality rate: ' + temp[2] + '<br />' + "Lookup criteria 2 : Gender(" + g2 + ") Race(" +
@@ -559,6 +619,7 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		function highlightFeature(e) {
 			let layer = e.target;
+			stateMortRateByDensityScatter.highlight_state_selection(layer.feature.properties.name);
 			layer.setStyle({
 				weight: 6,
 				color: 'white',
@@ -574,6 +635,7 @@
 
 		function highlightCountyFeature(e) {
 			let layer = e.target;
+			countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
 			layer.setStyle({
 				weight: 6,
 				color: 'white',
@@ -599,14 +661,20 @@
 			info.update();
 		}
 
-		function zoomToFeature(e) {
-			var layer = e.target;
-			//map.fitBounds(e.target.getBounds());
+		function zoomToCounty(e) {
+			let layer = e.target;
+			map.fitBounds(e.target.getBounds());
+			resetHighlight(e);
+		}
+
+		function zoomOutToState(e) {
+			let layer = e.target;
+			map.setView([37.8, -98], 5);
+			resetHighlightCounty(e);
 		}
 
 		// this is what happens when a state is clicked on
 		function click_event_handler(e) {
-			zoomToFeature(e);
 			let layer = e.target;
 			state = e.target.feature.properties.name;
 			layer.setStyle({
@@ -632,9 +700,8 @@
 			queue.update();
 			// update Dennis's graph based on the selection
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
-			county_data_of_state = get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race);
-			update_bars(get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race));
-			sortOrder = false;
+			let county_data_of_state = get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race);
+			countyMortRateByStateBarChart.update_bars(county_data_of_state);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -648,7 +715,8 @@
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
-				click: click_event_handler
+				click: click_event_handler,
+				dblclick: zoomToCounty
 			});
 		}
 
@@ -657,7 +725,8 @@
 			// this function determines what kind of event driven functionality exists for the layers
 			layer.on({
 				mouseover: highlightCountyFeature,
-				mouseout: resetHighlightCounty
+				mouseout: resetHighlightCounty,
+				dblclick: zoomOutToState
 			});
 		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -717,13 +786,13 @@
 			if (race_gender_inspector === "Single") {
 				// Single mode
 				// Try to get a value from cache
-				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME);
+				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE);
 				if (cache_lookup === undefined) {
 					//console.log("no cache");
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
-					temp = return_county_information(feature.properties.NAME, gender, race)[1];
-					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME, temp);
+					temp = return_county_information(feature.properties.NAME, feature.properties.STATE, gender, race)[1];
+					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE, temp);
 				} else {
 					// get the value from the cache
 					temp = cache_lookup;
@@ -733,13 +802,13 @@
 			} else {
 				// Multiple mode
 				//temp = return_county_information_difference(feature.properties.NAME)[1];
-				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME);
+				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE);
 				if (cache_lookup === undefined) {
 					//console.log("no cache");
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
-					temp = return_county_information_difference(feature.properties.NAME)[1];
-					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME, temp);
+					temp = return_county_information_difference(feature.properties.NAME, feature.properties.STATE)[1];
+					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE, temp);
 				} else {
 					// get the value from the cache
 					temp = cache_lookup;
@@ -770,18 +839,16 @@
 				onEachFeature: onEachCountyFeature
 			})
 		}
-
 		// load the data asynchrously
 		setTimeout(load_county_data, 0);
-
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
 		//
 		function reload_geojson() {
 			geojson.eachLayer(async function(layer) {
 				// get the current color of the respective layer
-				var existing_color = layer.options.fillColor;
-				var return_style;
+				let existing_color = layer.options.fillColor;
+				let return_style;
 
 				// get the new color based on the selection of the data
 				return_style = style(layer.feature);
@@ -790,15 +857,17 @@
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					sleep_time = 150;
-					number_of_blinks = 2;
-					for (var i = 0; i < number_of_blinks; i++) {
+					let sleep_time = 100;
+					let number_of_blinks = 2;
+					for (let i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
+							//fillColor: return_style.fillColor
 						});
 						await sleep(sleep_time);
 						layer.setStyle({
 							color: 'white'
+							//fillColor: existing_color
 						});
 						i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
 					}
@@ -812,18 +881,19 @@
 			geojson_county.eachLayer(async function(layer) {
 				// get the current color of the respective layer
 				// get the new color based on the selection of the data
-				var existing_color = layer.options.fillColor;
-				var return_style;
+				let existing_color = layer.options.fillColor;
+				let return_style;
 				// get the new color based on the selection of the data
 				return_style = county_style(layer.feature);
+
 				//console.log('State: ' + layer.feature.properties.name + ' Existing fill color' + existing_color + ' - ' + return_style.fillColor);
 				if (existing_color != return_style.fillColor) {
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					sleep_time = 100;
-					number_of_blinks = 2;
-					for (var i = 0; i < number_of_blinks; i++) {
+					let sleep_time = 20;
+					let number_of_blinks = 1;
+					for (let i = 0; i < number_of_blinks; i++) {
 						layer.setStyle({
 							color: 'red'
 						});
@@ -897,25 +967,17 @@
 		function execute() {
 			// save the choices from the dropdowns and go forward with the animation
 			save_dropdown_options();
-			if (race_gender_inspector === "Multiple") {
-				drop_down_operator(true);
-				reload_based_on_priority();
-				setTimeout(function() {
-					drop_down_operator(false);
-				}, 500);
-			} else {
+			drop_down_operator(true);
+			reload_based_on_priority();
+			setTimeout(function() {
+				drop_down_operator(false);
+			}, 500);
+			if (race_gender_inspector === "Single") {
 				// save the choices from the dropdowns and go forward with the animation
-				drop_down_operator(true);
-				reload_based_on_priority();
-				setTimeout(function() {
-					drop_down_operator(false);
-				}, 500);
 				if (selection_list.length > 0) {
-					//New values for dataset
-					var state_abbreviation = get_state_abbreviation(selection_list[0]);
-					county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-					update_bars(county_data_of_state);
-					sortOrder = false;
+					let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
+					let county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
+					countyMortRateByStateBarChart.update_bars(county_data_of_state);
 				}
 			}
 		}
@@ -923,9 +985,9 @@
 		window.radio_change = function() {
 			// Based on the radio button selection, display different set of divs to the user
 			// first, get the radio button value to determine where the user has clicked
-			var curr_selection;
-			var radio_choice = document.getElementsByName("radio_comp_type");
-			for (var i = 0; i < radio_choice.length; i++) {
+			let curr_selection;
+			let radio_choice = document.getElementsByName("radio_comp_type");
+			for (let i = 0; i < radio_choice.length; i++) {
 				if (radio_choice[i].checked) {
 					curr_selection = radio_choice[i].value;
 					// once the current selection is found, then break out from the loop and save the value
@@ -936,15 +998,14 @@
 			// When the user changes selection using the radio button, save user's choices and then
 			// change the radio button options
 			race_gender_inspector = curr_selection;
-			if (curr_selection === "Multiple") {
+			if (race_gender_inspector === "Multiple") {
 				document.getElementById("single_selection_dropdown").style.display = "none";
 				document.getElementById("multiple_selection_dropdown").style.display = "block";
-				legend.update();
-			} else {
+			} else if (race_gender_inspector === "Single") {
 				document.getElementById("single_selection_dropdown").style.display = "block";
 				document.getElementById("multiple_selection_dropdown").style.display = "none";
-				legend.update();
 			}
+			legend.update();
 			setTimeout(reload_based_on_priority(), 0);
 		}
 
@@ -1000,7 +1061,7 @@
 
 		function fade_Out_Effect(div) {
 			// decrease the opacity of the div by 0.01 every 20 ms, to provide a smooth fadeout effect
-			var fadeEffect = setInterval(function() {
+			let fadeEffect = setInterval(function() {
 				if (!div.style.opacity) {
 					div.style.opacity = 1;
 				}
@@ -1009,11 +1070,12 @@
 				} else {
 					clearInterval(fadeEffect);
 				}
-			}, 20);
+			}, 100);
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+		// Moved all my things to static/countyMortRateByStateBarChart.js
+		let body = document.getElementsByTagName("body")[0];
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Legend displays the color of the states that is corresponding to the mortaility rate
@@ -1034,27 +1096,26 @@
 				resp_labels = [];
 				partitions = [-150, -100, -50, 0, 50, 100, 150];
 				resp_labels.push('<i style="background:' + return_Color(-151) + '"></i> ' + '-150% or more');
-				for (var i = 0; i < partitions.length - 1; i++) {
+				for (let i = 0; i < partitions.length - 1; i++) {
 					from = partitions[i];
 					to = partitions[i + 1];
 					if (i == 3) {
 						resp_labels.push('<i style="background:' + return_Color(0) + '"></i> ' + '0% or no data');
 					}
-					// add to screen
 					resp_labels.push(
 						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
 						from + ' to ' + to + '%');
 				}
 				resp_labels.push('<i style="background:' + return_Color(151) + '"></i> ' + '150% or more');
 				this._div.innerHTML = '<h4>Mortality rate % difference</h4>' + resp_labels.join('<br>');
-			} else {
+			} else if (race_gender_inspector === "Single") {
 				resp_labels = [];
 				partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450];
-				for (var i = 0; i < partitions.length; i++) {
+				resp_labels.push('<i style="background:' + return_Color(null) + '"></i> ' + 'Insufficient Data');
+				for (let i = 0; i < partitions.length; i++) {
 					// from is the first range and to is the second
 					from = partitions[i];
 					to = partitions[i + 1];
-					// add to screen
 					resp_labels.push(
 						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
 						from + (to ? ' to ' + to + "" : '+'));
@@ -1072,182 +1133,18 @@
 		queue.addTo(map);
 		// disable double click from zooming in the map
 		map.doubleClickZoom.disable();
-		// add MA to the queue
-		selection_list.push("Massachusetts");
+
 		queue.update();
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		var body = document.getElementsByTagName('body')[0]
+
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		var w = Math.round(body.clientWidth * 0.7);
 		var h = Math.round(body.clientHeight * 0.3);
-
-		function get_state_abbreviation(state_name) {
-			for (let i = 0; i < json_data.length; i++) {
-				if (json_data[i][10] === state_name && json_data[i][11] == "State") {
-					return json_data[i][9];
-				}
-			}
-			let str = "could not find state with name " + state_name;
-			console.log(str);
-			return str;
-		};
-
-		// a list that contains the name, state vs county type and mortality rate
-		function get_county_data_of_state(state_abbreviation, gender, race) {
-			var data = [];
-			for (let i = 0; i < json_data.length; i++) {
-				if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race) {
-					data.push({
-						county: json_data[i][10],
-						type: json_data[i][11],
-						mort_rate: json_data[i][15]
-					});
-				}
-			}
-			if (data.length === 0) {
-				console.log('did not find any state/counties with matching state abbreviation ' + state_abbreviation);
-			}
-			return data;
-		};
-
-		function update_bars(county_data_of_state) {
-			// update scales
-			xScale.domain(d3.range(county_data_of_state.length));
-			yScale.domain([0, d3.max(county_data_of_state, function(d) {
-				return d.mort_rate;
-			})]);
-			colorScale.domain([0, d3.max(county_data_of_state, function(d) {
-				return d.mort_rate;
-			})]);
-
-			//Update all rects
-			var bars = svg.selectAll("rect").data(county_data_of_state);
-
-			bars.enter().append("rect")
-				.merge(bars)
-				.attr("x", function(d, i) {
-					return xScale(i);
-				})
-				.attr("y", function(d) {
-					return h - yScale(d.mort_rate) + 5;
-				})
-				.attr("width", xScale.bandwidth())
-				.attr("height", function(d) {
-					return yScale(d.mort_rate);
-				})
-				.attr("fill", function(d) {
-					if (d.type === "State") {
-						return "green";
-					}
-					return "rgb(0, 0, " + Math.round(colorScale(d.mort_rate)) + ")";
-
-				})
-				.on("mouseover", function(d) {
-
-					//Get this bar's x/y values, then augment for the tooltip
-					var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
-					//var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
-
-					//Update the tooltip position and value
-					d3.select("#tooltip")
-						.style("left", (w + 10) + "px")
-						//.style("top", yPosition + "px")
-						.select("#value")
-						.text(d.mort_rate + "/100K");
-
-					d3.select("#tooltip").select("#tooltipLabel").text(d.county)
-
-					//Show the tooltip
-					d3.select("#tooltip").classed("hidden", false);
-
-				})
-				.on("mouseout", function() {
-					//Hide the tooltip
-					d3.select("#tooltip").classed("hidden", true);
-
-				});
-			// remove old bars
-			bars.exit().remove();
-		};
-
-		// should be sorted alphabetcally by default
-		var sortOrder = false;
-
-		// switch between sorting alphabetically and by mort rate
-		function sort_bars() {
-			sortOrder = !sortOrder;
-			svg.selectAll("rect")
-				.sort(function(a, b) {
-					if (sortOrder) {
-						return d3.descending(a.mort_rate, b.mort_rate);
-					} else {
-						return d3.ascending(a.county, b.county);
-					}
-				})
-				.transition("sort_bars")
-				.delay(300)
-				.duration(1500)
-				.attr("x", function(d, i) {
-					return xScale(i);
-				});
-		};
-
-		d3.select("#graphButtons")
-			.select("#refreshGraph")
-			.on("click", function() {
-
-				if (selection_list.length > 0) {
-					//New values for dataset
-					var state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
-					county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-					update_bars(county_data_of_state);
-					sortOrder = false;
-				}
-			});
-
-		d3.select("#graphButtons")
-			.select("#sortGraph")
-			.on("click", function() {
-				sort_bars();
-			});
-
-
-		var county_data_of_state = get_county_data_of_state("MA", gender, race);
-
-		// returns an array of d3 scales to use with the county_data_of_state dataset
-		var xScale = d3.scaleBand()
-			.domain(d3.range(county_data_of_state.length))
-			.rangeRound([0, w])
-			.paddingInner(0.05);
-
-		var yScale = d3.scaleLinear()
-			.domain([0, d3.max(county_data_of_state, function(d) {
-				return d.mort_rate;
-			})])
-			.range([15, h]);
-
-		var colorScale = d3.scaleLinear()
-			.domain([0, d3.max(county_data_of_state, function(d) {
-				return d.mort_rate;
-			})])
-			.range([0, 255]);
-
-
-
-		var svg = d3.select("body")
-			.append("svg")
-			.attr("width", w)
-			.attr("height", h)
-			.append("g");
-
-		update_bars(county_data_of_state);
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		var width = Math.round(body.clientWidth * 0.7);
-		var height = Math.round(body.clientHeight * 0.3);
 
 		// kludgy functions
 		function get_state_data_overall(state_name) {
@@ -1304,16 +1201,17 @@
 		function update_grouped_barchart(state_data, strata) {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
 
+
 			svg2.selectAll("*").remove()
 
-			var data = state_data;		
+			var data = state_data;
 			var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 			var x = d3.scaleBand().rangeRound([0, w]).padding(0.1)
 			var y = d3.scaleLinear().rangeRound([h, 0]);
 
 			var g = svg2.append("g")
-			           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");			
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 			var ymaxdomain = d3.max(data, function(d) {
 				return d.mort_rate;
@@ -1366,7 +1264,7 @@
 					return color(d[strata])
 				})
 
-			// add x-axis	
+			// add x-axis
 			g.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(0," + h + ")")
@@ -1417,15 +1315,18 @@
 				}
 			});
 
-		var margin = {top: 20, right: 20, bottom: 30, left: 40};
+		var margin = {
+			top: 20,
+			right: 20,
+			bottom: 30,
+			left: 40
+		};
 
 		//Create SVG element
 		var svg2 = d3.select("body")
 		.append("svg")
 		.attr("width", w + margin.left + margin.right)
 		.attr("height", h + margin.top + margin.bottom);
-
-		//update_bars(state_data);
 	</script>
 
 </body>
