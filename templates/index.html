@@ -25,9 +25,7 @@
 		.graph {
 			margin-top: 8px
 		}
-	</style>
 
-	<style>
 		.grow_title {
 			border-radius: 10px;
 			height: 35px;
@@ -129,7 +127,10 @@
 </head>
 
 <body data-gr-c-s-loaded="true">
-	<!-- #################################### TOP OF PAGE ############################################################################## -->
+	<!-- ########################################################################################################################### -->
+	<!-- ########################################################################################################################### -->
+	<!-- #################################### DIVS ############################################################################## -->
+	<!-- ########################################################################################################################### -->
 	<div style="width:100%; ">
 		<div class="grow_title">
 			<h1 style="padding:0px; margin:0px">US Heart Disease Mortality rate</h1>
@@ -143,7 +144,7 @@
 		<li>Zooming in/out on the map will alternate between county or state layer, depending on the zoom level</li>
 		<li>Hovering over state highlights the corresponding mark in scatterplot, also providing information in top right of map</li>
 		<li>Hovering over county highlights the corresponding mark in bar chart, also providing information in top right of map</li>
-		<li>Single click on state adds state to queue for further analysis, max states in queue is 2</li>
+		<li>Single click on state adds state to queue for further analysis, max states in queue is 4</li>
 		<li>Double click on state zooms to state's bounds and switches to county layer</li>
 		<li>Double click on county zooms out to state layer</li>
 	</div>
@@ -157,7 +158,7 @@
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<label onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart">Grouped bar chart</label>
 	</div>
-
+	<!-- #################################### radio buttons below map ################################################################### -->
 	<div id="countyMortRateByState" class="graph">
 		<script src="/static/countyMortRateByStateBarChart.js"></script>
 	</div>
@@ -166,27 +167,25 @@
 	</div>
 	<!-- #################################### bottomest? of page ################################################################### -->
 	<!-- stolen from Dennis - Jon -->
-
 	<div id="tooltip2" class="hidden">
 		<p><strong><span id="tooltipLabel">Important Label Heading</span></strong></p>
 		<p><span id="value">100</span></p>
 	</div>
 	<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button>
 		<div id="jonsgraph" class="graph">
-		</div></div>
-
+		</div>
+	</div>
+	<!-- ########################################################################################################################### -->
+	<!-- ########################################################################################################################### -->
 	<!-- #################################### SCRIPTS ############################################################################## -->
+	<!-- ########################################################################################################################### -->
 	<!-- source: https://leafletjs.com/examples/choropleth/ -->
+	<!-- MAP js files  -->
 	<script type="text/javascript" src="/static/us-states.js"></script>
-
-	<!-- this is the data from the data.gov -->
 	<script type="text/javascript" src="/static/data_as_json.js"></script>
-
-	<!-- this is the data from http://eric.clst.org/tech/usgeojson/ -->
 	<script type="text/javascript" src="/static/gz_2010_us_050_00_20m.js"></script>
-
 	<script type="text/javascript" src="/static/cache.js"></script>
-
+	<!-- end MAP js files  -->
 
 	<script type="text/javascript">
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -219,7 +218,7 @@
 		// add MA to the queue
 		selection_list.push("Massachusetts");
 		var selection_count = selection_list.length;
-		var selection_max = 2;
+		var selection_max = 4;
 		// used to store the object which holds all information and functions to deal with the countyMortRateByStateBarChart - DS
 		var countyMortRateByStateBarChart;
 		// used to store the object which holds object dealing with stateMortRatebyDensityScatter - DS
@@ -567,6 +566,7 @@
 			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
 			id: 'mapbox.light'
 		}).addTo(map);
+
 		graph_selection_change();
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -968,43 +968,41 @@
 
 		function reload_based_on_priority() {
 			if (map_type_level === "state") {
-				// if the current zoom is state, reload state level geojson
-				reload_geojson();
-				reload_geojson_county();
+					// if the current zoom is state, reload state level geojson
+					reload_geojson();
+					reload_geojson_county();
 			} else {
-				// if the current zoom is county, reload state level geojson
-				reload_geojson_county();
-				reload_geojson();
+					// if the current zoom is county, reload state level geojson
+					reload_geojson_county();
+					reload_geojson();
 			}
 		}
 
 		function graph_selection_change() {
-				// Based on the radio button selection, display different set of divs to the user
-				// first, get the radio button value to determine where the user has clicked
-				let curr_selection;
-				let radio_choice = document.getElementsByName("radio_graph_select");
-				for (let i = 0; i < radio_choice.length; i++) {
-					if (radio_choice[i].checked) {
-						curr_selection = radio_choice[i].value;
-						// once the current selection is found, then break out from the loop and save the value
-						break;
-					}
+			// Based on the radio button selection, display different set of divs to the user
+			// first, get the radio button value to determine where the user has clicked
+			let curr_selection;
+			let radio_choice = document.getElementsByName("radio_graph_select");
+			for (let i = 0; i < radio_choice.length; i++) {
+				if (radio_choice[i].checked) {
+					curr_selection = radio_choice[i].value;
+					// once the current selection is found, then break out from the loop and save the value
+					break;
 				}
-				if (curr_selection === "county_bar_chart"){
+			}
+			if (curr_selection === "county_bar_chart") {
 					document.getElementById("countyMortRateByState").style.display = "block";
 					document.getElementById("stateMortRateByDensity").style.display = "none";
 					document.getElementById("groupedBarChartButtons").style.display = "none";
-				}
-				else if (curr_selection === "density_vs_mort_rate_scatter"){
+			} else if (curr_selection === "density_vs_mort_rate_scatter") {
 					document.getElementById("countyMortRateByState").style.display = "none";
 					document.getElementById("stateMortRateByDensity").style.display = "block";
 					document.getElementById("groupedBarChartButtons").style.display = "none";
-				}
-				else if (curr_selection === "state_comp_bar_chart"){
+			} else if (curr_selection === "state_comp_bar_chart") {
 					document.getElementById("countyMortRateByState").style.display = "none";
 					document.getElementById("stateMortRateByDensity").style.display = "none";
 					document.getElementById("groupedBarChartButtons").style.display = "block";
-				}
+			}
 		}
 
 		function execute() {
