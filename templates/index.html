@@ -138,9 +138,9 @@
 	</div>
 	<!-- ##################################################### MAP Functionality div ############################################################################ -->
 	<div class="grow_map_info" style="color:grey; font-size:13px; padding:5px; margin:0px">
-		<h5 >Hover over to learn about map functionality</h5>
+		<h5>Hover over to learn about map functionality</h5>
 		<!-- <p>Hover over to learn about map functionality</p> -->
-		<li>Zooming in/out on the map will expose the county or state layer, depending on the zoom level</li>
+		<li>Zooming in/out on the map will alternate between county or state layer, depending on the zoom level</li>
 		<li>Hovering over state highlights the corresponding mark in scatterplot, also providing information in top right of map</li>
 		<li>Hovering over county highlights the corresponding mark in bar chart, also providing information in top right of map</li>
 		<li>Single click on state adds state to queue for further analysis, max states in queue is 2</li>
@@ -150,6 +150,14 @@
 	<!-- ##################################################### MAP ############################################################################ -->
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
+	<div id="graph_selector" style="color:grey; font-size:13px; padding:5px; margin:0px">
+		<label onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="county_bar_chart" checked>County mortality rate bar chart</label>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<label onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="density_vs_mort_rate_scatter">Density vs Mortality rate scatterplot</label>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<label onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart">Grouped bar chart</label>
+	</div>
+
 	<div id="countyMortRateByState" class="graph">
 		<script src="/static/countyMortRateByStateBarChart.js"></script>
 	</div>
@@ -163,7 +171,9 @@
 		<p><strong><span id="tooltipLabel">Important Label Heading</span></strong></p>
 		<p><span id="value">100</span></p>
 	</div>
-	<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button></div>
+	<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button>
+		<div id="jonsgraph" class="graph">
+		</div></div>
 
 	<!-- #################################### SCRIPTS ############################################################################## -->
 	<!-- source: https://leafletjs.com/examples/choropleth/ -->
@@ -555,6 +565,7 @@
 			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
 			id: 'mapbox.light'
 		}).addTo(map);
+		graph_selection_change();
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -963,6 +974,34 @@
 			}
 		}
 
+		function graph_selection_change() {
+				// Based on the radio button selection, display different set of divs to the user
+				// first, get the radio button value to determine where the user has clicked
+				let curr_selection;
+				let radio_choice = document.getElementsByName("radio_graph_select");
+				for (let i = 0; i < radio_choice.length; i++) {
+					if (radio_choice[i].checked) {
+						curr_selection = radio_choice[i].value;
+						// once the current selection is found, then break out from the loop and save the value
+						break;
+					}
+				}
+				if (curr_selection === "county_bar_chart"){
+					document.getElementById("countyMortRateByState").style.display = "block";
+					document.getElementById("stateMortRateByDensity").style.display = "none";
+					document.getElementById("groupedBarChartButtons").style.display = "none";
+				}
+				else if (curr_selection === "density_vs_mort_rate_scatter"){
+					document.getElementById("countyMortRateByState").style.display = "none";
+					document.getElementById("stateMortRateByDensity").style.display = "block";
+					document.getElementById("groupedBarChartButtons").style.display = "none";
+				}
+				else if (curr_selection === "state_comp_bar_chart"){
+					document.getElementById("countyMortRateByState").style.display = "none";
+					document.getElementById("stateMortRateByDensity").style.display = "none";
+					document.getElementById("groupedBarChartButtons").style.display = "block";
+				}
+		}
 
 		function execute() {
 			// save the choices from the dropdowns and go forward with the animation
@@ -1323,10 +1362,10 @@
 		};
 
 		//Create SVG element
-		var svg2 = d3.select("body")
-		.append("svg")
-		.attr("width", w + margin.left + margin.right)
-		.attr("height", h + margin.top + margin.bottom);
+		var svg2 = d3.select("#jonsgraph")
+			.append("svg")
+			.attr("width", w + margin.left + margin.right)
+			.attr("height", h + margin.top + margin.bottom);
 	</script>
 
 </body>
