@@ -45,9 +45,9 @@
 		.grow_map_info {
 			border-radius: 10px;
 			height: 30px;
-			width: 100%;
+			width: 50%;
 			float: left;
-			position: relative;
+			position: left;
 			transition: height 0.5s;
 			-webkit-transition: height 0.5s;
 			overflow: hidden;
@@ -714,7 +714,8 @@
 			// update Dennis's graph based on the selection
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			let county_data_of_state = get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race);
-			countyMortRateByStateBarChart.update_bars(county_data_of_state);
+
+			countyMortRateByStateBarChart.update_bars(county_data_of_state, e.target.feature.properties.abbreviation, gender, race);
 			state_data = get_state_data_gender(selection_list);
 			update_grouped_barchart(state_data, jons_graph_type);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1018,7 +1019,7 @@
 				if (selection_list.length > 0) {
 					let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
 					let county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-					countyMortRateByStateBarChart.update_bars(county_data_of_state);
+					countyMortRateByStateBarChart.update_bars(county_data_of_state, state_abbreviation, gender, race);
 				}
 			}
 		}

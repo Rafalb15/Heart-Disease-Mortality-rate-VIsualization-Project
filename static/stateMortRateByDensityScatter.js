@@ -81,7 +81,7 @@ class StateMortRatebyDensity {
         return yScale(d.mort_rate);
       })
       .attr("r", 5)
-      .attr("fill-opacity", 0.5)
+      .attr("fill-opacity", 0.7)
       .attr("stroke", "black")
       .attr("stroke-width", 1)
       .attr("fill", "red")
