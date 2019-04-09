@@ -28,4 +28,6 @@
 ~~----> dynamically update legend~~<br />
 ~~---> fix county lookup~~<br />
 ---> Clean up graphs<br />
+
 #### county data is made available by US census, data downloaded from http://eric.clst.org/tech/usgeojson/ <br />
+#### state data was shared by Mike Bostock, https://leafletjs.com/examples/choropleth/ <br />

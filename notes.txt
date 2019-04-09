@@ -1,4 +1,0 @@
-look at us-states.js and add data
-
-must start up a python server
-python -m http.server 8000
