@@ -13,6 +13,45 @@ class CountyMortRateByStateBarChart {
     this.sortOrder = false;
   }
 
+  graph_bar_color(d) {
+    let color;
+    switch (true) {
+      case (d > 450):
+        color = '#210009';
+        break;
+      case (d > 400):
+        color = '#560019';
+        break;
+      case (d > 350):
+        color = '#800026';
+        break;
+      case (d > 300):
+        color = '#BD0026';
+        break;
+      case (d > 250):
+        color = '#E31A1C';
+        break;
+      case (d > 200):
+        color = '#FC4E2A';
+        break;
+      case (d > 150):
+        color = '#FD8D3C';
+        break;
+      case (d > 100):
+        color = '#FEB24C';
+        break;
+      case (d > 50):
+        color = '#FED976';
+        break;
+      case (d == null || d == 0):
+        color = '#BEBEBE';
+        break;
+      default:
+        color = '#FFEDA0';
+        break;
+    };
+    return color;
+  }
 
   highlight_county_selection(selection, state) {
     // define color changer based on svg's colorscale
@@ -27,7 +66,7 @@ class CountyMortRateByStateBarChart {
           if (d.type === "State") {
             return "green";
           }
-          return "rgb(0, 0, " + Math.round(color_changer(d.mort_rate)) + ")";
+          return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
         })
       }
     });
@@ -67,7 +106,7 @@ class CountyMortRateByStateBarChart {
         if (d.type === "State") {
           return "green";
         }
-        return "rgb(0, 0, " + Math.round(colorScale(d.mort_rate)) + ")";
+        return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
       })
       .on("mouseover", function(d) {
         //Update the tooltip position and value
@@ -142,7 +181,7 @@ addLoadEvent(function() {
 
   let barChart = div.append("div");
 
-  let w = Math.round(document.body.clientWidth * 0.7);
+  let w = Math.round(document.body.clientWidth * 0.9);
   let h = Math.round(document.body.clientHeight * 0.3);
   let county_data_of_state = get_county_data_of_state("MA", gender, race);
   let xScale = d3.scaleBand()
@@ -155,12 +194,12 @@ addLoadEvent(function() {
     })])
     .range([15, h]);
 
-    let xAxis = d3.axisBottom()
-        .scale(xScale)
-        .ticks(50);
-    let yAxis = d3.axisLeft()
-        .scale(yScale)
-        .ticks(50);
+  let xAxis = d3.axisBottom()
+    .scale(xScale)
+    .ticks(50);
+  let yAxis = d3.axisLeft()
+    .scale(yScale)
+    .ticks(50);
 
   // let xAxis = d3.svg.axis()
   //   .scale(xScale)
@@ -175,14 +214,14 @@ addLoadEvent(function() {
     .attr("height", h)
     .append("g");
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0, " + (h-50) + ")")
-        .call(xAxis);
-    svg.append("g")
-        .attr("class", "y axis")
-        .attr("transform", "translate(" + 50 + ",0)")
-        .call(yAxis);
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0, " + (h - 50) + ")")
+    .call(xAxis);
+  svg.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + 50 + ",0)")
+    .call(yAxis);
 
   countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, xScale, yScale, colorScale, svg, county_data_of_state);
 
@@ -210,7 +249,7 @@ function get_county_data_of_state(state_abbreviation, gender, race) {
       data.push({
         county: json_data[i][10],
         type: json_data[i][11],
-        mort_rate: json_data[i][15],
+        mort_rate: Math.round(json_data[i][15]),
         // Rafal added
         state: json_data[i][9]
         // Include the state information as well
