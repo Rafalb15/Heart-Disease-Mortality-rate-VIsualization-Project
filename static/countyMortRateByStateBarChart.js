@@ -89,8 +89,17 @@ class CountyMortRateByStateBarChart {
       return d.mort_rate;
     })]);
 
-    svg.select("#graph_title").text("Graphs is shown for " + state + " with " + gender + " gender " + race + " race ");
+    let xAxis = d3.axisBottom()
+      .scale(xScale)
+      .tickFormat("");
+    //.ticks(50);
+    let yAxis = d3.axisLeft()
+      .scale(yScale)
 
+    // Uopdate the graph's title accordingly with the selections
+    svg.select("#graph_title").text("Mortality rate across counties in " + state + " for Gender: " + gender + " and Race: " + race);
+    svg.select("#x_axis").call(xAxis);
+    svg.select("#y_axis").call(yAxis);
     //Update all rects
     let bars = svg.selectAll("rect").data(county_data_of_state);
     bars.enter().append("rect")
@@ -99,11 +108,11 @@ class CountyMortRateByStateBarChart {
         return xScale(i);
       })
       .attr("y", function(d) {
-        return h - yScale(d.mort_rate) + 5;
+        return yScale(d.mort_rate);
       })
       .attr("width", xScale.bandwidth())
       .attr("height", function(d) {
-        return yScale(d.mort_rate);
+        return (h-20) - yScale(d.mort_rate);
       })
       .attr("fill", function(d) {
         if (d.type === "State") {
@@ -177,10 +186,10 @@ addLoadEvent(function() {
 
   let buttons = div.append("div")
     .attr("id", "graphButtons");
-  let refreshGraph = buttons.append("button")
-    .attr("type", "button")
-    .attr("id", "refreshGraph")
-    .text("Refresh Graph");
+  // let refreshGraph = buttons.append("button")
+  //   .attr("type", "button")
+  //   .attr("id", "refreshGraph")
+  //   .text("Refresh Graph");
   let sortGraph = buttons.append("button")
     .attr("type", "button")
     .attr("id", "sortGraph")
@@ -193,13 +202,13 @@ addLoadEvent(function() {
   let county_data_of_state = get_county_data_of_state("MA", gender, race);
   let xScale = d3.scaleBand()
     .domain(d3.range(county_data_of_state.length))
-    .rangeRound([45, w - 45])
+    .rangeRound([50,w-50])
     .paddingInner(0.15);
   let yScale = d3.scaleLinear()
     .domain([0, d3.max(county_data_of_state, function(d) {
       return d.mort_rate;
     })])
-    .range([10, h - 50]);
+    .range([h-20 , 20]);
 
   let xAxis = d3.axisBottom()
     .scale(xScale)
@@ -220,32 +229,33 @@ addLoadEvent(function() {
     .append("g");
 
   svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0, " + (h - 10) + ")")
+    .attr("id", "x_axis")
+    .attr("transform", "translate(0, " + (w - 20) + ")")
     .call(xAxis);
   svg.append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + 40 + ",40)")
+    .attr("id", "y_axis")
+    .attr("transform", "translate(" + 50  + ",0)")
     .call(yAxis);
   svg.append("text")
     .attr("x", (w / 2))
     .attr("y", 40)
     .attr("id", "graph_title")
     .attr("text-anchor", "middle")
-    .style("font-size", "14px")
+    .style("font-size", "20px")
+    .style("font-weight","bold")
     //.style("text-decoration", "bold")
     .text("Race(overall) Gender(overall) for MA");
 
   countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, xScale, yScale, colorScale, svg, county_data_of_state, xAxis, yAxis);
 
-  refreshGraph.on("click", function() {
-    if (selection_list.length > 0) {
-      //New values for dataset
-      let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
-      county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-      countyMortRateByStateBarChart.update_bars(county_data_of_state, state_abbreviation, gender, race);
-    }
-  });
+  // refreshGraph.on("click", function() {
+  //   if (selection_list.length > 0) {
+  //     //New values for dataset
+  //     let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
+  //     county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
+  //     countyMortRateByStateBarChart.update_bars(county_data_of_state, state_abbreviation, gender, race);
+  //   }
+  // });
 
   sortGraph.on("click", function() {
     countyMortRateByStateBarChart.sort_bars();
