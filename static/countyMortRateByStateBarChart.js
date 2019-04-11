@@ -203,7 +203,8 @@ addLoadEvent(function() {
   let xScale = d3.scaleBand()
     .domain(d3.range(county_data_of_state.length))
     .rangeRound([50,w-50])
-    .paddingInner(0.15);
+    .paddingInner(0.15)
+    .align(0.1);
   let yScale = d3.scaleLinear()
     .domain([0, d3.max(county_data_of_state, function(d) {
       return d.mort_rate;
