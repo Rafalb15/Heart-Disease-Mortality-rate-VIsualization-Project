@@ -13,6 +13,7 @@
 	<script src="/static/d3.js"></script>
 	<script src='//js.zapjs.com/js/download.js'></script>
 	<script src="static/setupFunctions.js"></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js'></script>
 
 
 	<style>
@@ -168,8 +169,8 @@
 	<!-- #################################### bottomest? of page ################################################################### -->
 	<!-- stolen from Dennis - Jon -->
 	<div id="tooltip2" class="hidden">
-		<p><strong><span id="tooltipLabel">Important Label Heading</span></strong></p>
-		<p><span id="value">100</span></p>
+		<p><strong><span id="tooltip2Label">Important Label Heading</span></strong></p>
+		<p><span id="value2">100</span></p>
 	</div>
 	<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button>
 		<div id="jonsgraph" class="graph">
@@ -1283,6 +1284,14 @@
 					return "translate(" + x(d.state) + ",0)";
 				})
 
+			var tip2 = d3.tip()
+				.attr("class","tooltip2")
+				.html(function(d) {
+					return d.mort_rate
+				});
+
+			groups.call(tip2);
+
 			var bars = groups.selectAll("rect")
 				.data(function(d) {
 					return [d]
@@ -1304,6 +1313,8 @@
 				.attr("fill", function(d) {
 					return color(d[strata])
 				})
+				.on("mouseover",tip2.show)
+				.on("mouseout",tip2.hide)
 
 			// add x-axis
 			g.append("g")
