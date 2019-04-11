@@ -13,6 +13,45 @@ class CountyMortRateByStateBarChart {
     this.sortOrder = false;
   }
 
+  graph_bar_color(d) {
+    let color;
+    switch (true) {
+      case (d > 450):
+        color = '#210009';
+        break;
+      case (d > 400):
+        color = '#560019';
+        break;
+      case (d > 350):
+        color = '#800026';
+        break;
+      case (d > 300):
+        color = '#BD0026';
+        break;
+      case (d > 250):
+        color = '#E31A1C';
+        break;
+      case (d > 200):
+        color = '#FC4E2A';
+        break;
+      case (d > 150):
+        color = '#FD8D3C';
+        break;
+      case (d > 100):
+        color = '#FEB24C';
+        break;
+      case (d > 50):
+        color = '#FED976';
+        break;
+      case (d == null || d == 0):
+        color = '#BEBEBE';
+        break;
+      default:
+        color = '#FFEDA0';
+        break;
+    };
+    return color;
+  }
 
   highlight_county_selection(selection, state) {
     // define color changer based on svg's colorscale
@@ -27,13 +66,14 @@ class CountyMortRateByStateBarChart {
           if (d.type === "State") {
             return "green";
           }
-          return "rgb(0, 0, " + Math.round(color_changer(d.mort_rate)) + ")";
+          return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
         })
+        d3.select(this).attr("opacity", 0.7);
       }
     });
   }
 
-  update_bars(county_data_of_state) {
+  update_bars(county_data_of_state, state, gender, race) {
     this.county_data_of_state = county_data_of_state
     this.sortOrder = false;
     let xScale = this.xScale;
@@ -49,6 +89,17 @@ class CountyMortRateByStateBarChart {
       return d.mort_rate;
     })]);
 
+    let xAxis = d3.axisBottom()
+      .scale(xScale)
+      .tickFormat("");
+    //.ticks(50);
+    let yAxis = d3.axisLeft()
+      .scale(yScale)
+
+    // Uopdate the graph's title accordingly with the selections
+    svg.select("#graph_title").text("Mortality rate across counties in " + state + " for Gender: " + gender + " and Race: " + race);
+    svg.select("#x_axis").call(xAxis);
+    svg.select("#y_axis").call(yAxis);
     //Update all rects
     let bars = svg.selectAll("rect").data(county_data_of_state);
     bars.enter().append("rect")
@@ -57,18 +108,19 @@ class CountyMortRateByStateBarChart {
         return xScale(i);
       })
       .attr("y", function(d) {
-        return h - yScale(d.mort_rate) + 5;
+        return yScale(d.mort_rate);
       })
       .attr("width", xScale.bandwidth())
       .attr("height", function(d) {
-        return yScale(d.mort_rate);
+        return (h-20) - yScale(d.mort_rate);
       })
       .attr("fill", function(d) {
         if (d.type === "State") {
           return "green";
         }
-        return "rgb(0, 0, " + Math.round(colorScale(d.mort_rate)) + ")";
+        return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
       })
+      .attr("opacity", 0.7)
       .on("mouseover", function(d) {
         //Update the tooltip position and value
         d3.select("#tooltip")
@@ -86,6 +138,9 @@ class CountyMortRateByStateBarChart {
       });
     // remove old bars
     bars.exit().remove();
+
+
+
 
   }
 
@@ -131,10 +186,10 @@ addLoadEvent(function() {
 
   let buttons = div.append("div")
     .attr("id", "graphButtons");
-  let refreshGraph = buttons.append("button")
-    .attr("type", "button")
-    .attr("id", "refreshGraph")
-    .text("Refresh Graph");
+  // let refreshGraph = buttons.append("button")
+  //   .attr("type", "button")
+  //   .attr("id", "refreshGraph")
+  //   .text("Refresh Graph");
   let sortGraph = buttons.append("button")
     .attr("type", "button")
     .attr("id", "sortGraph")
@@ -142,29 +197,27 @@ addLoadEvent(function() {
 
   let barChart = div.append("div");
 
-  let w = Math.round(document.body.clientWidth * 0.7);
+  let w = Math.round(document.body.clientWidth * 0.9);
   let h = Math.round(document.body.clientHeight * 0.3);
   let county_data_of_state = get_county_data_of_state("MA", gender, race);
   let xScale = d3.scaleBand()
     .domain(d3.range(county_data_of_state.length))
-    .rangeRound([0, w])
-    .paddingInner(0.05);
+    .rangeRound([50,w-50])
+    .paddingInner(0.15);
   let yScale = d3.scaleLinear()
     .domain([0, d3.max(county_data_of_state, function(d) {
       return d.mort_rate;
     })])
-    .range([15, h]);
+    .range([h-20 , 20]);
 
-    let xAxis = d3.axisBottom()
-        .scale(xScale)
-        .ticks(50);
-    let yAxis = d3.axisLeft()
-        .scale(yScale)
-        .ticks(50);
+  let xAxis = d3.axisBottom()
+    .scale(xScale)
+    .tickFormat("");
+  //.ticks(50);
+  let yAxis = d3.axisLeft()
+    .scale(yScale)
+  //.ticks(50);
 
-  // let xAxis = d3.svg.axis()
-  //   .scale(xScale)
-  //   .orient('bottom');
   let colorScale = d3.scaleLinear()
     .domain([0, d3.max(county_data_of_state, function(d) {
       return d.mort_rate;
@@ -175,31 +228,40 @@ addLoadEvent(function() {
     .attr("height", h)
     .append("g");
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0, " + (h-50) + ")")
-        .call(xAxis);
-    svg.append("g")
-        .attr("class", "y axis")
-        .attr("transform", "translate(" + 50 + ",0)")
-        .call(yAxis);
+  svg.append("g")
+    .attr("id", "x_axis")
+    .attr("transform", "translate(0, " + (w - 20) + ")")
+    .call(xAxis);
+  svg.append("g")
+    .attr("id", "y_axis")
+    .attr("transform", "translate(" + 50  + ",0)")
+    .call(yAxis);
+  svg.append("text")
+    .attr("x", (w / 2))
+    .attr("y", 40)
+    .attr("id", "graph_title")
+    .attr("text-anchor", "middle")
+    .style("font-size", "20px")
+    .style("font-weight","bold")
+    //.style("text-decoration", "bold")
+    .text("Race(overall) Gender(overall) for MA");
 
-  countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, xScale, yScale, colorScale, svg, county_data_of_state);
+  countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, xScale, yScale, colorScale, svg, county_data_of_state, xAxis, yAxis);
 
-  refreshGraph.on("click", function() {
-    if (selection_list.length > 0) {
-      //New values for dataset
-      let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
-      county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-      countyMortRateByStateBarChart.update_bars(county_data_of_state);
-    }
-  });
+  // refreshGraph.on("click", function() {
+  //   if (selection_list.length > 0) {
+  //     //New values for dataset
+  //     let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
+  //     county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
+  //     countyMortRateByStateBarChart.update_bars(county_data_of_state, state_abbreviation, gender, race);
+  //   }
+  // });
 
   sortGraph.on("click", function() {
     countyMortRateByStateBarChart.sort_bars();
   });
 
-  countyMortRateByStateBarChart.update_bars(county_data_of_state);
+  countyMortRateByStateBarChart.update_bars(county_data_of_state, "MA", "overall", "overall");
 });
 
 // a list that contains the name, state vs county type and mortality rate
@@ -210,7 +272,7 @@ function get_county_data_of_state(state_abbreviation, gender, race) {
       data.push({
         county: json_data[i][10],
         type: json_data[i][11],
-        mort_rate: json_data[i][15],
+        mort_rate: Math.round(json_data[i][15]),
         // Rafal added
         state: json_data[i][9]
         // Include the state information as well
