@@ -39,7 +39,7 @@ class StateMortRatebyDensity {
       if (state == d.stateName) {
         d3.select(this).attr("fill", "yellow").attr("r", 10);
       } else {
-        d3.select(this).attr("fill", "red").attr("r", 5);
+        d3.select(this).attr("fill", "red").attr("r", 2.5);
       }
     });
   }
@@ -80,7 +80,7 @@ class StateMortRatebyDensity {
       .attr("cy", function(d) {
         return yScale(d.mort_rate);
       })
-      .attr("r", 5)
+      .attr("r", 2.5)
       .attr("fill-opacity", 0.7)
       .attr("stroke", "black")
       .attr("stroke-width", 1)

@@ -8,6 +8,7 @@ class CountyMortRateByStateBarChart {
     this.yScale = yScale;
     this.colorScale = colorScale;
     this.svg = svg;
+    this.padding = 30;
     this.county_data_of_state = county_data_of_state;
     // should be sorted alphabetcally by default
     this.sortOrder = false;
@@ -112,7 +113,7 @@ class CountyMortRateByStateBarChart {
       })
       .attr("width", xScale.bandwidth())
       .attr("height", function(d) {
-        return (h-20) - yScale(d.mort_rate);
+        return (h - 20) - yScale(d.mort_rate);
       })
       .attr("fill", function(d) {
         if (d.type === "State") {
@@ -202,14 +203,14 @@ addLoadEvent(function() {
   let county_data_of_state = get_county_data_of_state("MA", gender, race);
   let xScale = d3.scaleBand()
     .domain(d3.range(county_data_of_state.length))
-    .rangeRound([50,w-50])
+    .rangeRound([50, w - 50])
     .paddingInner(0.15)
     .align(0.1);
   let yScale = d3.scaleLinear()
     .domain([0, d3.max(county_data_of_state, function(d) {
       return d.mort_rate;
     })])
-    .range([h-20 , 20]);
+    .range([h - 20, 20]);
 
   let xAxis = d3.axisBottom()
     .scale(xScale)
@@ -235,7 +236,7 @@ addLoadEvent(function() {
     .call(xAxis);
   svg.append("g")
     .attr("id", "y_axis")
-    .attr("transform", "translate(" + 50  + ",0)")
+    .attr("transform", "translate(" + 50 + ",0)")
     .call(yAxis);
   svg.append("text")
     .attr("x", (w / 2))
@@ -243,7 +244,7 @@ addLoadEvent(function() {
     .attr("id", "graph_title")
     .attr("text-anchor", "middle")
     .style("font-size", "20px")
-    .style("font-weight","bold")
+    .style("font-weight", "bold")
     //.style("text-decoration", "bold")
     .text("Race(overall) Gender(overall) for MA");
 
