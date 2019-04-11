@@ -1197,7 +1197,7 @@
 					if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
 						data.push({
 							state: json_data[i][10],
-							mort_rate: json_data[i][15],
+							mort_rate: parseFloat(json_data[i][15]) || 0,
 							gender: json_data[i][21],
 							race: json_data[i][23]
 						});
@@ -1214,7 +1214,7 @@
 					if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] === "Overall") {
 						data.push({
 							state: json_data[i][10],
-							mort_rate: json_data[i][15],
+							mort_rate: parseFloat(json_data[i][15]) || 0,
 							gender: json_data[i][21],
 							race: json_data[i][23]
 						});
@@ -1231,7 +1231,7 @@
 					if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] != "Overall") {
 						data.push({
 							state: json_data[i][10],
-							mort_rate: json_data[i][15],
+							mort_rate: parseFloat(json_data[i][15]) || 0,
 							gender: json_data[i][21],
 							race: json_data[i][23]
 						});
