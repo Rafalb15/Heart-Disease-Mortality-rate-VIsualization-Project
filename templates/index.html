@@ -1265,6 +1265,46 @@
 		return data;
 		};
 
+		function graph_bar_color(d) {
+			let color;
+			switch (true) {
+				case (d > 450):
+				color = '#210009';
+				break;
+				case (d > 400):
+				color = '#560019';
+				break;
+				case (d > 350):
+				color = '#800026';
+				break;
+				case (d > 300):
+				color = '#BD0026';
+				break;
+				case (d > 250):
+				color = '#E31A1C';
+				break;
+				case (d > 200):
+				color = '#FC4E2A';
+				break;
+				case (d > 150):
+				color = '#FD8D3C';
+				break;
+				case (d > 100):
+				color = '#FEB24C';
+				break;
+				case (d > 50):
+				color = '#FED976';
+				break;
+				case (d == null || d == 0):
+				color = '#BEBEBE';
+				break;
+				default:
+				color = '#FFEDA0';
+				break;
+			};
+			return color;
+		}
+
 
 		function update_grouped_barchart(state_data, strata) {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
@@ -1337,7 +1377,7 @@
 					return h - y(d.mort_rate);
 				})
 				.attr("fill", function(d) {
-					return color(d[strata])
+					return graph_bar_color(d.mort_rate)
 				})
 				.on("mouseover", tip2.show)
 				.on("mouseout", tip2.hide)
