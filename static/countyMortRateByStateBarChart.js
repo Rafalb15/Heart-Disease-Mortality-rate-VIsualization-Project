@@ -43,29 +43,24 @@ class CountyMortRateByStateBarChart {
     setup_buttons(container) {
         //this.buttons = container.append("div")
           //      .attr("id", "graphButtons");
-        this.container.append("button")
+        container.append("button")
             .attr("type", "button")
             .attr("id", "sortGraph")
             .text("Sort Graph")
+            .style("width", "100px")
             .on("click", function() { countyMortRateByStateBarChart.sort_bars(); });
     }
 
     setup_title(container){
         let w = this.w;
-
         this.title = container.append("span")
-            //.attr("x", (w / 2))
-            //.attr("y", 40)
             .attr("id", "graph_title")
             .attr("text-anchor", "middle")
             .style("font-size", "20px")
             .style("font-weight", "bold")
             .style("text-align","center")
             .style("display", "inline-block")
-            .style("width", w + "px ");
-
-            //.style("text-decoration", "bold")
-            //.text("Race(overall) Gender(overall) for MA");
+            .style("width", w-300 + "px");
     }
     
     setup_svg(container) {
@@ -102,7 +97,7 @@ class CountyMortRateByStateBarChart {
         let xScale = this.xScale;
         let yScale = this.yScale;
         let h = this.h;
-        //let w = this.w;
+        let w = this.w;
         let y_pad = this.y_pad;
         let x_pad = this.x_pad; 
         
@@ -142,7 +137,7 @@ class CountyMortRateByStateBarChart {
             .on("mouseover", function(d) {
                 //Update and show the tooltip
                 d3.select("#tooltip")
-                    .style("left", (w + x_pad) + "px")
+                    .style("left", (w -350) + "px")
                     .select("#value")
                     .text(d.mort_rate + "/100K");
                 d3.select("#tooltip").select("#tooltipLabel").text(d.county);
