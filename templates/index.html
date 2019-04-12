@@ -1025,20 +1025,18 @@
 					// changed_vals.length == 1 ? update_grouped_barchart(get_state_data_overall(selection_list), changed_vals[0]) : console.log("It is 1")
 					// changed_vals.length == 2 ? update_grouped_barchart(get_state_data_overall(selection_list), "overall") : console.log("It is 2")
 					if (changed_vals.length == 0) {
-						console.log("0");
 						// if no change to single mode dropdowns, then use existing
 						jons_graph_type == "race" ? update_grouped_barchart(selection_list, "race") : "nothing";
 						jons_graph_type == "gender" ? update_grouped_barchart(selection_list, "gender") : "nothing";
 						jons_graph_type == "overall" ? update_grouped_barchart(selection_list, "overall") : "nothing";
 					} else if (changed_vals.length == 1) {
-						console.log("1");
 						let type = changed_vals[0];
-						console.log(type);
-						type == "race" ? update_grouped_barchart(selection_list, "race") : "nothing";
-						type == "gender" ? update_grouped_barchart(selection_list, "gender") : "nothing";
+						type == "race" ? update_grouped_barchart(selection_list, type) : "nothing";
+						type == "gender" ? update_grouped_barchart(selection_list, type) : "nothing";
+						jons_graph_type = type;
 					} else {
-						console.log("1");
 						update_grouped_barchart(selection_list, "overall");
+						jons_graph_type = "overall";
 					}
 				}
 			}
@@ -1232,7 +1230,7 @@
 						}
 					}
 				}
-			} 
+			}
 
 			if (strata == "gender"){
 				for (let j = 0; j < state_name.length; j++) {
@@ -1261,7 +1259,7 @@
 							});
 						}
 					}
-				}	
+				}
 			}
 
 		return data;
