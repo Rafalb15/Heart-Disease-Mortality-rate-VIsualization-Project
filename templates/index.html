@@ -710,7 +710,7 @@
 			queue.update();
 			// update Dennis's graph based on the selection
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
-			countyMortRateByStateBarChart.update_bars(get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race), e.target.feature.properties.abbreviation, gender, race);
+			countyMortRateByStateBarChart.update_bars(e.target.feature.properties.abbreviation, gender, race);
 			// update John's's graph based on the selection
 			update_grouped_barchart(selection_list, jons_graph_type);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1018,7 +1018,7 @@
 					// Update Denni's graph
 					let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
 					let county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-					countyMortRateByStateBarChart.update_bars(get_county_data_of_state(state_abbreviation, gender, race), get_state_abbreviation(selection_list[selection_list.length - 1]), gender, race);
+					countyMortRateByStateBarChart.update_bars(get_state_abbreviation(selection_list[selection_list.length - 1]), gender, race);
 
 					// Update John's graph
 					// changed_vals.length == 0 ? update_grouped_barchart(get_state_data_overall(selection_list), jons_graph_type) : console.log("It is 0")
