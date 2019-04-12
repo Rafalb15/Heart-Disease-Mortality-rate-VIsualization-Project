@@ -712,7 +712,7 @@
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			countyMortRateByStateBarChart.update_bars(get_county_data_of_state(e.target.feature.properties.abbreviation, gender, race), e.target.feature.properties.abbreviation, gender, race);
 			// update John's's graph based on the selection
-			update_grouped_barchart(get_state_data_overall(selection_list), jons_graph_type);
+			update_grouped_barchart(selection_list, jons_graph_type);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -995,7 +995,7 @@
 				document.getElementById("stateMortRateByDensity").style.display = "block";
 				document.getElementById("groupedBarChartButtons").style.display = "none";
 			} else if (curr_selection === "state_comp_bar_chart") {
-				update_grouped_barchart(get_state_data_overall(selection_list), jons_graph_type);
+				update_grouped_barchart(selection_list, jons_graph_type);
 				document.getElementById("countyMortRateByState").style.display = "none";
 				document.getElementById("stateMortRateByDensity").style.display = "none";
 				document.getElementById("groupedBarChartButtons").style.display = "block";
@@ -1027,18 +1027,18 @@
 					if (changed_vals.length == 0) {
 						console.log("0");
 						// if no change to single mode dropdowns, then use existing
-						jons_graph_type == "race" ? update_grouped_barchart(get_state_data_race(selection_list), "race") : "nothing";
-						jons_graph_type == "gender" ? update_grouped_barchart(get_state_data_gender(selection_list), "gender") : "nothing";
-						jons_graph_type == "overall" ? update_grouped_barchart(get_state_data_overall(selection_list), "overall") : "nothing";
+						jons_graph_type == "race" ? update_grouped_barchart(selection_list, "race") : "nothing";
+						jons_graph_type == "gender" ? update_grouped_barchart(selection_list, "gender") : "nothing";
+						jons_graph_type == "overall" ? update_grouped_barchart(selection_list, "overall") : "nothing";
 					} else if (changed_vals.length == 1) {
 						console.log("1");
 						let type = changed_vals[0];
 						console.log(type);
-						type == "race" ? update_grouped_barchart(get_state_data_race(selection_list), "race") : "nothing";
-						type == "gender" ? update_grouped_barchart(get_state_data_gender(selection_list), "gender") : "nothing";
+						type == "race" ? update_grouped_barchart(selection_list, "race") : "nothing";
+						type == "gender" ? update_grouped_barchart(selection_list, "gender") : "nothing";
 					} else {
 						console.log("1");
-						update_grouped_barchart(get_state_data_overall(selection_list), "overall");
+						update_grouped_barchart(selection_list, "overall");
 					}
 				}
 			}
@@ -1216,65 +1216,65 @@
 		var w = Math.round(body.clientWidth * 0.7);
 		var h = Math.round(body.clientHeight * 0.3);
 
-		// kludgy functions
-		function get_state_data_overall(state_name) {
+		function get_state_data(state_name, strata) {
 			var data = [];
-			for (let j = 0; j < state_name.length; j++) {
-				for (let i = 0; i < json_data.length; i++) {
-					if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
-						data.push({
-							state: json_data[i][10],
-							mort_rate: parseFloat(json_data[i][15]) || 0,
-							gender: json_data[i][21],
-							race: json_data[i][23]
-						});
+
+			if(strata == "overall"){
+				for (let j = 0; j < state_name.length; j++) {
+					for (let i = 0; i < json_data.length; i++) {
+						if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
+							data.push({
+								state: json_data[i][10],
+								mort_rate: parseFloat(json_data[i][15]) || 0,
+								gender: json_data[i][21],
+								race: json_data[i][23]
+							});
+						}
+					}
+				}
+			} 
+
+			if (strata == "gender"){
+				for (let j = 0; j < state_name.length; j++) {
+					for (let i = 0; i < json_data.length; i++) {
+						if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] === "Overall"){
+							data.push({
+								state: json_data[i][10],
+								mort_rate: parseFloat(json_data[i][15]) || 0,
+								gender: json_data[i][21],
+								race: json_data[i][23]
+							});
+						}
 					}
 				}
 			}
-			return data;
+
+			if(strata == "race"){
+				for (let j = 0; j < state_name.length; j++) {
+					for (let i = 0; i < json_data.length; i++) {
+						if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] != "Overall"){
+							data.push({
+								state: json_data[i][10],
+								mort_rate: parseFloat(json_data[i][15]) || 0,
+								gender: json_data[i][21],
+								race: json_data[i][23]
+							});
+						}
+					}
+				}	
+			}
+
+		return data;
 		};
 
-		function get_state_data_gender(state_name) {
-			var data = [];
-			for (let j = 0; j < state_name.length; j++) {
-				for (let i = 0; i < json_data.length; i++) {
-					if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] === "Overall") {
-						data.push({
-							state: json_data[i][10],
-							mort_rate: parseFloat(json_data[i][15]) || 0,
-							gender: json_data[i][21],
-							race: json_data[i][23]
-						});
-					}
-				}
-			}
-			return data;
-		};
-
-		function get_state_data_race(state_name) {
-			var data = [];
-			for (let j = 0; j < state_name.length; j++) {
-				for (let i = 0; i < json_data.length; i++) {
-					if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] != "Overall") {
-						data.push({
-							state: json_data[i][10],
-							mort_rate: parseFloat(json_data[i][15]) || 0,
-							gender: json_data[i][21],
-							race: json_data[i][23]
-						});
-					}
-				}
-			}
-			return data;
-		};
 
 		function update_grouped_barchart(state_data, strata) {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
 
-
 			svg2.selectAll("*").remove()
 			//" Hello";
-			var data = state_data;
+			var data = get_state_data(state_data,strata);
+
 			var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 			var x = d3.scaleBand().rangeRound([0, w]).padding(0.1)
@@ -1371,7 +1371,7 @@
 				if (selection_list.length > 0) {
 					//New values for dataset
 					jons_graph_type = "overall";
-					update_grouped_barchart(get_state_data_overall(selection_list), "");
+					update_grouped_barchart(selection_list,"overall");
 				}
 			});
 
@@ -1381,7 +1381,7 @@
 				if (selection_list.length > 0) {
 					//New values for dataset
 					jons_graph_type = "gender";
-					update_grouped_barchart(get_state_data_gender(selection_list), "gender");
+					update_grouped_barchart(selection_list, "gender");
 				}
 			});
 
@@ -1391,7 +1391,7 @@
 				if (selection_list.length > 0) {
 					//New values for dataset
 					jons_graph_type = "race";
-					update_grouped_barchart(get_state_data_race(selection_list), "race");
+					update_grouped_barchart(selection_list, "race");
 				}
 			});
 
