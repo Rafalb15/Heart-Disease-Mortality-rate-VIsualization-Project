@@ -11,12 +11,13 @@ class CountyMortRateByStateBarChart {
         this.x_pad = 50;
         this.sortOrder = false;
         this.tooltip = null;
-        this.buttons = null;
+        //this.buttons = null;
         this.title = null;
         this.svg = null;
         this.xScale = null;
         this.yScale = null;
         
+        //the order of these is important
         this.setup_tooltip(container);
         this.setup_buttons(container);
         this.setup_title(container);
@@ -59,7 +60,10 @@ class CountyMortRateByStateBarChart {
             .attr("text-anchor", "middle")
             .style("font-size", "20px")
             .style("font-weight", "bold")
-            .style("text-align","center");
+            .style("text-align","center")
+            .style("display", "inline-block")
+            .style("width", w + "px ");
+
             //.style("text-decoration", "bold")
             //.text("Race(overall) Gender(overall) for MA");
     }
@@ -87,12 +91,10 @@ class CountyMortRateByStateBarChart {
         this.svg.append("g")
             .attr("id", "x_axis")
             .attr("transform", "translate(0, " + (w-y_pad) + ")");
-            //.call(xAxis);
 
         this.svg.append("g")
             .attr("id", "y_axis")
             .attr("transform", "translate(" + x_pad + ",0)");
-            //.call(yAxis);
     }
 
     update_bars(state, gender, race){
@@ -238,11 +240,11 @@ class CountyMortRateByStateBarChart {
   _____________________________________________________________________
 */
 addLoadEvent(function(e) {
-  let div = d3.select("#countyMortRateByState");
-  let w = Math.round(document.body.clientWidth * 0.9);
-  let h = Math.round(document.body.clientHeight * 0.3);
-  countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, div);
-  countyMortRateByStateBarChart.update_bars("MA", "Overall", "Overall");
+    let div = d3.select("#countyMortRateByState");
+    let w = Math.round(document.body.clientWidth * 0.9);
+    let h = Math.round(document.body.clientHeight * 0.3);
+    countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, div);
+    countyMortRateByStateBarChart.update_bars("MA", "Overall", "Overall");
 });
 
 /*
