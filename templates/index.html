@@ -55,7 +55,7 @@
 		}
 
 		.grow_map_info:hover {
-			height: 140px;
+			height: 155px;
 		}
 	</style>
 
@@ -146,6 +146,7 @@
 		<li>Hovering over state highlights the corresponding mark in scatterplot, also providing information in top right of map</li>
 		<li>Hovering over county highlights the corresponding mark in bar chart, also providing information in top right of map</li>
 		<li>Single click on state adds state to queue for further analysis, max states in queue is 4</li>
+		<li>If there is more than one state in the queue, clicking on a state that is already in the queue will remove that state from the queue</li>
 		<li>Double click on state zooms to state's bounds and switches to county layer</li>
 		<li>Double click on county zooms out to state layer</li>
 	</div>
@@ -701,12 +702,15 @@
 					selection_list.push(state);
 				// state is already included, so clicking again pop it off
 				} else {
-					// if(selection_list.length >= 1){
-					// 		selection_list.pop();
-					// 		selection_count -= 1;
-					// }
-					// else
-
+					if(selection_list.length > 1){
+						// if the selection list is greater than 1, then delete the state
+						// that the user clicks on
+						var filtered = selection_list.filter(function(value, index, arr){
+						    return value != state;
+						});
+						//console.log(filtered);
+						selection_list = filtered;
+						}
 				}
 			} else {
 				selection_count = 1;
