@@ -5,11 +5,36 @@ class StateMortRatebyDensity {
     this.container = container;
     this.tooltip = tooltip;
     this.padding = 30;
-    this.svg = container.append("svg")
-      .attr("width", w)
-      .attr("height", h);
+    this.svg = null;
+    this.title = null;
+    this.w = w;
+    this.h = h;
+
     this.setup_tooltip(tooltip);
+    this.setup_title(container);
+    this.setup_svg(container);
     this.update_scatter();
+
+  }
+
+  setup_title(container) {
+    let w = this.w;
+    this.title = container.append("span")
+      .attr("id", "graph_title")
+      .attr("text-anchor", "middle")
+      .style("font-size", "20px")
+      .style("font-weight", "bold")
+      .style("text-align", "center")
+      .style("display", "inline-block")
+      .style("width", w + "px")
+      .text("Overall State mortality rate across all genders and races versus Density");
+  }
+
+  setup_svg(container) {
+    this.svg = container.append("svg")
+      .attr("width", this.w)
+      .attr("height", this.h);
+
   }
 
   setup_tooltip(tooltip) {
@@ -29,6 +54,8 @@ class StateMortRatebyDensity {
       .attr("id", "mort_rate")
       .text("100");
   }
+
+
 
   highlight_state_selection(state) {
     // define color changer based on svg's colorscale
@@ -51,17 +78,17 @@ class StateMortRatebyDensity {
     let svg = this.svg;
     let h = svg.attr("height");
     let w = svg.attr("width");
+
+
     let xScale = d3.scaleLinear()
       .domain([0, d3.max(data, function(d) {
         return d.density;
       })])
       .range([padding, w - padding * 2]);
     let yScale = d3.scaleLinear()
-      .domain([d3.min(data, function(d) {
+      .domain([0, d3.max(data, function(d) {
         return d.mort_rate;
-      }), d3.max(data, function(d) {
-        return d.mort_rate;
-      })])
+      }) + 100])
       .range([h - padding, padding]);
     let xAxis = d3.axisBottom()
       .scale(xScale)
@@ -113,13 +140,6 @@ class StateMortRatebyDensity {
       .attr("transform", "translate(" + padding + ",0)")
       .call(yAxis);
 
-      svg.append("text")
-          .attr("x", (w / 2))
-          .attr("y", 40)
-          .attr("text-anchor", "middle")
-          .style("font-size", "14px")
-          //.style("text-decoration", "bold")
-          .text("Overall State's mortality rate versus Density Graph");
   }
 }
 

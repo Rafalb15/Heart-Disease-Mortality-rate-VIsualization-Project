@@ -16,7 +16,7 @@ class CountyMortRateByStateBarChart {
         this.svg = null;
         this.xScale = null;
         this.yScale = null;
-        
+
         //the order of these is important
         this.setup_tooltip(container);
         this.setup_buttons(container);
@@ -62,7 +62,7 @@ class CountyMortRateByStateBarChart {
             .style("display", "inline-block")
             .style("width", w-300 + "px");
     }
-    
+
     setup_svg(container) {
         let y_pad = this.y_pad;
         let x_pad = this.x_pad;
@@ -74,7 +74,7 @@ class CountyMortRateByStateBarChart {
             .attr("width", w)
             .attr("height", h)
             .append("g");
-        
+
         this.xScale = d3.scaleBand()
             .rangeRound([x_pad, w-100])
             .padding(0.15)
@@ -99,8 +99,8 @@ class CountyMortRateByStateBarChart {
         let h = this.h;
         let w = this.w;
         let y_pad = this.y_pad;
-        let x_pad = this.x_pad; 
-        
+        let x_pad = this.x_pad;
+
         this.sortOrder = false;
         let county_data_of_state = get_county_data_of_state(state, gender, race);
 
@@ -116,7 +116,7 @@ class CountyMortRateByStateBarChart {
             .scale(xScale)
             .tickFormat("");
         let yAxis = d3.axisLeft()
-            .scale(yScale);       
+            .scale(yScale);
         svg.select("#x_axis").call(xAxis);
         svg.select("#y_axis").call(yAxis);
 
@@ -146,7 +146,7 @@ class CountyMortRateByStateBarChart {
             .on("mouseout", function() { d3.select("#tooltip").classed("hidden", true);});
 
         // remove old bars
-        bars.exit().remove();   
+        bars.exit().remove();
     }
 
     highlight_county_selection(selection, state) {

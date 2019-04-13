@@ -695,11 +695,18 @@
 				fillColor: 'blue'
 			});
 			if (selection_count < selection_max) {
+				// if the selection list does not include the state, then add it to the selection_list
 				if (!selection_list.includes(state)) {
 					selection_count += 1;
 					selection_list.push(state);
+				// state is already included, so clicking again pop it off
 				} else {
-					//alert(state + " is already in the list");
+					// if(selection_list.length >= 1){
+					// 		selection_list.pop();
+					// 		selection_count -= 1;
+					// }
+					// else
+
 				}
 			} else {
 				selection_count = 1;
@@ -1379,6 +1386,7 @@
 				.attr("fill", function(d) {
 					return graph_bar_color(d.mort_rate)
 				})
+				.attr("opacity", 0.7)
 				.on("mouseover", tip2.show)
 				.on("mouseout", tip2.hide)
 
