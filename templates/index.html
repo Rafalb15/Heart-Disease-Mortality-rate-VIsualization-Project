@@ -1225,6 +1225,15 @@
 		var w = Math.round(body.clientWidth * 0.7);
 		var h = Math.round(body.clientHeight * 0.3);
 
+		function get_race_abbreviation(race) {
+			if(race === "Asian and Pacific Islander"){
+				race = "APIA";
+			} else if(race === "American Indian and Alaskan Native"){
+				race = "AI/AN";
+			}
+			return race;
+		}
+
 		function get_state_data(state_name, strata) {
 			var data = [];
 
@@ -1236,7 +1245,7 @@
 								state: json_data[i][10],
 								mort_rate: parseFloat(json_data[i][15]) || 0,
 								gender: json_data[i][21],
-								race: json_data[i][23]
+								race: get_race_abbreviation(json_data[i][23])
 							});
 						}
 					}
@@ -1251,7 +1260,7 @@
 								state: json_data[i][10],
 								mort_rate: parseFloat(json_data[i][15]) || 0,
 								gender: json_data[i][21],
-								race: json_data[i][23]
+								race: get_race_abbreviation(json_data[i][23])
 							});
 						}
 					}
@@ -1266,7 +1275,7 @@
 								state: json_data[i][10],
 								mort_rate: parseFloat(json_data[i][15]) || 0,
 								gender: json_data[i][21],
-								race: json_data[i][23]
+								race: get_race_abbreviation(json_data[i][23])
 							});
 						}
 					}
@@ -1316,32 +1325,37 @@
 			return color;
 		}
 
-
 		function update_grouped_barchart(state_data, strata) {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
 
-			svg2.selectAll("*").remove()
-			//" Hello";
+			// remove old chart
+			chart.selectAll("*").remove()
+			
+			// get data for this state, strata
 			var data = get_state_data(state_data,strata);
+
+			console.log(data);
+
+			// if strata is state, set to "" for graph
+			if(strata === "overall"){
+				strata = "";
+			};
 
 			var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-			var x = d3.scaleBand().rangeRound([0, w]).padding(0.1)
-			var y = d3.scaleLinear().rangeRound([h, 0]);
-
-			var g = svg2.append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-			var ymaxdomain = d3.max(data, function(d) {
-				return d.mort_rate;
-			});
-
-			x.domain(data.map(function(d) {
-				return d.state
+			color.domain(data.map(function(d) {
+				return d[strata];
 			}));
 
-			y.domain([0, ymaxdomain]);
+			// x is main axis
+			var x = d3.scaleBand()
+				.rangeRound([0, w])
+				.padding(0.1)
+				.domain(data.map(function(d) {
+					return d.state
+				}));			
 
+			// x1 is secondary axis
 			var x1 = d3.scaleBand()
 				.rangeRound([0, x.bandwidth()])
 				.padding(0.05)
@@ -1349,17 +1363,23 @@
 					return d[strata];
 				}));
 
-			color.domain(data.map(function(d) {
-				return d[strata];
-			}));
 
-			var groups = g.selectAll("rect")
+			// set up y axis
+			var y = d3.scaleLinear().rangeRound([h, 0]);
+			var ymaxdomain = d3.max(data, function(d) {
+				return d.mort_rate;
+			});
+			y.domain([0, ymaxdomain]);
+
+			var g = chart.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			var bars = g.append("g")
+				.selectAll("g")
 				.data(data)
 				.enter()
 				.append("g")
-				.attr("transform", function(d) {
-					return "translate(" + x(d.state) + ",0)";
-				})
+
 
 			var tip2 = d3.tip()
 				.attr("class", "tooltip2")
@@ -1367,16 +1387,22 @@
 					return d.mort_rate
 				});
 
-			groups.call(tip2);
+			bars.call(tip2);
 
-			var bars = groups.selectAll("rect")
+			// var bars = states.selectAll("rect")
+			// 	.data(function(d) {
+			// 		return [d]
+			// 	})
+
+			bars.attr("transform", function(d) {
+					return "translate(" + x(d.state) + ",0)";
+				})
+				.selectAll("rect")
 				.data(function(d) {
 					return [d]
 				})
-
-			bars.enter()
+				.enter()
 				.append("rect")
-				.merge(bars)
 				.attr("x", function(d, i) {
 					return x1(d[strata])
 				})
@@ -1398,7 +1424,15 @@
 			g.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(0," + h + ")")
-				.call(d3.axisBottom(x));
+				.call(d3.axisBottom(x))
+				.selectAll("text")
+				.attr("y",15)
+
+			// add secondary x-axis
+			bars.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + h + ")")
+				.call(d3.axisBottom(x1).tickSize(0));
 
 			// add y-axis
 			g.append("g")
@@ -1411,8 +1445,6 @@
 				.attr("fill", "#000")
 				.attr("font-weight", "bold")
 				.attr("text-anchor", "start")
-				.text("mort_rate");
-
 		};
 
 		d3.select("#groupedBarChartButtons")
@@ -1453,7 +1485,7 @@
 		};
 
 		//Create SVG element
-		var svg2 = d3.select("#jonsgraph")
+		var chart = d3.select("#jonsgraph")
 			.append("svg")
 			.attr("width", w + margin.left + margin.right)
 			.attr("height", h + margin.top + margin.bottom);
