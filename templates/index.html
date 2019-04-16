@@ -1282,6 +1282,21 @@
 				}
 			}
 
+			if(strata == "both"){
+				for (let j = 0; j < state_name.length; j++) {
+					for (let i = 0; i < json_data.length; i++) {
+						if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] != "Overall"){
+							data.push({
+								state: json_data[i][10],
+								mort_rate: parseFloat(json_data[i][15]) || 0,
+								gender: json_data[i][21],
+								race: get_race_abbreviation(json_data[i][23])
+							});
+						}
+					}
+				}
+			}
+
 		return data;
 		};
 
@@ -1402,12 +1417,12 @@
 				.enter()
 				.append("rect")
 				.attr("x", function(d, i) {
-					return x1(d[strata])
+					return x1(d[strata]) + (x1.bandwidth() - d3.min([x1.bandwidth(),100]))/2
 				})
 				.attr("y", function(d) {
 					return y(d.mort_rate);
 				})
-				.attr("width", x1.bandwidth())
+				.attr("width", d3.min([x1.bandwidth(),100]))
 				.attr("height", function(d) {
 					return h - y(d.mort_rate);
 				})
