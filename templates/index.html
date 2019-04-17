@@ -173,7 +173,7 @@
 		<p><strong><span id="tooltip2Label">Important Label Heading</span></strong></p>
 		<p><span id="value2">100</span></p>
 	</div>
-	<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button>
+	<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button><!--<button type="button" id="selectGenderByRace">Gender by Race</button><button type="button" id="selectRaceByGender">Race by Gender</button>-->
 		<div id="jonsgraph" class="graph">
 		</div>
 	</div>
@@ -1041,6 +1041,9 @@
 					} else if(gender == "Overall" & race != "Overall"){
 						jons_graph_type = "race";
 						update_grouped_barchart(selection_list,"race");
+					} else { // if both gender, race != Overall, change to whatever last choice was
+						jons_graph_type = changed_vals[0];
+						update_grouped_barchart(selection_list,changed_vals[0]);
 					}
 
 					// changed_vals.length == 0 ? update_grouped_barchart(get_state_data_overall(selection_list), jons_graph_type) : console.log("It is 0")
@@ -1236,6 +1239,9 @@
 		var w = Math.round(body.clientWidth * 0.7);
 		var h = Math.round(body.clientHeight * 0.3);
 
+		race_list = ["White","Black","Hispanic","Asian and Pacific Islander","American Indian and Alaskan Native"];
+		gender_list = ["Male","Female"]
+
 		function get_race_abbreviation(race) {
 			if(race === "Asian and Pacific Islander"){
 				race = "APIA";
@@ -1245,6 +1251,8 @@
 			return race;
 		}
 
+		// get state data for two levels of stratification
+		// strata2 argument not used
 		function get_state_data(state_name, strata, strata2 = "") {
 			var data = [];
 
@@ -1277,7 +1285,6 @@
 							}
 						}
 					}
-
 				} else if(strata2 == "race"){
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
@@ -1291,9 +1298,9 @@
 							}
 						}
 					}
-				
 				}
 			}
+
 
 			if(strata == "race"){
 				if(strata2 == ""){
@@ -1376,19 +1383,6 @@
 			// get data for this state, strata
 			var data = get_state_data(state_data,strata,strata2);
 
-			//console.log(data);
-
-			// if strata is overall, set to "" for graph
-			// if(strata === "overall"){
-			// 	strata = "";
-			// };
-
-			var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-			color.domain(data.map(function(d) {
-				return d[strata];
-			}));
-
 			// x is main axis
 			var x = d3.scaleBand()
 				.rangeRound([0, w])
@@ -1420,6 +1414,7 @@
 				.enter()
 				.append("g")
 
+			// add d3-min tooltip
 			var tip2 = d3.tip()
 				.attr("class", "tooltip2")
 				.html(function(d) {
@@ -1427,11 +1422,6 @@
 				});
 
 			bars.call(tip2);
-
-			// var bars = states.selectAll("rect")
-			// 	.data(function(d) {
-			// 		return [d]
-			// 	})
 
 			bars.attr("transform", function(d) {
 					return "translate(" + x(d.state) + ",0)";
@@ -1443,12 +1433,13 @@
 				.enter()
 				.append("rect")
 				.attr("x", function(d, i) {
+					// position the bars for the strata variable correctly
 					return x1(d[strata]) + (x1.bandwidth() - d3.min([x1.bandwidth(),100]))/2
 				})
 				.attr("y", function(d) {
 					return y(d.mort_rate);
 				})
-				.attr("width", d3.min([x1.bandwidth(),100]))
+				.attr("width", d3.min([x1.bandwidth(),100])) // sent width of the bars to be no bigger than 100px
 				.attr("height", function(d) {
 					return h - y(d.mort_rate);
 				})
@@ -1516,13 +1507,14 @@
 				}
 			});
 
+		// buttons for cases where strata2 not ""
 		// d3.select("#groupedBarChartButtons")
 		// 	.select("#selectRaceByGender")
 		// 	.on("click", function() {
 		// 		if (selection_list.length > 0) {
 		// 			//New values for dataset
 		// 			jons_graph_type = "raceByGender";
-		// 			update_grouped_barchart(selection_list, "race", "gender");
+		// 			update_grouped_barchart(selection_list, "gender", "race");
 		// 		}
 		// 	});
 
@@ -1532,7 +1524,7 @@
 		// 		if (selection_list.length > 0) {
 		// 			//New values for dataset
 		// 			jons_graph_type = "genderByRace";
-		// 			update_grouped_barchart(selection_list, "gender", "race");
+		// 			update_grouped_barchart(selection_list, "race", "gender");
 		// 		}
 		// 	});
 
