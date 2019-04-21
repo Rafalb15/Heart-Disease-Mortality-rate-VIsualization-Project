@@ -1279,8 +1279,8 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		var w = Math.round(body.clientWidth * 0.7);
-		var h = Math.round(body.clientHeight * 0.3);
+		var w = Math.round(body.clientWidth);
+		var h = Math.round(body.clientHeight * 0.25);
 
 		race_list = ["White", "Black", "Hispanic", "Asian and Pacific Islander", "American Indian and Alaskan Native"];
 		gender_list = ["Male", "Female"]
@@ -1417,30 +1417,17 @@
 			return color;
 		}
 
-		function update_grouped_barchart(state_data, strata, strata2 = "") {
+		function update_grouped_barchart(state_data, strata, strata2="") {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
 
 			// remove old chart
 			chart.selectAll("*").remove()
-
+			
 			// get data for this state, strata
-			var data = get_state_data(state_data, strata, strata2);
+			var data = get_state_data(state_data,strata,strata2);
 
-			// x is main axis
-			var x = d3.scaleBand()
-				.rangeRound([0, w])
-				.padding(0.1)
-				.domain(data.map(function(d) {
-					return d.state
-				}));
-
-			// x1 is secondary axis
-			var x1 = d3.scaleBand()
-				.rangeRound([0, x.bandwidth()])
-				.padding(0.05)
-				.domain(data.map(function(d) {
-					return d[strata];
-				}));
+			// change width to expand when more states are added in selection list
+			w = Math.round(body.clientWidth)*selection_list.length/selection_max;
 
 			// set up y axis
 			var y = d3.scaleLinear().rangeRound([h, 0]);
@@ -1449,66 +1436,73 @@
 			});
 			y.domain([0, ymaxdomain]);
 
-			var g = chart.append("g")
+
+			// if no stratifying variable picked
+			if(strata == "overall" & strata2 == ""){
+				data = d3.nest()
+				.key(function(d) {return d.state})
+				.entries(data);
+
+				// set up x-axes
+				// x_state is main axis
+				var x_state = d3.scaleBand()
+				.rangeRound([0, w])
+				.padding(0.05)
+				.domain(data.map(function(d){
+					return d.key;
+				}));
+
+				var g = chart.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-			var bars = g.selectAll("g")
+				var bars = g.selectAll("g")
 				.data(data)
 				.enter()
 				.append("g")
+				.attr("transform", function(d) {
+					return "translate(" + x_state(d.key) + ",0)";
+				})
 
-			// add d3-min tooltip
-			var tip2 = d3.tip()
+				// add d3-min tooltip
+				var tip2 = d3.tip()
 				.attr("class", "tooltip2")
 				.html(function(d) {
-					return d.mort_rate
+					return d.values[0].mort_rate;
 				});
+				bars.call(tip2);
 
-			bars.call(tip2);
-
-			bars.attr("transform", function(d) {
-					return "translate(" + x(d.state) + ",0)";
-				})
-				.selectAll("rect")
+				bars.selectAll("rect")
 				.data(function(d) {
-					return [d]
+					return [d];
 				})
 				.enter()
 				.append("rect")
-				.attr("x", function(d, i) {
-					// position the bars for the strata variable correctly
-					return x1(d[strata]) + (x1.bandwidth() - d3.min([x1.bandwidth(), 100])) / 2
+				.attr("x", function(d) {
+						// position the bars for the strata variable correctly
+						return (x_state.bandwidth()-d3.min([x_state.bandwidth(),50]))/2;
 				})
 				.attr("y", function(d) {
-					return y(d.mort_rate);
+					return y([d.values[0].mort_rate]);
 				})
-				.attr("width", d3.min([x1.bandwidth(), 100])) // sent width of the bars to be no bigger than 100px
+				.attr("width", d3.min([x_state.bandwidth(),50])) // sent width of the bars to be no bigger than 100px
 				.attr("height", function(d) {
-					return h - y(d.mort_rate);
+					return h - y([d.values[0].mort_rate]);
 				})
 				.attr("fill", function(d) {
-					return graph_bar_color(d.mort_rate)
+					return graph_bar_color([d.values[0].mort_rate]);
 				})
 				.attr("opacity", 0.7)
 				.on("mouseover", tip2.show)
 				.on("mouseout", tip2.hide)
 
-			// add x-axis
-			g.append("g")
+				// add x-axis
+				g.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(0," + h + ")")
-				.call(d3.axisBottom(x))
-				.selectAll("text")
-				.attr("y", 15);
+				.call(d3.axisBottom(x_state).tickSize(0))
 
-			// add secondary x-axis
-			bars.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + h + ")")
-				.call(d3.axisBottom(x1).tickSize(0));
-
-			// add y-axis
-			g.append("g")
+				// add y-axis
+				g.append("g")
 				.attr("class", "axis")
 				.call(d3.axisLeft(y).ticks(null, "s"))
 				.append("text")
@@ -1518,6 +1512,105 @@
 				.attr("fill", "#000")
 				.attr("font-weight", "bold")
 				.attr("text-anchor", "start")
+
+			} // end if(strata == "overall" & strata2 == ""){ 
+
+			// if one stratifying variable picked
+			if(strata != "overall" & strata2 == "") {
+				data = d3.nest()
+				.key(function(d) {return d.state})
+				.key(function(d) {return d[strata]})
+				.entries(data);
+
+				var x_state = d3.scaleBand()
+				.rangeRound([0, w])
+				.padding(0.05)
+				.domain(data.map(function(d){
+					return d.key;
+				}));
+
+				strata_categories = data[0].values.map(function(d,i){
+					return d.key;
+				});
+
+				var x_strata = d3.scaleBand()
+				.rangeRound([0, x_state.bandwidth()])
+				.padding(0.02)
+				.domain(strata_categories);
+
+				var g = chart.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+				var bars = g.append("g")
+				.selectAll("g")
+				.data(data)
+				.enter().append("g");
+
+				// add d3-min tooltip
+				var tip2 = d3.tip()
+				.attr("class", "tooltip2")
+				.html(function(d) {
+					return d.values[0].mort_rate;
+				});
+				bars.call(tip2);
+
+				bars.attr("transform", function(d){
+					return "translate(" + x_state(d.key) + ",0)";
+				})
+				.selectAll("rect")
+				.data(function(d) {
+					return d.values;
+				})
+				.enter().append("rect")
+				.attr("x", function(d){
+					return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(),50]))/2;
+				})
+				.attr("y", function(d){
+					return y(d.values[0].mort_rate);
+				})
+				.attr("width", d3.min([x_strata.bandwidth(),50]))
+				.attr("height", function(d) {
+					return h - y(d.values[0].mort_rate);
+				})
+				.attr("fill", function(d) {
+					return graph_bar_color(d.values[0].mort_rate)
+				})
+				.attr("opacity", 0.7)
+				.on("mouseover", tip2.show)
+				.on("mouseout", tip2.hide)
+
+				// add x-axis
+				g.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + h + ")")
+				.call(d3.axisBottom(x_state).tickSize(0))
+				.select(".domain").remove()
+
+				g.selectAll("text")
+				.attr("y", 15);
+
+				bars.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + h + ")")
+				.attr("x", function(d){
+					return x_state(d.key);
+				})
+				.call(d3.axisBottom(x_strata).tickSize(0))
+
+			 	// add y-axis
+				g.append("g")
+				.attr("class", "axis")
+				.call(d3.axisLeft(y).ticks(null, "s"))
+				.append("text")
+				.attr("x", 2)
+				.attr("y", y(y.ticks().pop()) + 0.5)
+				.attr("dy", "0.32em")
+				.attr("fill", "#000")
+				.attr("font-weight", "bold")
+				.attr("text-anchor", "start")
+
+			} // end  if(strata != "overall" & strata =="") {	
+		
 		};
 
 		d3.select("#groupedBarChartButtons")
