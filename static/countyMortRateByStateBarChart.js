@@ -137,7 +137,7 @@ class CountyMortRateByStateBarChart {
             .on("mouseover", function(d) {
                 //Update and show the tooltip
                 d3.select("#tooltip")
-                    .style("left", (w -350) + "px")
+                    .style("left", (w -100) + "px")
                     .select("#value")
                     .text(d.mort_rate + "/100K");
                 d3.select("#tooltip").select("#tooltipLabel").text(d.county);
@@ -236,7 +236,7 @@ class CountyMortRateByStateBarChart {
 */
 addLoadEvent(function(e) {
     let div = d3.select("#countyMortRateByState");
-    let w = Math.round(document.body.clientWidth * 0.9);
+    let w = Math.round(document.body.clientWidth * 1);
     let h = Math.round(document.body.clientHeight * 0.3);
     countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, div);
     countyMortRateByStateBarChart.update_bars("MA", "Overall", "Overall");

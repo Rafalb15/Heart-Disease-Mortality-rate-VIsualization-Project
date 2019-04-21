@@ -149,7 +149,7 @@ addLoadEvent(function(e) {
     .attr("id", "tooltip")
     .classed("hidden", true);
   let scatter = div.append("div");
-  let w = Math.round(document.body.clientWidth * 0.9);
+  let w = Math.round(document.body.clientWidth * 1);
   let h = Math.round(document.body.clientHeight * 0.3);
   stateMortRateByDensityScatter = new StateMortRatebyDensity(w, h, scatter, tooltip);
 });

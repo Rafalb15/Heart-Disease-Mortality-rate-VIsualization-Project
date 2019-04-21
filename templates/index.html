@@ -23,15 +23,19 @@
 			margin: 20;
 		}
 
+		html {
+			overflow-y: scroll;
+		}
+
 		.graph {
 			margin-top: 8px
 		}
 
 		.grow_title {
 			border-radius: 10px;
-			height: 35px;
+			height: 45px;
 			width: 100%;
-			float: left;
+			float: center;
 			position: relative;
 			transition: height 0.5s;
 			-webkit-transition: height 0.5s;
@@ -40,12 +44,12 @@
 		}
 
 		.grow_title:hover {
-			height: 60px;
+			height: 80px;
 		}
 
 		.grow_map_info {
 			border-radius: 10px;
-			height: 30px;
+			height: 35px;
 			width: 50%;
 			float: left;
 			position: left;
@@ -55,7 +59,12 @@
 		}
 
 		.grow_map_info:hover {
-			height: 155px;
+			height: 175px;
+		}
+
+		select {
+			width: 75px;
+			text-overflow: ellipsis;
 		}
 	</style>
 
@@ -120,46 +129,51 @@
 	</style>
 
 	<style>#map { width: 100%; height: 50%}
-.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
-.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
+.info { padding: 6px 8px; font: 14px/16px Georgia, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
+.legend { text-align: left; font-family: Georgia; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Georgia, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
 </style>
 	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
 
 </head>
 
-<body data-gr-c-s-loaded="true">
+<body data-gr-c-s-loaded="true" style="width:80%; margin: 0 auto">
 	<!-- ########################################################################################################################### -->
 	<!-- ########################################################################################################################### -->
 	<!-- #################################### DIVS ############################################################################## -->
 	<!-- ########################################################################################################################### -->
 	<div style="width:100%; ">
 		<div class="grow_title">
-			<h1 style="padding:0px; margin:0px">US Heart Disease Mortality rate</h1>
-			<h5 style="padding:0px; margin:0px">Data is age-adjusted, spatially smoothed, and averaged over 3 years. Data is seperated by 5 race classes and 2 gender classes</h5>
+			<h1 style="padding:0px; margin:10px; font-family: Georgia;"><i>US Heart Disease Mortality rate Visualization</i></h1>
+			<h4 style="padding:0px; margin:0px; font-family: Georgia;">Data is age-adjusted, spatially smoothed, and averaged over 3 years. Data is seperated by 6 race classes including overall and 3 gender classes including overall</h4>
 		</div>
 	</div>
 	<!-- ##################################################### MAP Functionality div ############################################################################ -->
-	<div class="grow_map_info" style="color:grey; font-size:13px; padding:5px; margin:0px">
-		<h5>Hover over to learn about map functionality</h5>
+	<div class="grow_map_info" style="color:grey; padding:5px; margin-bottom:10px">
+		<h4 style="margin-bottom:5px">Hover over to learn about map functionality</h4>
 		<!-- <p>Hover over to learn about map functionality</p> -->
-		<li>Zooming in/out on the map will alternate between county or state layer, depending on the zoom level</li>
-		<li>Hovering over state highlights the corresponding mark in scatterplot, also providing information in top right of map</li>
-		<li>Hovering over county highlights the corresponding mark in bar chart, also providing information in top right of map</li>
-		<li>Single click on state adds state to queue for further analysis, max states in queue is 4</li>
-		<li>If there is more than one state in the queue, clicking on a state that is already in the queue will remove that state from the queue</li>
-		<li>Double click on state zooms to state's bounds and switches to county layer</li>
-		<li>Double click on county zooms out to state layer</li>
+		<div style="font-size:14px;padding:5px;font-family: Georgia">
+			<li>Zooming on the map will alternate between county or state layer</li>
+			<li>State hover corresponds to mark in scatterplot, more info in top right of map</li>
+			<li>County hover corresponds to county in bar chart, more info in top right of map</li>
+			<li>Single click on state adds state to queue for further analysis</li>
+			<li>If more than one state in queue, selecting state will remove state from queue if already present</li>
+			<li>Trying to add more than 5 unique states into queue, will reset queue</li>
+			<li>Double click on state zooms to state's bounds and switches to county layer</li>
+			<li>Double click on county zooms out to state layer</li>
+		</div>
 	</div>
 	<!-- ##################################################### MAP ############################################################################ -->
 	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
-	<div id="graph_selector" style="color:grey; font-size:13px; padding:5px; margin:0px">
-		<label onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="county_bar_chart" checked>County mortality rate bar chart</label>
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<label onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="density_vs_mort_rate_scatter">Density vs Mortality rate scatterplot</label>
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<label onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart">Grouped bar chart</label>
+	<div id="graph_selector" style="color:grey; padding:5px; margin:0px; font-family: Georgia; text-align: center; width: 100%;">
+
+		<h4 style="margin: 0px">
+			<label style="padding-right: 5%; padding-left: 7.5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="county_bar_chart" checked>County mortality rate bar chart</label>
+			<label style="padding-right: 5%; padding-left: 7.5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="density_vs_mort_rate_scatter">Density vs Mortality rate scatterplot</label>
+			<label style="padding-right: 5%; padding-left: 7.5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart">Grouped bar chart</label>
+		</h4>
 	</div>
+	<hr style="border-top: dotted 4px;" />
 	<!-- #################################### radio buttons below map ################################################################### -->
 	<div id="countyMortRateByState" class="graph">
 		<script src="/static/countyMortRateByStateBarChart.js"></script>
@@ -173,9 +187,10 @@
 		<p><strong><span id="tooltip2Label">Important Label Heading</span></strong></p>
 		<p><span id="value2">100</span></p>
 	</div>
-	<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button><!--<button type="button" id="selectGenderByRace">Gender by Race</button><button type="button" id="selectRaceByGender">Race by Gender</button>-->
-		<div id="jonsgraph" class="graph">
-		</div>
+
+	<!--<button type="button" id="selectGenderByRace">Gender by Race</button><button type="button" id="selectRaceByGender">Race by Gender</button>-->
+	<div id="jonsgraph" class="graph">
+		<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button></div>
 	</div>
 	<!-- ########################################################################################################################### -->
 	<!-- ########################################################################################################################### -->
@@ -220,7 +235,7 @@
 		// add MA to the queue
 		selection_list.push("Massachusetts");
 		var selection_count = selection_list.length;
-		var selection_max = 4;
+		var selection_max = 5;
 		// used to store the object which holds all information and functions to deal with the countyMortRateByStateBarChart - DS
 		var countyMortRateByStateBarChart;
 		// used to store the object which holds object dealing with stateMortRatebyDensityScatter - DS
@@ -695,30 +710,40 @@
 				fillOpacity: 0.7,
 				fillColor: 'blue'
 			});
-			if (selection_count < selection_max) {
+			if (selection_list.length < selection_max) {
 				// if the selection list does not include the state, then add it to the selection_list
 				if (!selection_list.includes(state)) {
-					selection_count += 1;
 					selection_list.push(state);
-				// state is already included, so clicking again pop it off
+					queue.update();
+					// state is already included, so clicking again pop it off
 				} else {
-					if(selection_list.length > 1){
+					if (selection_list.length > 1) {
 						// if the selection list is greater than 1, then delete the state
 						// that the user clicks on
-						var filtered = selection_list.filter(function(value, index, arr){
-						    return value != state;
+						var filtered = selection_list.filter(function(value, index, arr) {
+							return value != state;
 						});
 						//console.log(filtered);
 						selection_list = filtered;
-						}
+						queue.update();
+					}
 				}
 			} else {
-				selection_count = 1;
-				selection_list.length = 0;
-				selection_list.push(state);
+				if (!selection_list.includes(state)) {
+					selection_list.length = 0;
+					selection_list.push(state);
+					queue.update_full();
+				} else {
+					var filtered = selection_list.filter(function(value, index, arr) {
+						return value != state;
+					});
+					//console.log(filtered);
+					selection_list = filtered;
+					queue.update();
+				}
 			}
 			// update the queue with the selection
-			queue.update();
+
 			// update Dennis's graph based on the selection
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			countyMortRateByStateBarChart.update_bars(e.target.feature.properties.abbreviation, gender, race);
@@ -948,19 +973,19 @@
 				'&nbsp;&nbsp;&nbsp;&nbsp;' +
 				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple"><b>Multiple mode</b></label><br />' +
 
-				'<div id = "single_selection_dropdown" style="text-align: left; padding-top: 5px; padding-bottom: 5px">' +
+				'<div id = "single_selection_dropdown" style="text-align: left; padding-top: 5px; padding-bottom: 5px; font-family: Georgia">' +
 				'<div style="padding-left: 5px; padding-bottom: 5px">Gender - <select id="dd_gender_single1"><option>Overall</option><option>Female</option><option>Male</option></select></div>' +
 				'<div style="padding-left: 5px; padding-bottom: 5px">Race - ' + '<select id="dd_race_single1"><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 				'</div>' +
 
-				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left; padding-top: 5px; padding-bottom: 5px">' +
-				'<div style="padding-left: 5px; padding-bottom: 5px">1st lookup criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left; padding-top: 5px; padding-bottom: 5px; font-family: Georgia">' +
+				'<div style="padding-left: 5px; padding-bottom: 5px">1st criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
 				'Race - <select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 
-				'<div style="padding-left: 5px; padding-bottom: 5px">2nd lookup criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<div style="padding-left: 5px; padding-bottom: 5px">2nd criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
 				'Race - <select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
@@ -1000,16 +1025,16 @@
 			if (curr_selection === "county_bar_chart") {
 				document.getElementById("countyMortRateByState").style.display = "block";
 				document.getElementById("stateMortRateByDensity").style.display = "none";
-				document.getElementById("groupedBarChartButtons").style.display = "none";
+				document.getElementById("jonsgraph").style.display = "none";
 			} else if (curr_selection === "density_vs_mort_rate_scatter") {
 				document.getElementById("countyMortRateByState").style.display = "none";
 				document.getElementById("stateMortRateByDensity").style.display = "block";
-				document.getElementById("groupedBarChartButtons").style.display = "none";
+				document.getElementById("jonsgraph").style.display = "none";
 			} else if (curr_selection === "state_comp_bar_chart") {
 				update_grouped_barchart(selection_list, jons_graph_type);
 				document.getElementById("countyMortRateByState").style.display = "none";
 				document.getElementById("stateMortRateByDensity").style.display = "none";
-				document.getElementById("groupedBarChartButtons").style.display = "block";
+				document.getElementById("jonsgraph").style.display = "block";
 
 			}
 		}
@@ -1032,18 +1057,18 @@
 					countyMortRateByStateBarChart.update_bars(get_state_abbreviation(selection_list[selection_list.length - 1]), gender, race);
 
 					// Update Jon's graph
-					if(gender == "Overall" & race == "Overall"){
+					if (gender == "Overall" & race == "Overall") {
 						jons_graph_type = "overall";
-						update_grouped_barchart(selection_list,"overall");
-					} else if(gender != "Overall" & race == "Overall"){
+						update_grouped_barchart(selection_list, "overall");
+					} else if (gender != "Overall" & race == "Overall") {
 						jons_graph_type = "gender";
-						update_grouped_barchart(selection_list,"gender");
-					} else if(gender == "Overall" & race != "Overall"){
+						update_grouped_barchart(selection_list, "gender");
+					} else if (gender == "Overall" & race != "Overall") {
 						jons_graph_type = "race";
-						update_grouped_barchart(selection_list,"race");
+						update_grouped_barchart(selection_list, "race");
 					} else { // if both gender, race != Overall, change to whatever last choice was
 						jons_graph_type = changed_vals[0];
-						update_grouped_barchart(selection_list,changed_vals[0]);
+						update_grouped_barchart(selection_list, changed_vals[0]);
 					}
 
 					// changed_vals.length == 0 ? update_grouped_barchart(get_state_data_overall(selection_list), jons_graph_type) : console.log("It is 0")
@@ -1079,9 +1104,16 @@
 					break;
 				}
 			}
-			let changed_vals = save_dropdown_options();
 			// When the user changes selection using the radio button, save user's choices and then
 			// change the radio button options
+			let changed_vals = save_dropdown_options();
+
+			// update Dennis's graph accordingly
+			let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
+			let county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
+			countyMortRateByStateBarChart.update_bars(get_state_abbreviation(selection_list[selection_list.length - 1]), gender, race);
+			//
+
 			race_gender_inspector = curr_selection;
 			if (race_gender_inspector === "Multiple") {
 				document.getElementById("single_selection_dropdown").style.display = "none";
@@ -1111,11 +1143,11 @@
 			let changed_vals = [];
 			if (gender != document.getElementById("dd_gender_single1").value) {
 				changed_vals.push("gender");
-			} 
+			}
 			gender = document.getElementById("dd_gender_single1").value;
 			if (race != document.getElementById("dd_race_single1").value) {
 				changed_vals.push("race");
-			} 
+			}
 			race = document.getElementById("dd_race_single1").value;
 			g1 = document.getElementById("dd_gender_multiple1").value;
 			g2 = document.getElementById("dd_gender_multiple2").value;
@@ -1152,6 +1184,17 @@
 			fade_Out_Effect(this._div);
 		}
 
+		queue.update_full = function(props) {
+			// show the div if the user clicks any state and wants to add it to the queue
+			// set the opacity of the div to 1.0
+			this._div.style.opacity = "1.0";
+			s = this._div.style;
+			// update the contents of the div
+			this._div.innerHTML = '<b>Queue has been reset, current queue contents: ' + selection_list + '</b>';
+			// provide smooth fadeout effect to the div
+			fade_Out_Effect(this._div);
+		}
+
 		function fade_Out_Effect(div) {
 			// decrease the opacity of the div by 0.01 every 20 ms, to provide a smooth fadeout effect
 			let fadeEffect = setInterval(function() {
@@ -1163,7 +1206,7 @@
 				} else {
 					clearInterval(fadeEffect);
 				}
-			}, 100);
+			}, 400);
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1239,13 +1282,13 @@
 		var w = Math.round(body.clientWidth * 0.7);
 		var h = Math.round(body.clientHeight * 0.3);
 
-		race_list = ["White","Black","Hispanic","Asian and Pacific Islander","American Indian and Alaskan Native"];
-		gender_list = ["Male","Female"]
+		race_list = ["White", "Black", "Hispanic", "Asian and Pacific Islander", "American Indian and Alaskan Native"];
+		gender_list = ["Male", "Female"]
 
 		function get_race_abbreviation(race) {
-			if(race === "Asian and Pacific Islander"){
+			if (race === "Asian and Pacific Islander") {
 				race = "APIA";
-			} else if(race === "American Indian and Alaskan Native"){
+			} else if (race === "American Indian and Alaskan Native") {
 				race = "AI/AN";
 			}
 			return race;
@@ -1256,7 +1299,7 @@
 		function get_state_data(state_name, strata, strata2 = "") {
 			var data = [];
 
-			if(strata == "overall"){
+			if (strata == "overall") {
 				for (let j = 0; j < state_name.length; j++) {
 					for (let i = 0; i < json_data.length; i++) {
 						if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
@@ -1271,11 +1314,11 @@
 				}
 			}
 
-			if(strata == "gender"){
-				if(strata2 == ""){
+			if (strata == "gender") {
+				if (strata2 == "") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] == "Overall"){
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] == "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1285,10 +1328,10 @@
 							}
 						}
 					}
-				} else if(strata2 == "race"){
+				} else if (strata2 == "race") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] != "Overall"){
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] != "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1302,11 +1345,11 @@
 			}
 
 
-			if(strata == "race"){
-				if(strata2 == ""){
+			if (strata == "race") {
+				if (strata2 == "") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] != "Overall"){
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] != "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1316,10 +1359,10 @@
 							}
 						}
 					}
-				} else if(strata2 == "gender"){
+				} else if (strata2 == "gender") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] != "Overall"){
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] != "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1331,57 +1374,57 @@
 					}
 				}
 			}
-		return data;
+			return data;
 		};
 
 		function graph_bar_color(d) {
 			let color;
 			switch (true) {
 				case (d > 450):
-				color = '#210009';
-				break;
+					color = '#210009';
+					break;
 				case (d > 400):
-				color = '#560019';
-				break;
+					color = '#560019';
+					break;
 				case (d > 350):
-				color = '#800026';
-				break;
+					color = '#800026';
+					break;
 				case (d > 300):
-				color = '#BD0026';
-				break;
+					color = '#BD0026';
+					break;
 				case (d > 250):
-				color = '#E31A1C';
-				break;
+					color = '#E31A1C';
+					break;
 				case (d > 200):
-				color = '#FC4E2A';
-				break;
+					color = '#FC4E2A';
+					break;
 				case (d > 150):
-				color = '#FD8D3C';
-				break;
+					color = '#FD8D3C';
+					break;
 				case (d > 100):
-				color = '#FEB24C';
-				break;
+					color = '#FEB24C';
+					break;
 				case (d > 50):
-				color = '#FED976';
-				break;
+					color = '#FED976';
+					break;
 				case (d == null || d == 0):
-				color = '#BEBEBE';
-				break;
+					color = '#BEBEBE';
+					break;
 				default:
-				color = '#FFEDA0';
-				break;
+					color = '#FFEDA0';
+					break;
 			};
 			return color;
 		}
 
-		function update_grouped_barchart(state_data, strata, strata2="") {
+		function update_grouped_barchart(state_data, strata, strata2 = "") {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
 
 			// remove old chart
 			chart.selectAll("*").remove()
-			
+
 			// get data for this state, strata
-			var data = get_state_data(state_data,strata,strata2);
+			var data = get_state_data(state_data, strata, strata2);
 
 			// x is main axis
 			var x = d3.scaleBand()
@@ -1389,7 +1432,7 @@
 				.padding(0.1)
 				.domain(data.map(function(d) {
 					return d.state
-				}));			
+				}));
 
 			// x1 is secondary axis
 			var x1 = d3.scaleBand()
@@ -1397,7 +1440,7 @@
 				.padding(0.05)
 				.domain(data.map(function(d) {
 					return d[strata];
-			}));
+				}));
 
 			// set up y axis
 			var y = d3.scaleLinear().rangeRound([h, 0]);
@@ -1434,12 +1477,12 @@
 				.append("rect")
 				.attr("x", function(d, i) {
 					// position the bars for the strata variable correctly
-					return x1(d[strata]) + (x1.bandwidth() - d3.min([x1.bandwidth(),100]))/2
+					return x1(d[strata]) + (x1.bandwidth() - d3.min([x1.bandwidth(), 100])) / 2
 				})
 				.attr("y", function(d) {
 					return y(d.mort_rate);
 				})
-				.attr("width", d3.min([x1.bandwidth(),100])) // sent width of the bars to be no bigger than 100px
+				.attr("width", d3.min([x1.bandwidth(), 100])) // sent width of the bars to be no bigger than 100px
 				.attr("height", function(d) {
 					return h - y(d.mort_rate);
 				})
@@ -1456,7 +1499,7 @@
 				.attr("transform", "translate(0," + h + ")")
 				.call(d3.axisBottom(x))
 				.selectAll("text")
-				.attr("y",15);
+				.attr("y", 15);
 
 			// add secondary x-axis
 			bars.append("g")
@@ -1483,7 +1526,7 @@
 				if (selection_list.length > 0) {
 					//New values for dataset
 					jons_graph_type = "overall";
-					update_grouped_barchart(selection_list,"overall");
+					update_grouped_barchart(selection_list, "overall");
 				}
 			});
 
