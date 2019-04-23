@@ -7,7 +7,7 @@ class CountyMortRateByStateBarChart {
         this.w = w;
         this.h = h;
         this.container = container;
-        this.y_pad = 20;
+        this.y_pad = 40;
         this.x_pad = 50;
         this.sortOrder = false;
         this.tooltip = null;
@@ -81,15 +81,38 @@ class CountyMortRateByStateBarChart {
             .align(0.1);
 
         this.yScale = d3.scaleLinear()
-            .range([h-y_pad , y_pad]);
+            .range([h-y_pad , 10]);
 
         this.svg.append("g")
             .attr("id", "x_axis")
             .attr("transform", "translate(0, " + (w-y_pad) + ")");
+        
+        this.svg.append("line")
+            .attr("x1", x_pad)
+            .attr("y1", h-39)
+            .attr("x2", w-100)
+            .attr("y2", h-39)
+            .attr("stroke-width", 1)
+            .attr("stroke", "black")
 
         this.svg.append("g")
             .attr("id", "y_axis")
             .attr("transform", "translate(" + x_pad + ",0)");
+
+        this.svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x",0 - (h / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Mortaility Rate");
+        
+        this.svg.append("text")
+            .attr("y", h)
+            .attr("x", w/2)
+            .attr("dy", -25)
+            .attr("dx", -50)
+            .style("text-anchor", "middle")
+            .text("State/County");
     }
 
     update_bars(state, gender, race){
@@ -144,6 +167,7 @@ class CountyMortRateByStateBarChart {
                 d3.select("#tooltip").classed("hidden", false);
             })
             .on("mouseout", function() { d3.select("#tooltip").classed("hidden", true);});
+        //console.log(h);
 
         // remove old bars
         bars.exit().remove();
