@@ -89,15 +89,11 @@ class CountyMortRateByStateBarChart {
         
         this.svg.append("line")
             .attr("x1", x_pad)
-            .attr("y1", h-39)
+            .attr("y1", h-y_pad+1)
             .attr("x2", w-100)
-            .attr("y2", h-39)
+            .attr("y2", h-y_pad+1)
             .attr("stroke-width", 1)
             .attr("stroke", "black")
-
-        this.svg.append("g")
-            .attr("id", "y_axis")
-            .attr("transform", "translate(" + x_pad + ",0)");
 
         this.svg.append("text")
             .attr("transform", "rotate(-90)")
@@ -140,7 +136,6 @@ class CountyMortRateByStateBarChart {
             .tickFormat("");
         let yAxis = d3.axisLeft()
             .scale(yScale);
-        svg.select("#x_axis").call(xAxis);
         svg.select("#y_axis").call(yAxis);
 
         //Update all bars
