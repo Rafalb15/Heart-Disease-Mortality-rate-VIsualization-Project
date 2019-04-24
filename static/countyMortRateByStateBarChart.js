@@ -84,6 +84,10 @@ class CountyMortRateByStateBarChart {
             .range([h-y_pad , 10]);
 
         this.svg.append("g")
+            .attr("id", "y_axis")
+            .attr("transform", "translate("+x_pad+",0)");
+
+        this.svg.append("g")
             .attr("id", "x_axis")
             .attr("transform", "translate(0, " + (w-y_pad) + ")");
         
