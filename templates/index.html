@@ -304,35 +304,38 @@
 				};
 			} else {
 				switch (true) {
-					case (d >= 150):
+					case (d === null):
+						color = '#FFFFFF'
+						break;
+					case (d >= 140):
 						color = '#d73027';
 						break;
-					case (100 <= d && d < 150):
+					case (100 <= d && d < 140):
 						color = '#f46d43';
 						break;
-					case (50 <= d && d < 100):
+					case (60 <= d && d < 100):
 						color = '#fdae61';
 						break;
-					case (0 < d && d < 50):
+					case (20 <= d && d < 60):
 						color = '#fee090';
 						break;
-					case (d == 0):
+					case (-20 <= d && d < 20):
 						color = '#BEBEBE';
 						break;
-					case (-50 < d && d < 0):
+					case (-60 <= d && d < -20):
 						color = '#abd9e9';
 						break;
-					case (-100 < d && d <= 50):
+					case (-100 <= d && d < -60):
 						color = '#74add1';
 						break;
-					case (-150 < d && d <= -100):
+					case (-140 < d && d < -100):
 						color = '#4575b4';
 						break;
-					case (d <= -150):
+					case (d <= -140):
 						color = '#313695';
 						break;
 					default:
-						color = '#BEBEBE';
+						color = '#FFFFFF';
 						break;
 				};
 
@@ -469,7 +472,7 @@
 
 		function return_state_information_difference(state_name) {
 			// variables that will be used
-			let mort_rate_difference = 0;
+			let mort_rate_difference = null;
 			// value_1` and value_2 are undefined at this point, will be used to know when to break out of loop
 			let value_1;
 			let value_2;
@@ -508,7 +511,7 @@
 
 		function return_county_information_difference(county, state) {
 			// variables that will be used
-			let mort_rate_difference = 0;
+			let mort_rate_difference = null;
 			// value_1` and value_2 are undefined at this point, will be used to know when to break out of loop
 			let value_1;
 			let value_2;
@@ -1230,19 +1233,20 @@
 		legend.update = function() {
 			if (race_gender_inspector === "Multiple") {
 				resp_labels = [];
-				partitions = [-150, -100, -50, 0, 50, 100, 150];
-				resp_labels.push('<i style="background:' + return_Color(-151) + '"></i> ' + '-150% or more');
+				partitions = [-140, -100, -60, -20, 20, 60, 100, 140];
+				resp_labels.push('<i style="background:' + return_Color(null) + '"></i> ' + 'Insufficient Data');
+				resp_labels.push('<i style="background:' + return_Color(-141) + '"></i> ' + '-140% or less');
 				for (let i = 0; i < partitions.length - 1; i++) {
 					from = partitions[i];
 					to = partitions[i + 1];
-					if (i == 3) {
+					/*if (i == 3) {
 						resp_labels.push('<i style="background:' + return_Color(0) + '"></i> ' + '0% or no data');
-					}
+					}*/
 					resp_labels.push(
 						'<i style="background:' + return_Color(from + 1) + '"></i> ' +
 						from + ' to ' + to + '%');
 				}
-				resp_labels.push('<i style="background:' + return_Color(151) + '"></i> ' + '150% or more');
+				resp_labels.push('<i style="background:' + return_Color(141) + '"></i> ' + '140% or more');
 				this._div.innerHTML = '<h4>Mortality rate % difference</h4>' + resp_labels.join('<br>');
 			} else if (race_gender_inspector === "Single") {
 				resp_labels = [];
