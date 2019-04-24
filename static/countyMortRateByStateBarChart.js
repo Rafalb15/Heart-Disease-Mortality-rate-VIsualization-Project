@@ -97,7 +97,7 @@ class CountyMortRateByStateBarChart {
             .attr("x2", w-100)
             .attr("y2", h-y_pad+1)
             .attr("stroke-width", 1)
-            .attr("stroke", "black")
+            .attr("stroke", "black");
 
         this.svg.append("text")
             .attr("transform", "rotate(-90)")
