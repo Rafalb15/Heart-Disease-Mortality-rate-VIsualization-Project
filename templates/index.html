@@ -305,7 +305,7 @@
 			} else {
 				switch (true) {
 					case (d === null):
-						color = '#FFFFFF'
+						color = '#BEBEBE'
 						break;
 					case (d >= 140):
 						color = '#d73027';
@@ -320,19 +320,19 @@
 						color = '#fee090';
 						break;
 					case (-20 <= d && d < 20):
-						color = '#BEBEBE';
+						color = '#ffffbf';
 						break;
 					case (-60 <= d && d < -20):
-						color = '#abd9e9';
+						color = '#e0f3f8';
 						break;
 					case (-100 <= d && d < -60):
-						color = '#74add1';
+						color = '#abd9e9';
 						break;
 					case (-140 < d && d < -100):
-						color = '#4575b4';
+						color = '#74add1';
 						break;
 					case (d <= -140):
-						color = '#313695';
+						color = '#4575b4';
 						break;
 					default:
 						color = '#FFFFFF';
@@ -427,7 +427,7 @@
 					}
 				}
 			}
-			//save_cache_to_file();
+			save_cache_to_file();
 		}
 
 		function return_state_information(state_name, gender, race) {
@@ -1248,6 +1248,7 @@
 				}
 				resp_labels.push('<i style="background:' + return_Color(141) + '"></i> ' + '140% or more');
 				this._div.innerHTML = '<h4>Mortality rate % difference</h4>' + resp_labels.join('<br>');
+				//populate_cache();
 			} else if (race_gender_inspector === "Single") {
 				resp_labels = [];
 				partitions = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450];
