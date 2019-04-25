@@ -173,7 +173,7 @@
 			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart">Grouped bar chart</label>
 		</h4>
 	</div>
-	<hr style="border-top: dotted 4px;" />
+	<hr style="border-top: dotted 2px;" />
 	<!-- #################################### radio buttons below map ################################################################### -->
 	<div id="countyMortRateByState" class="graph">
 		<script src="/static/countyMortRateByStateBarChart.js"></script>
@@ -1427,7 +1427,7 @@
 
 			// remove old chart
 			chart.selectAll("*").remove()
-			
+
 			// get data for this state, strata
 			var data = get_state_data(state_data,strata,strata2);
 
@@ -1518,7 +1518,7 @@
 				.attr("font-weight", "bold")
 				.attr("text-anchor", "start")
 
-			} // end if(strata == "overall" & strata2 == ""){ 
+			} // end if(strata == "overall" & strata2 == ""){
 
 			// if one stratifying variable picked
 			if(strata != "overall" & strata2 == "") {
@@ -1614,8 +1614,8 @@
 				.attr("font-weight", "bold")
 				.attr("text-anchor", "start")
 
-			} // end  if(strata != "overall" & strata =="") {	
-		
+			} // end  if(strata != "overall" & strata =="") {
+
 		};
 
 		d3.select("#groupedBarChartButtons")

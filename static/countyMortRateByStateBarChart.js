@@ -57,7 +57,7 @@ class CountyMortRateByStateBarChart {
             .attr("id", "graph_title")
             .attr("text-anchor", "middle")
             .style("font-size", "20px")
-            .style("font-weight", "bold")
+            //.style("font-weight", "bold")
             .style("text-align","center")
             .style("display", "inline-block")
             .style("width", w-300 + "px");
@@ -86,7 +86,7 @@ class CountyMortRateByStateBarChart {
         this.svg.append("g")
             .attr("id", "y_axis")
             .attr("transform", "translate("+x_pad+",0)");
-        
+
         this.svg.append("line")
             .attr("x1", x_pad)
             .attr("y1", h-y_pad+1)
@@ -102,7 +102,7 @@ class CountyMortRateByStateBarChart {
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .text("Mortaility Rate");
-        
+
         this.svg.append("text")
             .attr("id", "xlabel")
             .attr("y", h)

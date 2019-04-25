@@ -23,7 +23,7 @@ class StateMortRatebyDensity {
         .attr("id", "graph_title")
         .attr("text-anchor", "middle")
         .style("font-size", "20px")
-        .style("font-weight", "bold")
+        //.style("font-weight", "bold")
         .style("text-align", "center")
         .style("display", "inline-block")
         .style("width", w + "px")
