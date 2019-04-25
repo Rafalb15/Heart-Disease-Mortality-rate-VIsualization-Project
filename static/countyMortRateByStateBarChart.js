@@ -86,10 +86,6 @@ class CountyMortRateByStateBarChart {
         this.svg.append("g")
             .attr("id", "y_axis")
             .attr("transform", "translate("+x_pad+",0)");
-
-        this.svg.append("g")
-            .attr("id", "x_axis")
-            .attr("transform", "translate(0, " + (w-y_pad) + ")");
         
         this.svg.append("line")
             .attr("x1", x_pad)
@@ -100,6 +96,7 @@ class CountyMortRateByStateBarChart {
             .attr("stroke", "black");
 
         this.svg.append("text")
+            .attr("id", "ylabel")
             .attr("transform", "rotate(-90)")
             .attr("x",0 - (h / 2))
             .attr("dy", "1em")
@@ -107,12 +104,20 @@ class CountyMortRateByStateBarChart {
             .text("Mortaility Rate");
         
         this.svg.append("text")
+            .attr("id", "xlabel")
             .attr("y", h)
             .attr("x", w/2)
             .attr("dy", -25)
             .attr("dx", -50)
             .style("text-anchor", "middle")
             .text("State/County");
+    }
+
+    state_mort_rate_bars(gender, race){
+        let svg = this.svg;
+
+        let state_data = get_state_data();
+
     }
 
     update_bars(state, gender, race){
@@ -273,23 +278,34 @@ addLoadEvent(function(e) {
 
 */
 
+function get_state_data(gender, race){
+    let data = [];
+    for (let i =0; i<json_data.length; i++){
+        if(json_data[i][11] === "State"){
+            data.push({
+                
+            })
+        }
+    }
+}
+
 // a list that contains the name, state vs county type and mortality rate
 function get_county_data_of_state(state_abbreviation, gender, race) {
-  let data = [];
-  for (let i = 0; i < json_data.length; i++) {
-      if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race) {
-          data.push({
-          county: json_data[i][10],
-          type: json_data[i][11],
-          mort_rate: Math.round(json_data[i][15]),
-          // Rafal added
-          state: json_data[i][9]
-          // Include the state information as well
-          });
-      }
-  }
-  if (data.length === 0) {
-      console.log('did not find any state/counties with matching state abbreviation ' + state_abbreviation);
-  }
-  return data;
+    let data = [];
+    for (let i = 0; i < json_data.length; i++) {
+        if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race) {
+            data.push({
+            county: json_data[i][10],
+            type: json_data[i][11],
+            mort_rate: Math.round(json_data[i][15]),
+            // Rafal added
+            state: json_data[i][9]
+            // Include the state information as well
+            });
+        }
+    }
+    if (data.length === 0) {
+        console.log('did not find any state/counties with matching state abbreviation ' + state_abbreviation);
+    }
+    return data;
 }
