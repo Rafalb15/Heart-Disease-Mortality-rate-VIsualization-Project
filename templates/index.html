@@ -907,25 +907,33 @@
 					// if the existing color does not match the new color that will be applied to the layer
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
-					let sleep_time = 50;
-					let number_of_blinks = 2;
-					for (let i = 0; i < number_of_blinks; i++) {
-						layer.setStyle({
-							color: 'red'
-							//fillColor: return_style.fillColor
-						});
-						await sleep(sleep_time);
-						layer.setStyle({
-							color: 'white'
-							//fillColor: existing_color
-						});
-						i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
-					}
+					let sleep_time = 700;
+					layer_fadeout(layer);
+					await sleep(sleep_time);
 				};
 				layer.setStyle(return_style);
 			});
 		}
 
+		function layer_fadeout(layer){
+			let fadeEffect = setInterval(function() {
+				if (layer.options.fillOpacity > 0) {
+					layer.setStyle({fillOpacity : layer.options.fillOpacity - .05})
+				} else {
+					clearInterval(fadeEffect);
+				}
+			}, 25);
+		}
+
+		function layer_fadein(layer){
+			let fadeEffect = setInterval(function() {
+				if (layer.options.fillOpacity < .6) {
+					layer.setStyle({fillOpacity : layer.options.fillOpacity + .2})
+				} else {
+					clearInterval(fadeEffect);
+				}
+			}, 100);
+		}
 
 		function reload_geojson_county() {
 			geojson_county.eachLayer(async function(layer) {
@@ -942,17 +950,14 @@
 					// signal to the user by changing the outline of the state in a blinking red and white fashion
 					// sleep the change for 250 ms seconds so users will be able to register
 					let sleep_time = 20;
-					let number_of_blinks = 1;
-					for (let i = 0; i < number_of_blinks; i++) {
-						layer.setStyle({
-							color: 'red'
-						});
+					// let number_of_blinks = 1;
+					// for (let i = 0; i < number_of_blinks; i++) {
 						await sleep(sleep_time);
-						layer.setStyle({
-							color: 'white'
-						});
-						i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
-					}
+					// 	// layer.setStyle({
+					// 	// 	color: 'white'
+					// 	// });
+					// 	// i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
+					// }
 				};
 				layer.setStyle(return_style);
 			});
@@ -1211,6 +1216,8 @@
 				}
 			}, 400);
 		}
+
+
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Moved all my things to static/countyMortRateByStateBarChart.js
