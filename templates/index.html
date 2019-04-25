@@ -789,37 +789,36 @@
 		function style(feature) {
 			let temp;
 			if (race_gender_inspector === "Single") {
-				// Single mode
-				// Try to get a value from cache
-				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.abbreviation);
-				if (cache_lookup === undefined) {
-					//console.log(feature.properties.abbreviation + " Not available in cache");
-					// if the value does not exist in the cache, get the value using search on the json data
-					// append the result to the cache to be used later
-					temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
-					add_to_cache(race_gender_inspector + gender + race, feature.properties.abbreviation, temp);
-				} else {
-					// get the value from the cache
-					temp = cache_lookup;
-					//console.log("returned from cache");
-				}
-				returncolor = return_Color(temp);
+						// Single mode
+						// Try to get a value from cache
+						cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.abbreviation);
+						if (cache_lookup === undefined) {
+							//console.log(feature.properties.abbreviation + " Not available in cache");
+							// if the value does not exist in the cache, get the value using search on the json data
+							// append the result to the cache to be used later
+							temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
+							add_to_cache(race_gender_inspector + gender + race, feature.properties.abbreviation, temp);
+						} else {
+							// get the value from the cache
+							temp = cache_lookup;
+							//console.log("returned from cache");
+						}
+						returncolor = return_Color(temp);
 			} else {
-				// Multiple mode
-				// Try to get a value from cache
-				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation);
-				if (cache_lookup === undefined) {
-					//console.log(feature.properties.abbreviation + " Not available in cache");
-					// if the value does not exist in the cache, get the value using search on the json data
-					// append the result to the cache to be used later
-					temp = return_state_information_difference(feature.properties.abbreviation)[1];
-					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation, temp);
-				} else {
-					temp = cache_lookup;
-					// get the value from the cache
-					//console.log("returned from cache");
-				}
-				returncolor = return_Color(temp);
+						// Multiple mode
+						// Try to get a value from cache
+						cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation);
+						if (cache_lookup === undefined) {
+							//console.log(feature.properties.abbreviation + " Not available in cache");
+							// if the value does not exist in the cache, get the value using search on the json data
+							// append the result to the cache to be used later
+							temp = return_state_information_difference(feature.properties.abbreviation)[1];
+							add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation, temp);
+						} else {
+							temp = cache_lookup;
+							// get the value from the cache
+						}
+						returncolor = return_Color(temp);
 			}
 			return {
 				weight: 3,
@@ -834,37 +833,35 @@
 		function county_style(feature) {
 			let temp;
 			if (race_gender_inspector === "Single") {
-				// Single mode
-				// Try to get a value from cache
-				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE);
-				if (cache_lookup === undefined) {
-					//console.log("no cache");
-					// if the value does not exist in the cache, get the value using search on the json data
-					// append the result to the cache to be used later
-					temp = return_county_information(feature.properties.NAME, feature.properties.STATE, gender, race)[1];
-					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE, temp);
-				} else {
-					// get the value from the cache
-					temp = cache_lookup;
-					//console.log("returned from cache");
-				}
-				returncolor = return_Color(temp);
+						// Single mode
+						// Try to get a value from cache
+						cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE);
+						if (cache_lookup === undefined) {
+							//console.log("no cache");
+							// if the value does not exist in the cache, get the value using search on the json data
+							// append the result to the cache to be used later
+							temp = return_county_information(feature.properties.NAME, feature.properties.STATE, gender, race)[1];
+							add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE, temp);
+						} else {
+							// get the value from the cache
+							temp = cache_lookup;
+							//console.log("returned from cache");
+						}
+						returncolor = return_Color(temp);
 			} else {
-				// Multiple mode
-				//temp = return_county_information_difference(feature.properties.NAME)[1];
-				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE);
-				if (cache_lookup === undefined) {
-					//console.log("no cache");
-					// if the value does not exist in the cache, get the value using search on the json data
-					// append the result to the cache to be used later
-					temp = return_county_information_difference(feature.properties.NAME, feature.properties.STATE)[1];
-					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE, temp);
-				} else {
-					// get the value from the cache
-					temp = cache_lookup;
-					//console.log("returned from cache");
-				}
-				returncolor = return_Color(temp);
+						// Multiple mode
+						//temp = return_county_information_difference(feature.properties.NAME)[1];
+						cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE);
+						if (cache_lookup === undefined) {
+							// if the value does not exist in the cache, get the value using search on the json data
+							// append the result to the cache to be used later
+							temp = return_county_information_difference(feature.properties.NAME, feature.properties.STATE)[1];
+							add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE, temp);
+						} else {
+							// get the value from the cache
+							temp = cache_lookup;
+						}
+						returncolor = return_Color(temp);
 			}
 			return {
 				weight: 1,
@@ -893,73 +890,72 @@
 		setTimeout(load_county_data, 0);
 		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
 
-		//
+		////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		function layer_fadeout(layer, sleep_time, aggressiveness) {
+			let fadeEffect = setInterval(function() {
+				if (layer.options.fillOpacity > 0) {
+					layer.setStyle({
+						fillOpacity: layer.options.fillOpacity - aggressiveness
+					})
+				} else {
+					clearInterval(fadeEffect);
+				}
+			}, sleep_time);
+		}
+		////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		function layer_fadein(layer, sleep_time, aggressiveness, opacity) {
+			let fadeEffect = setInterval(function() {
+				if (layer.options.fillOpacity < opacity) {
+					layer.setStyle({
+						fillOpacity: layer.options.fillOpacity + aggressiveness
+					})
+				} else {
+					clearInterval(fadeEffect);
+				}
+			}, sleep_time);
+		}
+		////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////
 		function reload_geojson() {
 			geojson.eachLayer(async function(layer) {
 				// get the current color of the respective layer
 				let existing_color = layer.options.fillColor;
-				let return_style;
-
-				// get the new color based on the selection of the data
-				return_style = style(layer.feature);
+				let return_style = style(layer.feature);
 				//console.log('State: ' + layer.feature.properties.name + ' Existing fill color' + existing_color + ' - ' + return_style.fillColor);
 				if (existing_color != return_style.fillColor) {
 					// if the existing color does not match the new color that will be applied to the layer
-					// signal to the user by changing the outline of the state in a blinking red and white fashion
-					// sleep the change for 250 ms seconds so users will be able to register
+					// sleep the change for 700 ms seconds so users will be able to register and fadein and out
 					let sleep_time = 700;
-					layer_fadeout(layer);
+					layer_fadeout(layer, 25, 0.05);
 					await sleep(sleep_time);
 				};
+				return_style.fillOpacity = 0.0;
 				layer.setStyle(return_style);
+				layer_fadein(layer, 25, 0.05, 0.7);
 			});
 		}
 
-		function layer_fadeout(layer){
-			let fadeEffect = setInterval(function() {
-				if (layer.options.fillOpacity > 0) {
-					layer.setStyle({fillOpacity : layer.options.fillOpacity - .05})
-				} else {
-					clearInterval(fadeEffect);
-				}
-			}, 25);
-		}
 
-		function layer_fadein(layer){
-			let fadeEffect = setInterval(function() {
-				if (layer.options.fillOpacity < .6) {
-					layer.setStyle({fillOpacity : layer.options.fillOpacity + .2})
-				} else {
-					clearInterval(fadeEffect);
-				}
-			}, 100);
-		}
 
 		function reload_geojson_county() {
 			geojson_county.eachLayer(async function(layer) {
 				// get the current color of the respective layer
 				// get the new color based on the selection of the data
 				let existing_color = layer.options.fillColor;
-				let return_style;
-				// get the new color based on the selection of the data
-				return_style = county_style(layer.feature);
-
+				let return_style = county_style(layer.feature);
 				//console.log('State: ' + layer.feature.properties.name + ' Existing fill color' + existing_color + ' - ' + return_style.fillColor);
 				if (existing_color != return_style.fillColor) {
 					// if the existing color does not match the new color that will be applied to the layer
-					// signal to the user by changing the outline of the state in a blinking red and white fashion
-					// sleep the change for 250 ms seconds so users will be able to register
-					let sleep_time = 20;
-					// let number_of_blinks = 1;
-					// for (let i = 0; i < number_of_blinks; i++) {
-						await sleep(sleep_time);
-					// 	// layer.setStyle({
-					// 	// 	color: 'white'
-					// 	// });
-					// 	// i < number_of_blinks - 1 ? await sleep(sleep_time) : 'nothing';
-					// }
+					// sleep the change for 700 ms seconds so users will be able to register and fadein and out
+					let sleep_time = 150;
+					layer_fadeout(layer, 5, .05);
+					await sleep(sleep_time);
 				};
+				return_style.fillOpacity = 0.0;
 				layer.setStyle(return_style);
+				layer_fadein(layer, 5, .05, 0.5);
 			});
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1429,17 +1425,17 @@
 			return color;
 		}
 
-		function update_grouped_barchart(state_data, strata, strata2="") {
+		function update_grouped_barchart(state_data, strata, strata2 = "") {
 			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
 
 			// remove old chart
 			chart.selectAll("*").remove()
 
 			// get data for this state, strata
-			var data = get_state_data(state_data,strata,strata2);
+			var data = get_state_data(state_data, strata, strata2);
 
 			// change width to expand when more states are added in selection list
-			w = Math.round(body.clientWidth)*selection_list.length/selection_max;
+			w = Math.round(body.clientWidth) * selection_list.length / selection_max;
 
 			// set up y axis
 			var y = d3.scaleLinear().rangeRound([h, 0]);
@@ -1450,176 +1446,182 @@
 
 
 			// if no stratifying variable picked
-			if(strata == "overall" & strata2 == ""){
+			if (strata == "overall" & strata2 == "") {
 				data = d3.nest()
-				.key(function(d) {return d.state})
-				.entries(data);
+					.key(function(d) {
+						return d.state
+					})
+					.entries(data);
 
 				// set up x-axes
 				// x_state is main axis
 				var x_state = d3.scaleBand()
-				.rangeRound([0, w])
-				.padding(0.05)
-				.domain(data.map(function(d){
-					return d.key;
-				}));
+					.rangeRound([0, w])
+					.padding(0.05)
+					.domain(data.map(function(d) {
+						return d.key;
+					}));
 
 				var g = chart.append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 				var bars = g.selectAll("g")
-				.data(data)
-				.enter()
-				.append("g")
-				.attr("transform", function(d) {
-					return "translate(" + x_state(d.key) + ",0)";
-				})
+					.data(data)
+					.enter()
+					.append("g")
+					.attr("transform", function(d) {
+						return "translate(" + x_state(d.key) + ",0)";
+					})
 
 				// add d3-min tooltip
 				var tip2 = d3.tip()
-				.attr("class", "tooltip2")
-				.html(function(d) {
-					return d.values[0].mort_rate;
-				});
+					.attr("class", "tooltip2")
+					.html(function(d) {
+						return d.values[0].mort_rate;
+					});
 				bars.call(tip2);
 
 				bars.selectAll("rect")
-				.data(function(d) {
-					return [d];
-				})
-				.enter()
-				.append("rect")
-				.attr("x", function(d) {
+					.data(function(d) {
+						return [d];
+					})
+					.enter()
+					.append("rect")
+					.attr("x", function(d) {
 						// position the bars for the strata variable correctly
-						return (x_state.bandwidth()-d3.min([x_state.bandwidth(),50]))/2;
-				})
-				.attr("y", function(d) {
-					return y([d.values[0].mort_rate]);
-				})
-				.attr("width", d3.min([x_state.bandwidth(),50])) // sent width of the bars to be no bigger than 100px
-				.attr("height", function(d) {
-					return h - y([d.values[0].mort_rate]);
-				})
-				.attr("fill", function(d) {
-					return graph_bar_color([d.values[0].mort_rate]);
-				})
-				.attr("opacity", 0.7)
-				.on("mouseover", tip2.show)
-				.on("mouseout", tip2.hide)
+						return (x_state.bandwidth() - d3.min([x_state.bandwidth(), 50])) / 2;
+					})
+					.attr("y", function(d) {
+						return y([d.values[0].mort_rate]);
+					})
+					.attr("width", d3.min([x_state.bandwidth(), 50])) // sent width of the bars to be no bigger than 100px
+					.attr("height", function(d) {
+						return h - y([d.values[0].mort_rate]);
+					})
+					.attr("fill", function(d) {
+						return graph_bar_color([d.values[0].mort_rate]);
+					})
+					.attr("opacity", 0.7)
+					.on("mouseover", tip2.show)
+					.on("mouseout", tip2.hide)
 
 				// add x-axis
 				g.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + h + ")")
-				.call(d3.axisBottom(x_state).tickSize(0))
+					.attr("class", "axis")
+					.attr("transform", "translate(0," + h + ")")
+					.call(d3.axisBottom(x_state).tickSize(0))
 
 				// add y-axis
 				g.append("g")
-				.attr("class", "axis")
-				.call(d3.axisLeft(y).ticks(null, "s"))
-				.append("text")
-				.attr("x", 2)
-				.attr("y", y(y.ticks().pop()) + 0.5)
-				.attr("dy", "0.32em")
-				.attr("fill", "#000")
-				.attr("font-weight", "bold")
-				.attr("text-anchor", "start")
+					.attr("class", "axis")
+					.call(d3.axisLeft(y).ticks(null, "s"))
+					.append("text")
+					.attr("x", 2)
+					.attr("y", y(y.ticks().pop()) + 0.5)
+					.attr("dy", "0.32em")
+					.attr("fill", "#000")
+					.attr("font-weight", "bold")
+					.attr("text-anchor", "start")
 
 			} // end if(strata == "overall" & strata2 == ""){
 
 			// if one stratifying variable picked
-			if(strata != "overall" & strata2 == "") {
+			if (strata != "overall" & strata2 == "") {
 				data = d3.nest()
-				.key(function(d) {return d.state})
-				.key(function(d) {return d[strata]})
-				.entries(data);
+					.key(function(d) {
+						return d.state
+					})
+					.key(function(d) {
+						return d[strata]
+					})
+					.entries(data);
 
 				var x_state = d3.scaleBand()
-				.rangeRound([0, w])
-				.padding(0.05)
-				.domain(data.map(function(d){
-					return d.key;
-				}));
+					.rangeRound([0, w])
+					.padding(0.05)
+					.domain(data.map(function(d) {
+						return d.key;
+					}));
 
-				strata_categories = data[0].values.map(function(d,i){
+				strata_categories = data[0].values.map(function(d, i) {
 					return d.key;
 				});
 
 				var x_strata = d3.scaleBand()
-				.rangeRound([0, x_state.bandwidth()])
-				.padding(0.02)
-				.domain(strata_categories);
+					.rangeRound([0, x_state.bandwidth()])
+					.padding(0.02)
+					.domain(strata_categories);
 
 				var g = chart.append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 				var bars = g.append("g")
-				.selectAll("g")
-				.data(data)
-				.enter().append("g");
+					.selectAll("g")
+					.data(data)
+					.enter().append("g");
 
 				// add d3-min tooltip
 				var tip2 = d3.tip()
-				.attr("class", "tooltip2")
-				.html(function(d) {
-					return d.values[0].mort_rate;
-				});
+					.attr("class", "tooltip2")
+					.html(function(d) {
+						return d.values[0].mort_rate;
+					});
 				bars.call(tip2);
 
-				bars.attr("transform", function(d){
-					return "translate(" + x_state(d.key) + ",0)";
-				})
-				.selectAll("rect")
-				.data(function(d) {
-					return d.values;
-				})
-				.enter().append("rect")
-				.attr("x", function(d){
-					return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(),50]))/2;
-				})
-				.attr("y", function(d){
-					return y(d.values[0].mort_rate);
-				})
-				.attr("width", d3.min([x_strata.bandwidth(),50]))
-				.attr("height", function(d) {
-					return h - y(d.values[0].mort_rate);
-				})
-				.attr("fill", function(d) {
-					return graph_bar_color(d.values[0].mort_rate)
-				})
-				.attr("opacity", 0.7)
-				.on("mouseover", tip2.show)
-				.on("mouseout", tip2.hide)
+				bars.attr("transform", function(d) {
+						return "translate(" + x_state(d.key) + ",0)";
+					})
+					.selectAll("rect")
+					.data(function(d) {
+						return d.values;
+					})
+					.enter().append("rect")
+					.attr("x", function(d) {
+						return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(), 50])) / 2;
+					})
+					.attr("y", function(d) {
+						return y(d.values[0].mort_rate);
+					})
+					.attr("width", d3.min([x_strata.bandwidth(), 50]))
+					.attr("height", function(d) {
+						return h - y(d.values[0].mort_rate);
+					})
+					.attr("fill", function(d) {
+						return graph_bar_color(d.values[0].mort_rate)
+					})
+					.attr("opacity", 0.7)
+					.on("mouseover", tip2.show)
+					.on("mouseout", tip2.hide)
 
 				// add x-axis
 				g.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + h + ")")
-				.call(d3.axisBottom(x_state).tickSize(0))
-				.select(".domain").remove()
+					.attr("class", "axis")
+					.attr("transform", "translate(0," + h + ")")
+					.call(d3.axisBottom(x_state).tickSize(0))
+					.select(".domain").remove()
 
 				g.selectAll("text")
-				.attr("y", 15);
+					.attr("y", 15);
 
 				bars.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + h + ")")
-				.attr("x", function(d){
-					return x_state(d.key);
-				})
-				.call(d3.axisBottom(x_strata).tickSize(0))
+					.attr("class", "axis")
+					.attr("transform", "translate(0," + h + ")")
+					.attr("x", function(d) {
+						return x_state(d.key);
+					})
+					.call(d3.axisBottom(x_strata).tickSize(0))
 
-			 	// add y-axis
+				// add y-axis
 				g.append("g")
-				.attr("class", "axis")
-				.call(d3.axisLeft(y).ticks(null, "s"))
-				.append("text")
-				.attr("x", 2)
-				.attr("y", y(y.ticks().pop()) + 0.5)
-				.attr("dy", "0.32em")
-				.attr("fill", "#000")
-				.attr("font-weight", "bold")
-				.attr("text-anchor", "start")
+					.attr("class", "axis")
+					.call(d3.axisLeft(y).ticks(null, "s"))
+					.append("text")
+					.attr("x", 2)
+					.attr("y", y(y.ticks().pop()) + 0.5)
+					.attr("dy", "0.32em")
+					.attr("fill", "#000")
+					.attr("font-weight", "bold")
+					.attr("text-anchor", "start")
 
 			} // end  if(strata != "overall" & strata =="") {
 
