@@ -283,7 +283,7 @@ function get_state_data(gender, race){
     for (let i =0; i<json_data.length; i++){
         if(json_data[i][11] === "State"){
             data.push({
-                
+
             })
         }
     }
@@ -293,7 +293,7 @@ function get_state_data(gender, race){
 function get_county_data_of_state(state_abbreviation, gender, race) {
     let data = [];
     for (let i = 0; i < json_data.length; i++) {
-        if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race) {
+        if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null) {
             data.push({
             county: json_data[i][10],
             type: json_data[i][11],
