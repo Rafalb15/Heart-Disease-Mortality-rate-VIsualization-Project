@@ -241,7 +241,7 @@ class CountyMortRateByStateBarChart {
         // go through all of the values and look match up the map selection and the bars
         this.svg.selectAll("rect").each(function(d, i) {
             // the bar that is howevered over in the map will be yellow
-            if (state == d.state && d.county.includes(selection)) {
+            if (state == d.state && d.name.includes(selection)) {
                 d3.select(this).attr("fill", "yellow");
             } else {
                 d3.select(this).attr("fill", function(d) {
