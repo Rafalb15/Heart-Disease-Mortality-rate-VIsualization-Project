@@ -13,6 +13,7 @@ class CountyMortRateByStateBarChart {
         this.sort_mode = "mortality rate";
         this.cur_state = null;
         this.tooltip = null;
+        //this.buttons = null;
         this.title = null;
         this.svg = null;
         this.xScale = null;
@@ -46,33 +47,10 @@ class CountyMortRateByStateBarChart {
           //      .attr("id", "graphButtons");
         container.append("button")
             .attr("type", "button")
-            .attr("id", "sort_graph")
+            .attr("id", "sortGraph")
             .text("Sort Graph")
             .style("width", "100px")
-            .on("click", function() {
-                if (countyMortRateByStateBarChart.sort_mode === "mortality rate"){
-                    countyMortRateByStateBarChart.sort_mode = "alphabetical";
-                }else if(countyMortRateByStateBarChart.sort_mode === "alphabetical"){
-                    countyMortRateByStateBarChart.sort_mode = "mortality rate";
-                }
-                countyMortRateByStateBarChart.sort_bars(200, 1500); 
-            });
-
-        container.append("button")
-            .attr("type", "button")
-            .attr("id", "change_graph")
-            .text("Switch to county mode")
-            .style("width", "200 px")
-            .on("click", function(){
-                if (countyMortRateByStateBarChart.graph_mode === "State"){
-                    countyMortRateByStateBarChart.graph_mode = "County";
-                    container.select("#change_graph").text("Switch to state mode");
-                }else if (countyMortRateByStateBarChart.graph_mode === "County"){
-                    countyMortRateByStateBarChart.graph_mode = "State";
-                    container.select("#change_graph").text("Switch to county mode");
-                }
-                countyMortRateByStateBarChart.update_bars(countyMortRateByStateBarChart.cur_state);
-            });
+            .on("click", function() { countyMortRateByStateBarChart.sort_bars(); });
     }
 
     setup_title(container){
@@ -84,7 +62,7 @@ class CountyMortRateByStateBarChart {
             .style("font-weight", "bold")
             .style("text-align","center")
             .style("display", "inline-block")
-            .style("width", w-600 + "px");
+            .style("width", w-300 + "px");
     }
 
     setup_svg(container) {
@@ -110,7 +88,7 @@ class CountyMortRateByStateBarChart {
         this.svg.append("g")
             .attr("id", "y_axis")
             .attr("transform", "translate("+x_pad+",0)");
-
+        
         this.svg.append("line")
             .attr("x1", x_pad)
             .attr("y1", h-y_pad+1)
@@ -134,7 +112,7 @@ class CountyMortRateByStateBarChart {
             .attr("dy", -25)
             .attr("dx", -50)
             .style("text-anchor", "middle")
-            .text("State/County");
+            .text("State/County")
     }
 
     update_bars(state){
@@ -144,7 +122,6 @@ class CountyMortRateByStateBarChart {
         }else if (this.graph_mode === "County"){
             this.county_mort_rate_bars(state);
         }
-        this.sort_bars(0, 0);
     }
 
     state_mort_rate_bars(){
@@ -152,18 +129,14 @@ class CountyMortRateByStateBarChart {
         let xScale = this.xScale;
         let yScale = this.yScale;
         let states_data = get_states_data(gender, race);
-        // update graph title
         this.container.select("#graph_title").text("Mortality rate in each state for Gender: " + gender + " and Race: " + race);
-        //update xscale and yscale
         xScale.domain(d3.range(states_data.length));
         yScale.domain([0, d3.max(states_data, function(d) { return d.mort_rate; })]);
 
-        //update axes
         let yAxis = d3.axisLeft().scale(yScale);
         svg.select("#y_axis").call(yAxis);
         svg.select("#x_label").text("State");
 
-        //update bars
         let bars = svg.selectAll("rect").data(states_data);
         let rects = bars.enter().append("rect").merge(bars);
         rects = this.setup_rectangles(rects);
@@ -177,18 +150,21 @@ class CountyMortRateByStateBarChart {
 
     county_mort_rate_bars(state){
         let svg = this.svg;
+        let h = this.h;
+        let w = this.w;
+        let y_pad = this.y_pad;
+        let x_pad = this.x_pad;
 
         this.sortOrder = false;
         let county_data_of_state = get_county_data_of_state(state, gender, race);
 
-        // Update the graph's title
+        // Update the graph's title accordingly with the selections
         this.container.select("#graph_title").text("Mortality rate across counties in " + state + " for Gender: " + gender + " and Race: " + race + "");
 
         // update the xScale and yScale
         this.xScale.domain(d3.range(county_data_of_state.length));
         this.yScale.domain([0, d3.max(county_data_of_state, function(d) { return d.mort_rate; })]);
 
-        //update axes
         let yAxis = d3.axisLeft().scale(this.yScale);
         svg.select("#y_axis").call(yAxis);
         svg.select("#x_label").text("County");
@@ -208,7 +184,6 @@ class CountyMortRateByStateBarChart {
         bars.exit().remove();
     }
 
-    // set the sizes and scales of the rectangle
     setup_rectangles(rects){
         let xScale = this.xScale;
         let yScale = this.yScale;
@@ -221,7 +196,6 @@ class CountyMortRateByStateBarChart {
         return rects
     }
 
-    //add tooltip on hover to rectangles
     setup_tooltip_hover(rects){
         let w = this.w;
         rects.on("mouseover", function(d) {
@@ -256,21 +230,24 @@ class CountyMortRateByStateBarChart {
     }
 
     // switch between sorting alphabetically and by mort rate
-    sort_bars(delay, duration) {
+    sort_bars() {
+        let sortOrder = !this.sortOrder;
         let xScale = this.xScale;
-        let sort_function = function(a, b){ return null };
-        if (this.sort_mode === "mortality rate"){
-            sort_function = function(a, b) { return d3.descending(a.mort_rate, b.mort_rate); };
+        this.sortOrder = sortOrder;
+        if (sort_mode === "mortality rate"){
 
-        }else if (this.sort_mode === "alphabetical"){
-            sort_function = function(a, b) { return d3.ascending(a.name, b.name); };
         }
-
         this.svg.selectAll("rect")
-            .sort(sort_function)
+            .sort(function(a, b) {
+                if (sortOrder) {
+                    return d3.descending(a.mort_rate, b.mort_rate);
+                } else {
+                    return d3.ascending(a.county, b.county);
+                }
+            })
             .transition("sort_bars")
-            .delay(delay)
-            .duration(duration)
+            .delay(200)
+            .duration(1500)
             .attr("x", function(d, i) { return xScale(i); });
     }
 
