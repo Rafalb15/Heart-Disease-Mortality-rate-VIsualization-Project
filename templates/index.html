@@ -133,7 +133,6 @@
 .legend { text-align: left; font-family: Georgia; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Georgia, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
 </style>
 	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
-
 </head>
 
 <body data-gr-c-s-loaded="true" style="width:80%; margin: 0 auto">
@@ -259,8 +258,6 @@
 			}
 
 		}
-
-
 		// Return color HEX color based on d value
 		// Single map mode has a sequential map style
 		// Multiple map mode has a diverging map style
@@ -557,7 +554,9 @@
 			// wheel mouse zoom options to enable a smoooth zooming function
 			zoomDelta: 0.50,
 			zoomSnap: 0,
-			wheelPxPerZoomLevel: 50
+			wheelPxPerZoomLevel: 50,
+			fadeAnimation: true,
+			zoomAnimation: true
 			// setView defines the center of the map
 		}).setView([37.8, -98], current_zoom).setMaxBounds(mybounds);
 
@@ -696,9 +695,19 @@
 			resetHighlight(e);
 		}
 
+
 		function zoomOutToState(e) {
 			let layer = e.target;
-			map.setView([37.8, -98], 5);
+			// map.setView([37.8, -98], 5);
+			map.setZoom(4.5, {
+				pan: {
+					animate: true,
+					duration: 1.5
+				},
+				zoom: {
+					animate: true
+				}
+			});
 			resetHighlightCounty(e);
 		}
 
@@ -789,36 +798,36 @@
 		function style(feature) {
 			let temp;
 			if (race_gender_inspector === "Single") {
-						// Single mode
-						// Try to get a value from cache
-						cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.abbreviation);
-						if (cache_lookup === undefined) {
-							//console.log(feature.properties.abbreviation + " Not available in cache");
-							// if the value does not exist in the cache, get the value using search on the json data
-							// append the result to the cache to be used later
-							temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
-							add_to_cache(race_gender_inspector + gender + race, feature.properties.abbreviation, temp);
-						} else {
-							// get the value from the cache
-							temp = cache_lookup;
-							//console.log("returned from cache");
-						}
-						returncolor = return_Color(temp);
+				// Single mode
+				// Try to get a value from cache
+				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.abbreviation);
+				if (cache_lookup === undefined) {
+					//console.log(feature.properties.abbreviation + " Not available in cache");
+					// if the value does not exist in the cache, get the value using search on the json data
+					// append the result to the cache to be used later
+					temp = return_state_information(feature.properties.abbreviation, gender, race)[1];
+					add_to_cache(race_gender_inspector + gender + race, feature.properties.abbreviation, temp);
+				} else {
+					// get the value from the cache
+					temp = cache_lookup;
+					//console.log("returned from cache");
+				}
+				returncolor = return_Color(temp);
 			} else {
-						// Multiple mode
-						// Try to get a value from cache
-						cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation);
-						if (cache_lookup === undefined) {
-							//console.log(feature.properties.abbreviation + " Not available in cache");
-							// if the value does not exist in the cache, get the value using search on the json data
-							// append the result to the cache to be used later
-							temp = return_state_information_difference(feature.properties.abbreviation)[1];
-							add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation, temp);
-						} else {
-							temp = cache_lookup;
-							// get the value from the cache
-						}
-						returncolor = return_Color(temp);
+				// Multiple mode
+				// Try to get a value from cache
+				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation);
+				if (cache_lookup === undefined) {
+					//console.log(feature.properties.abbreviation + " Not available in cache");
+					// if the value does not exist in the cache, get the value using search on the json data
+					// append the result to the cache to be used later
+					temp = return_state_information_difference(feature.properties.abbreviation)[1];
+					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.abbreviation, temp);
+				} else {
+					temp = cache_lookup;
+					// get the value from the cache
+				}
+				returncolor = return_Color(temp);
 			}
 			return {
 				weight: 3,
@@ -833,35 +842,35 @@
 		function county_style(feature) {
 			let temp;
 			if (race_gender_inspector === "Single") {
-						// Single mode
-						// Try to get a value from cache
-						cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE);
-						if (cache_lookup === undefined) {
-							//console.log("no cache");
-							// if the value does not exist in the cache, get the value using search on the json data
-							// append the result to the cache to be used later
-							temp = return_county_information(feature.properties.NAME, feature.properties.STATE, gender, race)[1];
-							add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE, temp);
-						} else {
-							// get the value from the cache
-							temp = cache_lookup;
-							//console.log("returned from cache");
-						}
-						returncolor = return_Color(temp);
+				// Single mode
+				// Try to get a value from cache
+				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE);
+				if (cache_lookup === undefined) {
+					//console.log("no cache");
+					// if the value does not exist in the cache, get the value using search on the json data
+					// append the result to the cache to be used later
+					temp = return_county_information(feature.properties.NAME, feature.properties.STATE, gender, race)[1];
+					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE, temp);
+				} else {
+					// get the value from the cache
+					temp = cache_lookup;
+					//console.log("returned from cache");
+				}
+				returncolor = return_Color(temp);
 			} else {
-						// Multiple mode
-						//temp = return_county_information_difference(feature.properties.NAME)[1];
-						cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE);
-						if (cache_lookup === undefined) {
-							// if the value does not exist in the cache, get the value using search on the json data
-							// append the result to the cache to be used later
-							temp = return_county_information_difference(feature.properties.NAME, feature.properties.STATE)[1];
-							add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE, temp);
-						} else {
-							// get the value from the cache
-							temp = cache_lookup;
-						}
-						returncolor = return_Color(temp);
+				// Multiple mode
+				//temp = return_county_information_difference(feature.properties.NAME)[1];
+				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE);
+				if (cache_lookup === undefined) {
+					// if the value does not exist in the cache, get the value using search on the json data
+					// append the result to the cache to be used later
+					temp = return_county_information_difference(feature.properties.NAME, feature.properties.STATE)[1];
+					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE, temp);
+				} else {
+					// get the value from the cache
+					temp = cache_lookup;
+				}
+				returncolor = return_Color(temp);
 			}
 			return {
 				weight: 1,
