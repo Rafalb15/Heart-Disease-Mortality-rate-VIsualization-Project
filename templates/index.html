@@ -989,24 +989,24 @@
 				'<label onchange="radio_change()"><input type="radio" name="radio_comp_type" value="Multiple"><b>Multiple mode</b></label><br />' +
 
 				'<div id = "single_selection_dropdown" style="text-align: left; padding-top: 5px; padding-bottom: 5px; font-family: Georgia">' +
-				'<div style="padding-left: 5px; padding-bottom: 5px">Gender - <select id="dd_gender_single1"><option>Overall</option><option>Female</option><option>Male</option></select></div>' +
-				'<div style="padding-left: 5px; padding-bottom: 5px">Race - ' + '<select id="dd_race_single1"><option>Overall</option><option>White</option>' +
+				'<div style="padding-left: 5px; padding-bottom: 5px">Gender - <select id="dd_gender_single1" onclick="event_listener(event)"><option>Overall</option><option>Female</option><option>Male</option></select></div>' +
+				'<div style="padding-left: 5px; padding-bottom: 5px">Race - ' + '<select id="dd_race_single1" onclick="event_listener(event)"><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 				'</div>' +
 
 				'<div id = "multiple_selection_dropdown" style="display:none; text-align: left; padding-top: 5px; padding-bottom: 5px; font-family: Georgia">' +
-				'<div style="padding-left: 5px; padding-bottom: 5px">1st criteria : <br /> Gender - <select id="dd_gender_multiple1"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<div style="padding-left: 5px; padding-bottom: 5px">1st criteria : <br /> Gender - <select id="dd_gender_multiple1" onclick="event_listener(event)"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'Race - <select id="dd_race_multiple1" ><option>Overall</option><option>White</option>' +
+				'Race - <select id="dd_race_multiple1" onclick="event_listener(event)" ><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 
-				'<div style="padding-left: 5px; padding-bottom: 5px">2nd criteria : <br /> Gender - <select id="dd_gender_multiple2"><option>Overall</option><option>Female</option><option>Male</option></select>' +
+				'<div style="padding-left: 5px; padding-bottom: 5px">2nd criteria : <br /> Gender - <select id="dd_gender_multiple2" onclick="event_listener(event)"><option>Overall</option><option>Female</option><option>Male</option></select>' +
 				'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
-				'Race - <select id="dd_race_multiple2" ><option>Overall</option><option>White</option>' +
+				'Race - <select id="dd_race_multiple2" onclick="event_listener(event)"><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 				'</div>' +
 
-				'<div style="padding-bottom: 5px"><button class="btn" type="button" style="margin: auto" onclick="execute()">Update Map</button></div>' +
+				'<div style="padding-bottom: 5px"><button class="btn" type="button" style="margin: auto; border-radius: 12px; opacity: 0.5; " onclick="execute()" id="update_button">Update Map</button></div>' +
 				'</div>'
 			this._div.firstChild.onmousedown = this._div.firstChild.ondblclick = L.DomEvent.stopPropagation;
 			return this._div;
@@ -1054,8 +1054,14 @@
 			}
 		}
 
+
+		function event_listener(e) {
+				document.getElementById("update_button").style = "opacity:1; background-color: red; margin: auto; border-radius: 12px;";
+		}
+
 		function execute() {
 			// save the choices from the dropdowns and go forward with the animation
+			document.getElementById("update_button").style = "opacity:0.5; background-color: white; margin: auto; border-radius: 12px;";
 			let changed_vals = [];
 			changed_vals = save_dropdown_options();
 			drop_down_operator(true);
@@ -1110,6 +1116,7 @@
 		window.radio_change = function() {
 			// Based on the radio button selection, display different set of divs to the user
 			// first, get the radio button value to determine where the user has clicked
+			document.getElementById("update_button").style = "opacity:0.5; background-color: white; margin: auto; border-radius: 12px;";
 			let curr_selection;
 			let radio_choice = document.getElementsByName("radio_comp_type");
 			for (let i = 0; i < radio_choice.length; i++) {
