@@ -79,7 +79,7 @@ class StateMortRatebyDensity {
         this.svg.selectAll("circle").each(function(d, i) {
         // the bar that is howevered over in the map will be yellow
         if (state == d.stateName) {
-            d3.select(this).attr("fill", "yellow").attr("r", 10);
+            d3.select(this).attr("fill", "DodgerBlue").attr("r", 8);
         } else {
             d3.select(this).attr("fill", "red").attr("r", 2.5);
         }

@@ -154,9 +154,9 @@
 			<li>Zooming on the map will alternate between county or state layer</li>
 			<li>State hover corresponds to mark in scatterplot, more info in top right of map</li>
 			<li>County hover corresponds to county in bar chart, more info in top right of map</li>
-			<li>Single click on state adds state to queue for further analysis</li>
-			<li>If more than one state in queue, selecting state will remove state from queue if already present</li>
-			<li>Trying to add more than 5 unique states into queue, will reset queue</li>
+			<li>Single click on state adds state to list for further analysis</li>
+			<li>If more than one state in list, selecting state will remove state from list if already present</li>
+			<li>Trying to add more than 5 unique states into list, will reset list</li>
 			<li>Double click on state zooms to state's bounds and switches to county layer</li>
 			<li>Double click on county zooms out to state layer</li>
 		</div>
@@ -167,9 +167,9 @@
 	<div id="graph_selector" style="color:grey; padding:5px; margin:0px; font-family: Georgia; text-align: center; width: 100%;">
 
 		<h4 style="margin: 0px">
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="county_bar_chart" checked>County mortality rate bar chart</label>
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="density_vs_mort_rate_scatter">Density vs Mortality rate scatterplot</label>
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart">Grouped bar chart</label>
+			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="county_bar_chart" checked><i>State/County Mortality rate bar chart</i></label>
+			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="density_vs_mort_rate_scatter"><i>Pop. density vs Mortality rate scatterplot</i></label>
+			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart"><i>Comparison between selected states</i></label>
 		</h4>
 	</div>
 	<hr style="border-top: dotted 2px;" />
@@ -650,6 +650,7 @@
 		function highlightFeature(e) {
 			let layer = e.target;
 			stateMortRateByDensityScatter.highlight_state_selection(layer.feature.properties.name);
+			countyMortRateByStateBarChart.highlight_state_selection(layer.feature.properties.name);
 			layer.setStyle({
 				weight: 6,
 				color: 'white',
@@ -1201,7 +1202,7 @@
 			this._div.style.opacity = "1.0";
 			s = this._div.style;
 			// update the contents of the div
-			this._div.innerHTML = '<b>Items in the selection queue: ' + selection_list + '</b>';
+			this._div.innerHTML = '<b>States in the selection list: ' + selection_list + '</b>';
 			// provide smooth fadeout effect to the div
 			fade_Out_Effect(this._div);
 		}
@@ -1212,7 +1213,7 @@
 			this._div.style.opacity = "1.0";
 			s = this._div.style;
 			// update the contents of the div
-			this._div.innerHTML = '<b>Queue has been reset, current queue contents: ' + selection_list + '</b>';
+			this._div.innerHTML = '<b>List has been reset, current list contents: ' + selection_list + '</b>';
 			// provide smooth fadeout effect to the div
 			fade_Out_Effect(this._div);
 		}

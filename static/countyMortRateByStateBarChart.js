@@ -55,7 +55,7 @@ class CountyMortRateByStateBarChart {
                 }else if(countyMortRateByStateBarChart.sort_mode === "alphabetical"){
                     countyMortRateByStateBarChart.sort_mode = "mortality rate";
                 }
-                countyMortRateByStateBarChart.sort_bars(200, 1500); 
+                countyMortRateByStateBarChart.sort_bars(200, 1500);
             });
 
         container.append("button")
@@ -81,7 +81,7 @@ class CountyMortRateByStateBarChart {
             .attr("id", "graph_title")
             .attr("text-anchor", "middle")
             .style("font-size", "20px")
-            .style("font-weight", "bold")
+            //.style("font-weight", "bold")
             .style("text-align","center")
             .style("display", "inline-block")
             .style("width", w-600 + "px");
@@ -126,7 +126,7 @@ class CountyMortRateByStateBarChart {
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .text("Mortaility Rate");
-        
+
         this.svg.append("text")
             .attr("id", "x_label")
             .attr("y", h)
@@ -196,7 +196,7 @@ class CountyMortRateByStateBarChart {
         //Update all bars
         let bars = svg.selectAll("rect").data(county_data_of_state);
         let rects = bars.enter().append("rect").merge(bars)
-        rects = this.setup_rectangles(rects);    
+        rects = this.setup_rectangles(rects);
         rects.attr("fill", function(d) {
                 if (d.type === "State") { return "green"; }
                 return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
@@ -242,7 +242,25 @@ class CountyMortRateByStateBarChart {
         this.svg.selectAll("rect").each(function(d, i) {
             // the bar that is howevered over in the map will be yellow
             if (state == d.state && d.name.includes(selection)) {
-                d3.select(this).attr("fill", "yellow");
+                d3.select(this).attr("fill", "DodgerBlue");
+            } else {
+                d3.select(this).attr("fill", function(d) {
+                    if (d.type === "State") {
+                        return "green";
+                    }
+                    return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
+                })
+                d3.select(this).attr("opacity", 0.7);
+            }
+        });
+    }
+
+    highlight_state_selection(state) {
+        // go through all of the values and look match up the map selection and the bars
+        this.svg.selectAll("rect").each(function(d, i) {
+            // the bar that is howevered over in the map will be yellow
+            if (state == d.name) {
+                d3.select(this).attr("fill", "DodgerBlue");
             } else {
                 d3.select(this).attr("fill", function(d) {
                     if (d.type === "State") {
