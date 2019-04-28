@@ -241,6 +241,7 @@
 		var stateMortRateByDensityScatter;
 
 		var jons_graph_type = "overall";
+		var map_enable = true;
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
@@ -648,91 +649,118 @@
 		// Layer controls
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		function highlightFeature(e) {
-			let layer = e.target;
-			stateMortRateByDensityScatter.highlight_state_selection(layer.feature.properties.name);
-			countyMortRateByStateBarChart.highlight_state_selection(layer.feature.properties.name);
-			layer.setStyle({
-				weight: 6,
-				color: 'DodgerBlue',
-				dashArray: '',
-				fillOpacity: 0.7
-			});
-			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-				layer.bringToFront();
+			if (map_enable === true) {
+				let layer = e.target;
+				stateMortRateByDensityScatter.highlight_state_selection(layer.feature.properties.name);
+				countyMortRateByStateBarChart.highlight_state_selection(layer.feature.properties.name);
+				layer.setStyle({
+					weight: 6,
+					color: 'DodgerBlue',
+					dashArray: '',
+					fillOpacity: 0.7
+				});
+				if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+					layer.bringToFront();
+				}
+				info.update(layer.feature.properties);
 			}
-			info.update(layer.feature.properties);
 		}
 
 		function highlightCountyFeature(e) {
-			let layer = e.target;
-			countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
-			layer.setStyle({
-				weight: 6,
-				color: 'DodgerBlue',
-				dashArray: '',
-				fillOpacity: 0.7
-			});
-			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-				layer.bringToFront();
+			if (map_enable === true) {
+				let layer = e.target;
+				countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
+				layer.setStyle({
+					weight: 6,
+					color: 'DodgerBlue',
+					dashArray: '',
+					fillOpacity: 0.7
+				});
+				if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+					layer.bringToFront();
+				}
+				info.update(layer.feature.properties);
 			}
-			info.update(layer.feature.properties);
 		}
 
 		function resetHighlight(e) {
-			// reset the style after the mouse is moved to different state
-			geojson.resetStyle(e.target);
-			info.update();
+			if (map_enable == true) {
+				// reset the style after the mouse is moved to different state
+				geojson.resetStyle(e.target);
+				info.update();
+			}
 		}
 
 		function resetHighlightCounty(e) {
-			// reset the style after the mouse is moved to different county
-			geojson_county.resetStyle(e.target);
-			info.update();
+			if (map_enable == true) {
+				// reset the style after the mouse is moved to different county
+				geojson_county.resetStyle(e.target);
+				info.update();
+			}
 		}
 
 		function zoomToCounty(e) {
-			let layer = e.target;
-			map.fitBounds(e.target.getBounds());
-			resetHighlight(e);
+			if (map_enable == true) {
+				let layer = e.target;
+				map.fitBounds(e.target.getBounds());
+				resetHighlight(e);
+			}
 		}
 
 
 		function zoomOutToState(e) {
-			let layer = e.target;
-			// map.setView([37.8, -98], 5);
-			map.setZoom(4.5, {
-				pan: {
-					animate: true,
-					duration: 1.5
-				},
-				zoom: {
-					animate: true
-				}
-			});
-			resetHighlightCounty(e);
+			if (map_enable == true) {
+				let layer = e.target;
+				// map.setView([37.8, -98], 5);
+				map.setZoom(4.5, {
+					pan: {
+						animate: true,
+						duration: 1.5
+					},
+					zoom: {
+						animate: true
+					}
+				});
+				resetHighlightCounty(e);
+			}
 		}
 
 		// this is what happens when a state is clicked on
 		function click_event_handler(e) {
-			let layer = e.target;
-			state = e.target.feature.properties.name;
-			layer.setStyle({
-				weight: 6,
-				color: 'white',
-				dashArray: '',
-				fillOpacity: 0.7,
-				fillColor: 'blue'
-			});
-			if (selection_list.length < selection_max) {
-				// if the selection list does not include the state, then add it to the selection_list
-				if (!selection_list.includes(state)) {
-					selection_list.push(state);
-					queue.update();
-					// state is already included, so clicking again pop it off
+			if (map_enable == true) {
+				let layer = e.target;
+				state = e.target.feature.properties.name;
+				layer.setStyle({
+					weight: 6,
+					color: 'white',
+					dashArray: '',
+					fillOpacity: 0.7,
+					fillColor: 'blue'
+				});
+				if (selection_list.length < selection_max) {
+					// if the selection list does not include the state, then add it to the selection_list
+					if (!selection_list.includes(state)) {
+						selection_list.push(state);
+						queue.update();
+						// state is already included, so clicking again pop it off
+					} else {
+						if (selection_list.length > 1) {
+							// if the selection list is greater than 1, then delete the state
+							// that the user clicks on
+							var filtered = selection_list.filter(function(value, index, arr) {
+								return value != state;
+							});
+							//console.log(filtered);
+							selection_list = filtered;
+							queue.update();
+						}
+					}
 				} else {
-					if (selection_list.length > 1) {
-						// if the selection list is greater than 1, then delete the state
-						// that the user clicks on
+					if (!selection_list.includes(state)) {
+						selection_list.length = 0;
+						selection_list.push(state);
+						queue.update_full();
+					} else {
 						var filtered = selection_list.filter(function(value, index, arr) {
 							return value != state;
 						});
@@ -741,28 +769,15 @@
 						queue.update();
 					}
 				}
-			} else {
-				if (!selection_list.includes(state)) {
-					selection_list.length = 0;
-					selection_list.push(state);
-					queue.update_full();
-				} else {
-					var filtered = selection_list.filter(function(value, index, arr) {
-						return value != state;
-					});
-					//console.log(filtered);
-					selection_list = filtered;
-					queue.update();
-				}
-			}
-			// update the queue with the selection
+				// update the queue with the selection
 
-			// update Dennis's graph based on the selection
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////
-			countyMortRateByStateBarChart.update_bars(e.target.feature.properties.abbreviation);
-			// update John's's graph based on the selection
-			update_grouped_barchart(selection_list, jons_graph_type);
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// update Dennis's graph based on the selection
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				countyMortRateByStateBarChart.update_bars(e.target.feature.properties.abbreviation);
+				// update John's's graph based on the selection
+				update_grouped_barchart(selection_list, jons_graph_type);
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+			}
 		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// only let users add states to the queue, not implemented on county level
@@ -965,7 +980,7 @@
 					await sleep(sleep_time);
 					return_style.fillOpacity = 0.0;
 					layer.setStyle(return_style);
-					layer_fadein(layer, 5, .05, 0.5);
+					layer_fadein(layer, 5, .1, 0.5);
 				};
 
 			});
@@ -1014,7 +1029,13 @@
 		};
 
 
-		function reload_based_on_priority() {
+		async function flip_to_true() {
+			await sleep(2000);
+			map_enable = true;
+		}
+
+		async function reload_based_on_priority() {
+			map_enable = false;
 			if (map_type_level === "state") {
 				// if the current zoom is state, reload state level geojson
 				reload_geojson();
@@ -1024,7 +1045,10 @@
 				reload_geojson_county();
 				reload_geojson();
 			}
+			flip_to_true();
 		}
+
+
 
 		function graph_selection_change() {
 			// Based on the radio button selection, display different set of divs to the user
@@ -1057,7 +1081,7 @@
 
 
 		function event_listener(e) {
-				document.getElementById("update_button").style = "opacity:1; background-color: red; margin: auto; border-radius: 12px;";
+			document.getElementById("update_button").style = "opacity:1; background-color: red; margin: auto; border-radius: 12px;";
 		}
 
 		function execute() {
@@ -1144,7 +1168,7 @@
 				document.getElementById("multiple_selection_dropdown").style.display = "none";
 			}
 			legend.update();
-			setTimeout(reload_based_on_priority(), 0);
+			reload_based_on_priority();
 		}
 
 		function drop_down_operator(bool_val) {
@@ -1446,40 +1470,40 @@
 		}
 
 
-		function separate_with_commas(state_names){
+		function separate_with_commas(state_names) {
 			var series = "";
-			for (let i = 0; i < state_names.length - 1; i++){
+			for (let i = 0; i < state_names.length - 1; i++) {
 				// series = series + get_state_abbreviation(state_names[i]) + ", ";
 				series = series + state_names[i] + ", ";
 			}
-			return series + " and " + state_names[state_names.length-1];
+			return series + " and " + state_names[state_names.length - 1];
 		}
 
-		function capitalize_first_letter(word){
+		function capitalize_first_letter(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)
 		}
 
-		function format_chart_title(state_names, strata){
+		function format_chart_title(state_names, strata) {
 			var title_text = "";
-			if(strata == "overall"){
-				if(state_names.length == 1){
-      				title_text = "Bar chart for " + state_names[0];	
-      			} else if(selection_list.length == 2){
-      				title_text = "Bar chart for " + state_names[0] + " and " + state_names[1];	
-      			} else {
-      				title_text = "Bar chart for " + separate_with_commas(state_names);
-      			}
-			} 
+			if (strata == "overall") {
+				if (state_names.length == 1) {
+					title_text = "Bar chart for " + state_names[0];
+				} else if (selection_list.length == 2) {
+					title_text = "Bar chart for " + state_names[0] + " and " + state_names[1];
+				} else {
+					title_text = "Bar chart for " + separate_with_commas(state_names);
+				}
+			}
 
-			if(strata != "overall") {
+			if (strata != "overall") {
 				title_text = "Grouped Bar Chart of " + capitalize_first_letter(strata) + " for ";
-				if(state_names.length == 1){
-      				title_text = title_text + state_names[0];	
-      			} else if(selection_list.length == 2){
-      				title_text = title_text + state_names[0] + " and " + state_names[1];	
-      			} else {
-      				title_text = title_text + separate_with_commas(state_names);
-      			}
+				if (state_names.length == 1) {
+					title_text = title_text + state_names[0];
+				} else if (selection_list.length == 2) {
+					title_text = title_text + state_names[0] + " and " + state_names[1];
+				} else {
+					title_text = title_text + separate_with_commas(state_names);
+				}
 			}
 			return title_text;
 		}
@@ -1492,12 +1516,12 @@
 
 			// set up chart title
 			var chart_title_text = format_chart_title(state_data, strata);
-      		chart_title.text(chart_title_text)
-            .attr("text-anchor", "middle")
-            .style("font-size", "20px")
-            .style("text-align","center")
-            .style("display", "inline-block")
-            .style("width", w0 - 200 + "px");
+			chart_title.text(chart_title_text)
+				.attr("text-anchor", "middle")
+				.style("font-size", "20px")
+				.style("text-align", "center")
+				.style("display", "inline-block")
+				.style("width", w0 - 200 + "px");
 
 			// get data for this state, strata
 			var data = get_state_data(state_data, strata, strata2);
@@ -1581,17 +1605,17 @@
 
 				// add y-axis
 				g.append("g")
-				.attr("class", "axis")
-				.call(d3.axisLeft(y).ticks(null, "s"))
-				.append("text")
-				.attr("transform", "rotate(-90)")
-				.attr("x", 0 - (h / 2))
-				.attr("dy", "-2em")
-				.attr("fill", "#000")
-				.attr("text-anchor", "middle")
-				.style("font-size", "16px")
-				.style("font-family", "Times New Roman")
-				.text("Mortality Rate");
+					.attr("class", "axis")
+					.call(d3.axisLeft(y).ticks(null, "s"))
+					.append("text")
+					.attr("transform", "rotate(-90)")
+					.attr("x", 0 - (h / 2))
+					.attr("dy", "-2em")
+					.attr("fill", "#000")
+					.attr("text-anchor", "middle")
+					.style("font-size", "16px")
+					.style("font-family", "Times New Roman")
+					.text("Mortality Rate");
 
 			} // end if(strata == "overall" & strata2 == ""){
 
@@ -1683,17 +1707,17 @@
 
 				// add y-axis
 				g.append("g")
-				.attr("class", "axis")
-				.call(d3.axisLeft(y).ticks(null, "s"))
-				.append("text")
-				.attr("transform", "rotate(-90)")
-				.attr("x", 0 - (h / 2))
-				.attr("dy", "-2em")
-				.attr("fill", "#000")
-				.attr("text-anchor", "middle")
-				.style("font-size", "16px")
-				.style("font-family", "Times New Roman")
-				.text("Mortality Rate");
+					.attr("class", "axis")
+					.call(d3.axisLeft(y).ticks(null, "s"))
+					.append("text")
+					.attr("transform", "rotate(-90)")
+					.attr("x", 0 - (h / 2))
+					.attr("dy", "-2em")
+					.attr("fill", "#000")
+					.attr("text-anchor", "middle")
+					.style("font-size", "16px")
+					.style("font-family", "Times New Roman")
+					.text("Mortality Rate");
 
 
 			} // end  if(strata != "overall" & strata =="") {

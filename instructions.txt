@@ -1,0 +1,11 @@
+Instructions:
+
+From the main directory (where server.py file exists)
+Execute:
+python server.py <port_number>
+
+Example: python server.py 9000
+
+Requirements:
+Python version: 3+
+Flask module installed
