@@ -168,6 +168,7 @@ class CountyMortRateByStateBarChart {
         let rects = bars.enter().append("rect").merge(bars);
         rects = this.setup_rectangles(rects);
         rects.attr("fill", function(d) {
+                if (d.type === "Nation") {return "green"; }
                 return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
             })
             .attr("opacity", 0.7)
@@ -292,7 +293,7 @@ class CountyMortRateByStateBarChart {
                 d3.select(this).attr("fill", "DodgerBlue");
             } else {
                 d3.select(this).attr("fill", function(d) {
-                    if (d.type === "State") {
+                    if (d.type === "Nation") {
                         return "green";
                     }
                     return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
@@ -388,12 +389,13 @@ addLoadEvent(function(e) {
 function get_states_data(gender, race){
     let data = [];
     for (let i =0; i<json_data.length; i++){
-        if(json_data[i][11] === "State" && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null){
+        if((json_data[i][11] === "State" || json_data[i][11] === "Nation") && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null){
             let name = json_data[i][10]
             if(name !== "Guam" && name !== "Virgin Islands of the U.S." && name !== "American Samoa" && name !== "Northern Mariana Islands"){
                 data.push({
                     name: json_data[i][10],
-                    mort_rate: Math.round(json_data[i][15])
+                    mort_rate: Math.round(json_data[i][15]),
+                    type: json_data[i][11]
                 });
             }
         }
