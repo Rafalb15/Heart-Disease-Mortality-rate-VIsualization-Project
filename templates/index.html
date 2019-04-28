@@ -201,6 +201,7 @@
 	<script type="text/javascript" src="/static/data_as_json.js"></script>
 	<script type="text/javascript" src="/static/us_county_boundary.js"></script>
 	<script type="text/javascript" src="/static/cache.js"></script>
+	<script type ="text/javascript" src= "/static/censusPopDataFiltered.js"></script>
 	<!-- end MAP js files  -->
 
 	<script type="text/javascript">
@@ -603,41 +604,51 @@
 
 		info.update = function(props) {
 			// based on the current layer of the map, display different information in the top right
+			// State level zoom
 			if (map_type_level === "state") {
-				// State level zoom
-				if (race_gender_inspector === "Single") {
-					// Single comparison mode
-					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0] :
-						'Hover over a state to learn more!');
-				} else {
-					// Multiple comparison mode
-					let temp = props ? return_state_information_difference(props.abbreviation) : null;
-					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'State: ' + props.name + '</b><br />' + 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Lookup criteria 1 : Gender(" + g1 +
-						") Race(" + r1 +
-						') mortality rate: ' + temp[2] + '<br />' + "Lookup criteria 2 : Gender(" + g2 + ") Race(" +
-						r2 + ') mortality rate: ' + temp[3] :
-						'Hover over a state to learn more!');
+				if(props){ //we are actually hovered over something
+					if(race_gender_inspector === "Single"){
+						// Single comparison mode
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
+							+ 'State: ' + props.name + '</b><br />'
+							+ 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0];
+					}else{
+						// Multiple comparison mode
+						let temp = return_state_information_difference(props.abbreviation);
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
+							+ 'State: ' + props.name + '</b><br />'
+							+ 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Mortality rate percentage difference: ' + temp[0] + '<br />'
+							+ "Lookup criteria 1 : Gender(" + g1 +") Race(" + r1 +') mortality rate: ' + temp[2] + '<br />'
+							+ "Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
+					}
+				}else{
+					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + 'Hover over a state to learn more!'
 				}
-				//document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.name : 'Nowhere');
 			} else {
-				// County level zoom
-				if (race_gender_inspector === "Single") {
-					// Single comparison mode
-					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate: ' + return_county_information(props.NAME, props.STATE, gender, race)[0] :
-						'Hover over a county to learn more!');
-				} else {
-					// Multiple comparison mode
-					let temp = props ? return_county_information_difference(props.NAME, props.STATE) : null;
-					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + (props ?
-						'<b>' + 'County: ' + props.NAME + '</b><br />' + 'Mortality rate percentage difference: ' + temp[0] + '<br />' + "Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 +
-						') mortality rate: ' + temp[2] + '<br />' + "Lookup criteria 2 : Gender(" + g2 + ") Race(" +
-						r2 + ') mortality rate: ' + temp[3] :
-						'Hover over a county to learn more!');
+				if(props){ //we are actually hovered over something
+					let county_pop_data = get_county_pop_data_by_geoid(props.GEO_ID);
+					let density = Math.round(parseInt(county_pop_data.overall_overall)/props.CENSUSAREA);
+					if(race_gender_inspector === "Single"){
+						//single comparison mode
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
+							+ 'County: ' + props.NAME + '</b><br />'
+							+ 'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Mortality rate: '+ return_county_information(props.NAME, props.STATE, gender, race)[0];
+					}else{
+						//multiple comparison mode
+						let temp = return_county_information_difference(props.NAME, props.STATE);
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
+							+ 'County: ' + props.NAME + '</b><br />'
+							+ 'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Mortality rate percentage difference: ' + temp[0] + '<br />'
+							+ "Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 +') mortality rate: ' + temp[2] + '<br />'
+							+ "Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
+					}
+				}else{
+					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + 'Hover over a county to learn more!'
 				}
-				//document.getElementById("bottomofpage").innerHTML = 'Now hovered over: ' + (props ? '<b>' + props.NAME : 'Nowhere');
 			}
 
 		};
