@@ -23,3 +23,12 @@ function get_state_abbreviation(state_name) {
     console.log(str);
     return str;
 }
+
+function get_county_pop_data_by_geoid(geoid){
+    for (let i = 0; i < censusPopData.length; i++){
+        if (censusPopData[i].geoid === geoid){
+            return censusPopData[i];
+        }
+    }
+    return null;
+}
