@@ -70,22 +70,6 @@ class StateMortRatebyDensity {
         .text("100");
     }
 
-
-
-    highlight_state_selection(state) {
-        // define color changer based on svg's colorscale
-        let color_changer = this.colorScale;
-        // go through all of the values and look match up the map selection and the bars
-        this.svg.selectAll("circle").each(function(d, i) {
-        // the bar that is howevered over in the map will be yellow
-        if (state == d.stateName) {
-            d3.select(this).attr("fill", "DodgerBlue").attr("r", 8);
-        } else {
-            d3.select(this).attr("fill", "red").attr("r", 2.5);
-        }
-        });
-    }
-
     update_scatter() {
         let data = get_state_mort_rate_by_density_data();
         let padding = this.padding;
@@ -136,10 +120,30 @@ class StateMortRatebyDensity {
                 tooltip.select("#tooltipLabel").text(d.stateName);
                 //Show the tooltip
                 tooltip.classed("hidden", false);
+
+                map.eachLayer(function(layer){
+                    if(layer.feature){
+                        if(map_type_level === "state"){
+                            if(layer.feature.properties.name === d.stateName){
+                                highlightFeature({target: layer});
+                            }
+                        }
+                    }
+                });
+
             })
-            .on("mouseout", function() {
+            .on("mouseout", function(d) {
                 //Hide the tooltip
                 tooltip.classed("hidden", true);
+                map.eachLayer(function(layer){
+                    if(layer.feature){
+                        if(map_type_level === "state"){
+                            if(layer.feature.properties.name === d.stateName){
+                                resetHighlight({target: layer});
+                            }
+                        }
+                    }
+                });
             })
         //.attr("r", function(d){return aScale(d.mort_rate);})
         svg.append("g")
@@ -151,6 +155,20 @@ class StateMortRatebyDensity {
             .attr("transform", "translate(" + 2*padding + ",0)")
             .call(yAxis);
 
+    }
+
+    highlight_state_selection(state) {
+        // define color changer based on svg's colorscale
+        let color_changer = this.colorScale;
+        // go through all of the values and look match up the map selection and the bars
+        this.svg.selectAll("circle").each(function(d, i) {
+        // the bar that is howevered over in the map will be yellow
+        if (state == d.stateName) {
+            d3.select(this).attr("fill", "DodgerBlue").attr("r", 8);
+        } else {
+            d3.select(this).attr("fill", "red").attr("r", 2.5);
+        }
+        });
     }
 }
 
