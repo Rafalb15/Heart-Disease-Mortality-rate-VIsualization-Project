@@ -177,8 +177,6 @@ class CountyMortRateByStateBarChart {
 
     county_mort_rate_bars(state){
         let svg = this.svg;
-
-        this.sortOrder = false;
         let county_data_of_state = get_county_data_of_state(state, gender, race);
 
         // Update the graph's title
@@ -224,6 +222,7 @@ class CountyMortRateByStateBarChart {
     //add tooltip on hover to rectangles
     setup_tooltip_hover(rects){
         let w = this.w;
+        let state = this.cur_state;
         rects.on("mouseover", function(d) {
                 //Update and show the tooltip
                 d3.select("#tooltip")
@@ -232,8 +231,38 @@ class CountyMortRateByStateBarChart {
                     .text(d.mort_rate + "/100K");
                 d3.select("#tooltip").select("#tooltipLabel").text(d.name);
                 d3.select("#tooltip").classed("hidden", false);
+                // highlight the state/county on the map
+                map.eachLayer(function(layer){
+                    if(layer.feature){
+                        if(map_type_level === "state"){
+                            if(layer.feature.properties.name === d.name){
+                                highlightFeature({target: layer});
+                            }
+                        }else{
+                            if(layer.feature.properties.NAME === d.name.substring(0, d.name.length-7) && layer.feature.properties.STATE === state){
+                                highlightCountyFeature({target: layer});
+                            }
+                        }
+                    }
+                });
             })
-            .on("mouseout", function() { d3.select("#tooltip").classed("hidden", true);});
+            .on("mouseout", function(d) { 
+                d3.select("#tooltip").classed("hidden", true);
+                //unhighlight state/county
+                map.eachLayer(function(layer){
+                    if(layer.feature){
+                        if(map_type_level === "state"){
+                            if(layer.feature.properties.name === d.name){
+                                resetHighlight({target: layer});
+                            }
+                        }else{
+                            if(layer.feature.properties.NAME === d.name.substring(0, d.name.length-7) && layer.feature.properties.STATE === state){
+                                resetHighlightCounty({target: layer});
+                            }
+                        }
+                    }
+                });
+            });
         return rects;
     }
 
