@@ -224,6 +224,7 @@ class CountyMortRateByStateBarChart {
     setup_tooltip_hover(rects){
         let w = this.w;
         let state = this.cur_state;
+        let map_mode = this.map_mode;
         rects.on("mouseover", function(d) {
                 //Update and show the tooltip
                 d3.select("#tooltip")
@@ -240,8 +241,17 @@ class CountyMortRateByStateBarChart {
                                 highlightFeature({target: layer});
                             }
                         }else{
-                            if(layer.feature.properties.NAME === d.name.substring(0, d.name.length-7) && layer.feature.properties.STATE === state){
-                                highlightCountyFeature({target: layer});
+                            if(layer.feature.properties.STATE === state){
+                                let name = layer.feature.properties.NAME;
+                                //some problems with counties having the word county in their name
+                                let idx_mod = -7;
+                                //for Puerto Rico, although there are still some problems with spanish letters or something
+                                if(layer.feature.properties.STATE === "PR"){
+                                    idx_mod = -10;
+                                }
+                                if (name === d.name.substring(0, d.name.length+idx_mod) || name === d.name && d.type === "County"){
+                                    highlightCountyFeature({target: layer});
+                                }
                             }
                         }
                     }
@@ -257,8 +267,17 @@ class CountyMortRateByStateBarChart {
                                 resetHighlight({target: layer});
                             }
                         }else{
-                            if(layer.feature.properties.NAME === d.name.substring(0, d.name.length-7) && layer.feature.properties.STATE === state){
-                                resetHighlightCounty({target: layer});
+                            if(layer.feature.properties.STATE === state){
+                                let name = layer.feature.properties.NAME;
+                                //some problems with counties having the word county in their name
+                                let idx_mod = -7;
+                                //for Puerto Rico, although there are still some problems with spanish letters or something
+                                if(layer.feature.properties.STATE === "PR"){
+                                    idx_mod = -10;
+                                }
+                                if (name === d.name.substring(0, d.name.length+idx_mod) || name === d.name && d.type === "County"){
+                                    resetHighlightCounty({target: layer});
+                                }
                             }
                         }
                     }
@@ -269,38 +288,42 @@ class CountyMortRateByStateBarChart {
 
     highlight_county_selection(selection, state) {
         // go through all of the values and look match up the map selection and the bars
-        this.svg.selectAll("rect").each(function(d, i) {
-            // the bar that is howevered over in the map will be yellow
-            if (state == d.state && d.name.includes(selection)) {
-                d3.select(this).attr("fill", "DodgerBlue");
-            } else {
-                d3.select(this).attr("fill", function(d) {
-                    if (d.type === "State") {
-                        return "green";
-                    }
-                    return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
-                })
-                d3.select(this).attr("opacity", 0.7);
-            }
-        });
+        if (this.graph_mode === "County"){
+            this.svg.selectAll("rect").each(function(d, i) {
+                // the bar that is howevered over in the map will be yellow
+                if (state == d.state && d.name.includes(selection) && d.type === "County") {
+                    d3.select(this).attr("fill", "DodgerBlue");
+                } else {
+                    d3.select(this).attr("fill", function(d) {
+                        if (d.type === "State") {
+                            return "green";
+                        }
+                        return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
+                    })
+                    d3.select(this).attr("opacity", 0.7);
+                }
+            });
+        }
     }
 
     highlight_state_selection(state) {
         // go through all of the values and look match up the map selection and the bars
-        this.svg.selectAll("rect").each(function(d, i) {
-            // the bar that is howevered over in the map will be yellow
-            if (state == d.name) {
-                d3.select(this).attr("fill", "DodgerBlue");
-            } else {
-                d3.select(this).attr("fill", function(d) {
-                    if (d.type === "Nation") {
-                        return "green";
-                    }
-                    return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
-                })
-                d3.select(this).attr("opacity", 0.7);
-            }
-        });
+        if (this.graph_mode === "State"){
+            this.svg.selectAll("rect").each(function(d, i) {
+                // the bar that is howevered over in the map will be yellow
+                if (state == d.name) {
+                    d3.select(this).attr("fill", "DodgerBlue");
+                } else {
+                    d3.select(this).attr("fill", function(d) {
+                        if (d.type === "Nation") {
+                            return "green";
+                        }
+                        return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
+                    })
+                    d3.select(this).attr("opacity", 0.7);
+                }
+            });
+        }
     }
 
     // switch between sorting alphabetically and by mort rate

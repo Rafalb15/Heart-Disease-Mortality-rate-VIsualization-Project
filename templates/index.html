@@ -653,7 +653,7 @@
 			countyMortRateByStateBarChart.highlight_state_selection(layer.feature.properties.name);
 			layer.setStyle({
 				weight: 6,
-				color: 'white',
+				color: 'DodgerBlue',
 				dashArray: '',
 				fillOpacity: 0.7
 			});
@@ -668,7 +668,7 @@
 			countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
 			layer.setStyle({
 				weight: 6,
-				color: 'white',
+				color: 'DodgerBlue',
 				dashArray: '',
 				fillOpacity: 0.7
 			});
@@ -759,7 +759,7 @@
 
 			// update Dennis's graph based on the selection
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
-			countyMortRateByStateBarChart.update_bars(e.target.feature.properties.abbreviation, gender, race);
+			countyMortRateByStateBarChart.update_bars(e.target.feature.properties.abbreviation);
 			// update John's's graph based on the selection
 			update_grouped_barchart(selection_list, jons_graph_type);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1075,8 +1075,7 @@
 				if (selection_list.length > 0) {
 					// Update Denni's graph
 					let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
-					let county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-					countyMortRateByStateBarChart.update_bars(get_state_abbreviation(selection_list[selection_list.length - 1]), gender, race);
+					countyMortRateByStateBarChart.update_bars(state_abbreviation);
 
 					// Update Jon's graph
 					if (gender == "Overall" & race == "Overall") {
@@ -1133,8 +1132,7 @@
 
 			// update Dennis's graph accordingly
 			let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
-			let county_data_of_state = get_county_data_of_state(state_abbreviation, gender, race);
-			countyMortRateByStateBarChart.update_bars(get_state_abbreviation(selection_list[selection_list.length - 1]), gender, race);
+			countyMortRateByStateBarChart.update_bars(state_abbreviation);
 			//
 
 			race_gender_inspector = curr_selection;

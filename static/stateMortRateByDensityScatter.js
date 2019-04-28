@@ -48,7 +48,7 @@ class StateMortRatebyDensity {
             .attr("dy", "1em")
             //.attr("dx", -50)
             .style("text-anchor", "middle")
-            .text("Density (people/sq mile)");
+            .text("Density (people/sq mi)");
 
     }
 
@@ -116,7 +116,7 @@ class StateMortRatebyDensity {
                 .select("#mort_rate")
                 .text("Mortality rate: " + d.mort_rate + "/100K");
                 tooltip.select("#density")
-                .text("Density: " + d.density + '/square mile');
+                .text("Density: " + d.density + '/sq mi');
                 tooltip.select("#tooltipLabel").text(d.stateName);
                 //Show the tooltip
                 tooltip.classed("hidden", false);
@@ -144,7 +144,7 @@ class StateMortRatebyDensity {
                         }
                     }
                 });
-            })
+            });
         //.attr("r", function(d){return aScale(d.mort_rate);})
         svg.append("g")
             .attr("class", "x axis")
