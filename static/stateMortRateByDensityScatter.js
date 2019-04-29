@@ -25,24 +25,24 @@ class StateMortRatebyDensity {
     setup_tooltip(container) {
         this.tooltip = container.append("div")
             .attr("id", "tooltip")
-            //.style("background-color", "rgb(117, 190, 218)")
             .classed("hidden", true);
 
         this.tooltip.append("p")
-        .append("strong")
-        .append("span")
-        .attr("id", "tooltipLabel")
-        .text("Label Heading")
+            .append("strong")
+            .append("span")
+            .attr("id", "tooltipLabel")
+            .text("Label Heading")
 
         this.tooltip.append("p")
-        .append("span")
-        .attr("id", "density")
-        .text("100");
+            .append("span")
+            .attr("id", "density")
+            .text("100");
 
         this.tooltip.append("p")
-        .append("span")
-        .attr("id", "mort_rate")
-        .text("100");
+            .append("span")
+            .attr("id", "mort_rate")
+            .text("100");
+
     }
 
     setup_buttons(container){
@@ -116,7 +116,6 @@ class StateMortRatebyDensity {
         if(state){
             this.cur_state = state;
         }
-
         let data = [];
         let padding = this.padding;
         let tooltip = this.tooltip;
@@ -137,13 +136,20 @@ class StateMortRatebyDensity {
         let yScale = this.yScale.domain([0, d3.max(data, function(d) { return Math.round(d.mort_rate); }) + 100])
         let xAxis = d3.axisBottom().scale(xScale).ticks(5);
         let yAxis = d3.axisLeft().scale(yScale).ticks(5);
-        svg.select("#y_axis").call(yAxis);
-        svg.select("#x_axis").call(xAxis);
+        svg.select("#y_axis")
+            .transition()
+            .duration(1000)
+            .call(yAxis);
+        svg.select("#x_axis")
+            .transition()
+            .duration(1000)
+            .call(xAxis);
 
         let old = svg.selectAll("circle").data(data);
-        let circles = old.enter()
-            .append("circle")
-            .merge(old)
+        let circles = old.enter().append("circle").merge(old);
+        old.exit().remove();
+        circles.transition()
+            .duration(1000)
             .attr("cx", function(d) { return xScale(d.density); })
             .attr("cy", function(d) { return yScale(d.mort_rate); })
             .attr("r", 2.5)
@@ -151,7 +157,7 @@ class StateMortRatebyDensity {
             .attr("stroke", "black")
             .attr("stroke-width", 1)
             .attr("fill", "red")
-            .on("mouseover", function(d) {
+        circles.on("mouseover", function(d) {
                 //Update the tooltip position and value
                 let circle = d3.select(this);
                 let rect = this.getBoundingClientRect();
@@ -203,7 +209,6 @@ class StateMortRatebyDensity {
                     });
                 }
             });
-        old.exit().remove();
     }
 
     highlight_state_selection(state) {
