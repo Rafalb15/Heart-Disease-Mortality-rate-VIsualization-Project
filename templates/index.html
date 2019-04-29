@@ -201,7 +201,7 @@
 	<script type="text/javascript" src="/static/data_as_json.js"></script>
 	<script type="text/javascript" src="/static/us_county_boundary.js"></script>
 	<script type="text/javascript" src="/static/cache.js"></script>
-	<script type ="text/javascript" src= "/static/censusPopDataFiltered.js"></script>
+	<script type="text/javascript" src="/static/censusPopDataFiltered.js"></script>
 	<!-- end MAP js files  -->
 
 	<script type="text/javascript">
@@ -243,6 +243,7 @@
 
 		var jons_graph_type = "overall";
 		var map_enable = true;
+		var last_item_highlight = null;
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
@@ -407,6 +408,8 @@
 		function populate_cache() {
 			// helper function to iterate through all of the options in the multiple dropdown Screven
 			// used to generate cache data
+			let sg1 = document.getElementById('dd_gender_single1').options;
+			let sr1 = document.getElementById('dd_race_single1').options;
 			let temp_g1 = document.getElementById('dd_gender_multiple1').options;
 			let temp_r1 = document.getElementById('dd_race_multiple1').options;
 			let temp_g2 = document.getElementById('dd_gender_multiple2').options;
@@ -426,6 +429,14 @@
 					}
 				}
 			}
+			// for (let e = 0; e < sg1.length; e++) {
+			// 	for (let f = 0; f < sr1.length; f++) {
+			// 		gender = sg1[e].value;
+			// 		race = sr1[f].value;
+			// 		reload_based_on_priority();
+			// 		console.log(cache.length);
+			// 	}
+			// }
 			save_cache_to_file();
 		}
 
@@ -570,10 +581,12 @@
 				map.addLayer(geojson_county);
 				map.removeLayer(geojson);
 				map_type_level = "county";
+				//resetHighlight(last_item_highlight);
 			} else if (map.getZoom() <= zoom_state_county_split && map_type_level != "state") {
 				map.addLayer(geojson);
 				map.removeLayer(geojson_county);
 				map_type_level = "state";
+				//resetHighlightCounty(last_item_highlight);
 			}
 			info.update();
 		});
@@ -583,7 +596,7 @@
 			maxZoom: 10,
 			minZoom: 2,
 			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
-			id: 'mapbox.light'
+			id: 'mapbox.streets'
 		}).addTo(map);
 
 		graph_selection_change();
@@ -606,47 +619,47 @@
 			// based on the current layer of the map, display different information in the top right
 			// State level zoom
 			if (map_type_level === "state") {
-				if(props){ //we are actually hovered over something
-					if(race_gender_inspector === "Single"){
+				if (props) { //we are actually hovered over something
+					if (race_gender_inspector === "Single") {
 						// Single comparison mode
-						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
-							+ 'State: ' + props.name + '</b><br />'
-							+ 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
-							+ 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0];
-					}else{
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>' +
+							'State: ' + props.name + '</b><br />' +
+							'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' +
+							'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0];
+					} else {
 						// Multiple comparison mode
 						let temp = return_state_information_difference(props.abbreviation);
-						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
-							+ 'State: ' + props.name + '</b><br />'
-							+ 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
-							+ 'Mortality rate percentage difference: ' + temp[0] + '<br />'
-							+ "Lookup criteria 1 : Gender(" + g1 +") Race(" + r1 +') mortality rate: ' + temp[2] + '<br />'
-							+ "Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>' +
+							'State: ' + props.name + '</b><br />' +
+							'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' +
+							'Mortality rate percentage difference: ' + temp[0] + '<br />' +
+							"Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 + ') mortality rate: ' + temp[2] + '<br />' +
+							"Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
 					}
-				}else{
+				} else {
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + 'Hover over a state to learn more!'
 				}
 			} else {
-				if(props){ //we are actually hovered over something
+				if (props) { //we are actually hovered over something
 					let county_pop_data = get_county_pop_data_by_geoid(props.GEO_ID);
-					let density = Math.round(parseInt(county_pop_data.overall_overall)/props.CENSUSAREA);
-					if(race_gender_inspector === "Single"){
+					let density = Math.round(parseInt(county_pop_data.overall_overall) / props.CENSUSAREA);
+					if (race_gender_inspector === "Single") {
 						//single comparison mode
-						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
-							+ 'County: ' + props.NAME + '</b><br />'
-							+ 'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
-							+ 'Mortality rate: '+ return_county_information(props.NAME, props.STATE, gender, race)[0];
-					}else{
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>' +
+							'County: ' + props.NAME + '</b><br />' +
+							'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />' +
+							'Mortality rate: ' + return_county_information(props.NAME, props.STATE, gender, race)[0];
+					} else {
 						//multiple comparison mode
 						let temp = return_county_information_difference(props.NAME, props.STATE);
-						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
-							+ 'County: ' + props.NAME + '</b><br />'
-							+ 'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
-							+ 'Mortality rate percentage difference: ' + temp[0] + '<br />'
-							+ "Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 +') mortality rate: ' + temp[2] + '<br />'
-							+ "Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
+						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>' +
+							'County: ' + props.NAME + '</b><br />' +
+							'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />' +
+							'Mortality rate percentage difference: ' + temp[0] + '<br />' +
+							"Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 + ') mortality rate: ' + temp[2] + '<br />' +
+							"Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
 					}
-				}else{
+				} else {
 					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + 'Hover over a county to learn more!'
 				}
 			}
@@ -661,6 +674,7 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		function highlightFeature(e) {
 			if (map_enable === true) {
+				last_item_highlight = e.target;
 				let layer = e.target;
 				stateMortRateByDensityScatter.highlight_state_selection(layer.feature.properties.name);
 				countyMortRateByStateBarChart.highlight_state_selection(layer.feature.properties.name);
@@ -679,6 +693,7 @@
 
 		function highlightCountyFeature(e) {
 			if (map_enable === true) {
+				last_item_highlight = e.target;
 				let layer = e.target;
 				countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
 				layer.setStyle({
@@ -904,13 +919,13 @@
 				opacity: 1,
 				color: 'white',
 				dashArray: '3',
-				fillOpacity: 0.5,
+				fillOpacity: 0.6,
 				fillColor: returncolor
 			};
 		};
 
 
-		// for each feature in the geojson file, set the style and add it to the map
+		// for each feature in the geojson file, set the style and add it to the
 		geojson = L.geoJson(statesData, {
 			style: style,
 			onEachFeature: onEachFeature
@@ -943,7 +958,7 @@
 		////////////////////////////////////////////////////////////////////////////
 		function layer_fadein(layer, sleep_time, aggressiveness, opacity) {
 			let fadeEffect = setInterval(function() {
-				if (Math.round(layer.options.fillOpacity * 100)/100 < opacity) {
+				if (Math.round(layer.options.fillOpacity * 100) / 100 < opacity) {
 					layer.setStyle({
 						fillOpacity: layer.options.fillOpacity + aggressiveness
 					})
@@ -951,6 +966,30 @@
 					clearInterval(fadeEffect);
 				}
 			}, sleep_time);
+		}
+
+		function combined(layer, sleep_time, aggressiveness, opacity, return_style) {
+			let fadeEffectin = setInterval(function() {
+				if (layer.options.fillOpacity > 0) {
+					layer.setStyle({
+						fillOpacity: layer.options.fillOpacity - aggressiveness
+					})
+				} else {
+					clearInterval(fadeEffectin);
+				}
+			}, sleep_time);
+			return_style.fillOpacity = 0.0;
+			layer.setStyle(return_style);
+			let fadeEffectout = setInterval(function() {
+				if (Math.round(layer.options.fillOpacity * 100) / 100 < opacity) {
+					layer.setStyle({
+						fillOpacity: layer.options.fillOpacity + aggressiveness
+					})
+				} else {
+					clearInterval(fadeEffectout);
+				}
+			}, sleep_time);
+
 		}
 		////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////
@@ -975,6 +1014,7 @@
 
 
 
+
 		function reload_geojson_county() {
 			geojson_county.eachLayer(async function(layer) {
 				// get the current color of the respective layer
@@ -985,11 +1025,11 @@
 				if (existing_color != return_style.fillColor) {
 					// if the existing color does not match the new color that will be applied to the layer
 					// sleep the change for 700 ms seconds so users will be able to register and fadein and out
-					layer_fadeout(layer, 25, .1);
-					await sleep(100);
+					layer_fadeout(layer, 10, .2);
+					await sleep(150);
 					return_style.fillOpacity = 0.0;
 					layer.setStyle(return_style);
-					layer_fadein(layer, 25, .1, 0.5);
+					layer_fadein(layer, 10, .2, 0.6);
 				};
 
 			});
