@@ -234,7 +234,7 @@ class StateMortRatebyDensity {
     get_states_data() {
         let data = [];
         for (let i = 0; i < json_data.length; i++) {
-          if (json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
+          if (json_data[i][11] === "State" && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null) {
             let state_abbreviation = json_data[i][9];
             // Washington DC is lying too far out
             if (state_abbreviation !== "DC") {
