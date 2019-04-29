@@ -15,7 +15,7 @@ class StateMortRatebyDensity {
         this.yScale = null;
 
         this.setup_tooltip(container);
-        //this.setup_buttons(container);
+        this.setup_buttons(container);
         this.setup_title(container);
         this.setup_svg(container);
         this.update_scatter();
@@ -45,7 +45,7 @@ class StateMortRatebyDensity {
         .text("100");
     }
 
-    /*setup_buttons(container){
+    setup_buttons(container){
         container.append("button")
         .attr("type", "button")
         .attr("id", "change_graph")
@@ -61,7 +61,7 @@ class StateMortRatebyDensity {
             }
             stateMortRateByDensityScatter.update_scatter(stateMortRateByDensityScatter.cur_state);
         });
-    }*/
+    }
 
     setup_title(container) {
         let w = this.w;
@@ -116,42 +116,36 @@ class StateMortRatebyDensity {
         if(state){
             this.cur_state = state;
         }
-        if (this.graph_mode === "State"){
-            this.state_scatter();
-        }else if (this.graph_mode === "County"){
-            this.county_scatter(this.cur_state);
-        }
-    }
 
-    state_scatter() {
-        let data = this.get_states_data();
+        let data = [];
         let padding = this.padding;
         let tooltip = this.tooltip;
         let svg = this.svg;
         let h = svg.attr("height");
         let w = svg.attr("width");
+        let graph_mode = this.graph_mode;
 
-        // update graph title
-        this.container.select("#graph_title").text("Mortality rate in each state for Gender: (" + gender + ") and Race: (" + race + ") vs overall density");
+        if (this.graph_mode === "State"){
+            data = this.get_states_data();
+            this.container.select("#graph_title").text("Gender: (" + gender + ") and Race: (" + race + ") mortality rate vs density in each state");
+        }else if (this.graph_mode === "County"){
+            data = this.get_county_data_of_state(this.cur_state);
+            this.container.select("#graph_title").text("Gender: (" + gender + ") and Race: (" + race + ") mortality rate vs density for counties in " + this.cur_state);
+        }
 
         let xScale = this.xScale.domain([0, d3.max(data, function(d) { return d.density; })])
-        let yScale = this.yScale.domain([0, d3.max(data, function(d) { return d.mort_rate; }) + 100])
+        let yScale = this.yScale.domain([0, d3.max(data, function(d) { return Math.round(d.mort_rate); }) + 100])
         let xAxis = d3.axisBottom().scale(xScale).ticks(5);
         let yAxis = d3.axisLeft().scale(yScale).ticks(5);
         svg.select("#y_axis").call(yAxis);
         svg.select("#x_axis").call(xAxis);
 
-        // make some circles
-        svg.selectAll("circle")
-            .data(data)
-            .enter()
+        let old = svg.selectAll("circle").data(data);
+        let circles = old.enter()
             .append("circle")
-            .attr("cx", function(d) {
-                return xScale(d.density);
-            })
-            .attr("cy", function(d) {
-                return yScale(d.mort_rate);
-            })
+            .merge(old)
+            .attr("cx", function(d) { return xScale(d.density); })
+            .attr("cy", function(d) { return yScale(d.mort_rate); })
             .attr("r", 2.5)
             .attr("fill-opacity", 0.7)
             .attr("stroke", "black")
@@ -161,65 +155,80 @@ class StateMortRatebyDensity {
                 //Update the tooltip position and value
                 let circle = d3.select(this);
                 let rect = this.getBoundingClientRect();
-                tooltip.style("left", (Math.round(circle.attr("cx")) + 10) + "px")
-                .style("top", (this.getBoundingClientRect().top + window.pageYOffset + 20) + "px")
-                .select("#mort_rate")
-                .text("Mortality rate: " + d.mort_rate + "/100K");
+                tooltip.style("left", (Math.round(circle.attr("cx"))-30) + "px")
+                    .style("top", (this.getBoundingClientRect().top + window.pageYOffset -100) + "px")
+                    .select("#mort_rate")
+                    .text("Mortality rate: " + d.mort_rate + "/100K");
                 tooltip.select("#density")
-                .text("Density: " + d.density + '/sq mi');
+                    .text("Density: " + d.density + '/sq mi');
                 tooltip.select("#tooltipLabel").text(d.name);
                 //Show the tooltip
                 tooltip.classed("hidden", false);
-
-                map.eachLayer(function(layer){
-                    if(layer.feature){
-                        if(map_type_level === "state"){
+                if(map_type_level === "state"){
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
                             if(layer.feature.properties.name === d.name){
                                 highlightFeature({target: layer});
                             }
                         }
-                    }
-                });
-
+                    });
+                }else if(graph_mode === "County"){
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
+                            if(layer.feature.properties.GEO_ID === d.popData.geoid){
+                                highlightCountyFeature({target: layer});
+                            }
+                        }
+                    });
+                }
             })
             .on("mouseout", function(d) {
                 //Hide the tooltip
                 tooltip.classed("hidden", true);
-                map.eachLayer(function(layer){
-                    if(layer.feature){
-                        if(map_type_level === "state"){
+                if(map_type_level === "state"){
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
                             if(layer.feature.properties.name === d.name){
                                 resetHighlight({target: layer});
                             }
                         }
-                    }
-                });
-            });      
-    }
-
-    county_scatter(state){
-        let data = this.get_county_data_of_state(state);
-        let padding = this.padding;
-        let tooltip = this.tooltip;
-        let svg = this.svg;
-        let h = svg.attr("height");
-        let w = svg.attr("width");
-
-        let circles = svg.selectAll("rect").data(data);
+                    });
+                }else if(graph_mode === "County"){
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
+                            if(layer.feature.properties.GEO_ID === d.popData.geoid){
+                                resetHighlightCounty({target: layer});
+                            }
+                        }
+                    });
+                }
+            });
+        old.exit().remove();
     }
 
     highlight_state_selection(state) {
-        // define color changer based on svg's colorscale
-        let color_changer = this.colorScale;
-        // go through all of the values and look match up the map selection and the bars
-        this.svg.selectAll("circle").each(function(d, i) {
-        // the bar that is howevered over in the map will be yellow
-        if (state == d.name) {
-            d3.select(this).attr("fill", "DodgerBlue").attr("r", 8);
-        } else {
-            d3.select(this).attr("fill", "red").attr("r", 2.5);
+        if (this.graph_mode === "State"){
+            // go through all of the values and look match up the map selection and the bars
+            this.svg.selectAll("circle").each(function(d, i) {
+                if (state === d.name) {
+                    d3.select(this).attr("fill", "DodgerBlue").attr("r", 8);
+                } else {
+                    d3.select(this).attr("fill", "red").attr("r", 2.5);
+                }
+            });
         }
-        });
+    }
+
+    highlight_county_selection(geoid){
+        if (this.graph_mode === "County"){
+            this.svg.selectAll("circle").each(function(d){
+                if(geoid === d.popData.geoid){
+                    d3.select(this).attr("fill", "DodgerBlue").attr("r", 8);
+                }else {
+                    d3.select(this).attr("fill", "red").attr("r", 2.5);
+                }
+            });
+        }
     }
 
     get_states_data() {
@@ -251,11 +260,30 @@ class StateMortRatebyDensity {
         // find all counties that belong to the state and have data for the selected gender/race groups
         for (let i = 0; i < json_data.length; i++){
             if(json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null){
-                // find the population for the county and calculate the density
+                let geoid = get_geoid_from_mort_rate_county_name(json_data[i][10], state_abbreviation);
+                // find the population data for the county
                 for (let j = 0; j< censusPopData.length; j++){
+                    if(censusPopData[j].geoid=== geoid){
+                        let popData = censusPopData[j];
+                        let counties = countyData.features;
+                        //find the area of the county and calculate the density
+                        for (let k = 0; k < counties.length; k++){
+                            if (counties[k].properties.GEO_ID === geoid){
+                                data.push({
+                                    name: censusPopData[j].name,
+                                    mort_rate: json_data[i][15],
+                                    density: Math.round(parseInt(popData.overall_overall)/counties[k].properties.CENSUSAREA),
+                                    popData: censusPopData[j]
+                                });
+                                break;
+                            }
+                        }
+                        break;
+                    }
                 }
             }
         }
+        return data;
     }
 }
 
@@ -265,4 +293,5 @@ addLoadEvent(function(e) {
   let w = Math.round(document.body.clientWidth * 1);
   let h = Math.round(document.body.clientHeight * 0.3);
   stateMortRateByDensityScatter = new StateMortRatebyDensity(w, h, div);
+  stateMortRateByDensityScatter.update_scatter("Massachusetts", "Overall", "Overall");
 });

@@ -138,72 +138,50 @@ class CountyMortRateByStateBarChart {
         if(state){
             this.cur_state = state;
         }
-        if (this.graph_mode === "State"){
-            this.state_mort_rate_bars();
-        }else if (this.graph_mode === "County"){
-            this.county_mort_rate_bars(this.cur_state);
-        }
-        this.sort_bars(0, 0);
-    }
 
-    state_mort_rate_bars(){
+        let data = [];
         let svg = this.svg;
         let xScale = this.xScale;
         let yScale = this.yScale;
-        let states_data = this.get_states_data(gender, race);
-        // update graph title
-        this.container.select("#graph_title").text("Mortality rate in each state for Gender: (" + gender + ") and Race: (" + race + ")");
+        let fill_f = function(d) { return; };
+
+        if (this.graph_mode === "State"){
+            //this.state_mort_rate_bars();
+            data = this.get_states_data();
+            this.container.select("#graph_title").text("Mortality rate in each state for Gender: (" + gender + ") and Race: (" + race + ")");
+            svg.select("#x_label").text("State");
+            fill_f = function(d) {
+                if (d.type === "Nation") {return "green"; }
+                return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
+            };
+        }else if (this.graph_mode === "County"){
+            //this.county_mort_rate_bars(this.cur_state);
+            data = this.get_county_data(state);
+            this.container.select("#graph_title").text("Mortality rate across counties in " + state + " for Gender: " + gender + " and Race: " + race + "");
+            svg.select("#x_label").text("County");
+            fill_f = function(d){
+                if (d.type === "State") { return "green"; }
+                return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
+            }
+        }
+
         //update xscale and yscale
-        xScale.domain(d3.range(states_data.length));
-        yScale.domain([0, d3.max(states_data, function(d) { return d.mort_rate; })]);
+        xScale.domain(d3.range(data.length));
+        yScale.domain([0, d3.max(data, function(d) { return d.mort_rate; })]);
 
         //update axes
         let yAxis = d3.axisLeft().scale(yScale);
         svg.select("#y_axis").call(yAxis);
-        svg.select("#x_label").text("State");
-
+        
         //update bars
-        let bars = svg.selectAll("rect").data(states_data);
-        let rects = bars.enter().append("rect").merge(bars);
+        let old = svg.selectAll("rect").data(data);
+        let rects = old.enter().append("rect").merge(old);
         rects = this.setup_rectangles(rects);
-        rects.attr("fill", function(d) {
-                if (d.type === "Nation") {return "green"; }
-                return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
-            })
-            .attr("opacity", 0.7)
+        rects.attr("fill", fill_f).attr("opacity", 0.7);
         this.setup_tooltip_hover(rects);
-        bars.exit().remove();
-    }
+        old.exit().remove();
 
-    county_mort_rate_bars(state){
-        let svg = this.svg;
-        let county_data_of_state = this.get_county_data(state, gender, race);
-
-        // Update the graph's title
-        this.container.select("#graph_title").text("Mortality rate across counties in " + state + " for Gender: " + gender + " and Race: " + race + "");
-
-        // update the xScale and yScale
-        this.xScale.domain(d3.range(county_data_of_state.length));
-        this.yScale.domain([0, d3.max(county_data_of_state, function(d) { return d.mort_rate; })]);
-
-        //update axes
-        let yAxis = d3.axisLeft().scale(this.yScale);
-        svg.select("#y_axis").call(yAxis);
-        svg.select("#x_label").text("County");
-
-        //Update all bars
-        let bars = svg.selectAll("rect").data(county_data_of_state);
-        let rects = bars.enter().append("rect").merge(bars)
-        rects = this.setup_rectangles(rects);
-        rects.attr("fill", function(d) {
-                if (d.type === "State") { return "green"; }
-                return countyMortRateByStateBarChart.graph_bar_color(d.mort_rate);
-            })
-            .attr("opacity", 0.7);
-        this.setup_tooltip_hover(rects);
-
-        // remove old bars
-        bars.exit().remove();
+        this.sort_bars(0, 0);
     }
 
     // set the sizes and scales of the rectangle

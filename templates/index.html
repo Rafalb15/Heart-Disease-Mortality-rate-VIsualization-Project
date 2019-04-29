@@ -695,6 +695,7 @@
 			if (map_enable === true) {
 				last_item_highlight = e.target;
 				let layer = e.target;
+				stateMortRateByDensityScatter.highlight_county_selection(layer.feature.properties.GEO_ID);
 				countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
 				layer.setStyle({
 					weight: 6,
@@ -800,6 +801,7 @@
 				// update Dennis's graph based on the selection
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				countyMortRateByStateBarChart.update_bars(e.target.feature.properties.abbreviation);
+				stateMortRateByDensityScatter.update_scatter(e.target.feature.properties.name);
 				// update John's's graph based on the selection
 				update_grouped_barchart(selection_list, jons_graph_type);
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1149,7 +1151,7 @@
 					// Update Denni's graph
 					let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
 					countyMortRateByStateBarChart.update_bars(state_abbreviation);
-
+					stateMortRateByDensityScatter.update_scatter(selection_list[selection_list.length - 1]);
 					// Update Jon's graph
 					if (gender == "Overall" & race == "Overall") {
 						jons_graph_type = "overall";
@@ -1206,6 +1208,7 @@
 			// update Dennis's graph accordingly
 			let state_abbreviation = get_state_abbreviation(selection_list[selection_list.length - 1]);
 			countyMortRateByStateBarChart.update_bars(state_abbreviation);
+			stateMortRateByDensityScatter.update_scatter(selection_list[selection_list.length - 1]);
 			//
 
 			race_gender_inspector = curr_selection;
