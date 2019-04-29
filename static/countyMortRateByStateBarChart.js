@@ -42,8 +42,6 @@ class CountyMortRateByStateBarChart {
     }
 
     setup_buttons(container) {
-        //this.buttons = container.append("div")
-          //      .attr("id", "graphButtons");
         container.append("button")
             .attr("type", "button")
             .attr("id", "sort_graph")
@@ -81,7 +79,6 @@ class CountyMortRateByStateBarChart {
             .attr("id", "graph_title")
             .attr("text-anchor", "middle")
             .style("font-size", "20px")
-            //.style("font-weight", "bold")
             .style("text-align","center")
             .style("display", "inline-block")
             .style("width", w-600 + "px");
@@ -122,7 +119,7 @@ class CountyMortRateByStateBarChart {
         this.svg.append("text")
             .attr("id", "y_label")
             .attr("transform", "rotate(-90)")
-            .attr("x",0 - (h / 2))
+            .attr("x",0 - (h / 2)+y_pad/2)
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .text("Mortaility Rate");
@@ -138,11 +135,13 @@ class CountyMortRateByStateBarChart {
     }
 
     update_bars(state){
-        this.cur_state = state;
+        if(state){
+            this.cur_state = state;
+        }
         if (this.graph_mode === "State"){
             this.state_mort_rate_bars();
         }else if (this.graph_mode === "County"){
-            this.county_mort_rate_bars(state);
+            this.county_mort_rate_bars(this.cur_state);
         }
         this.sort_bars(0, 0);
     }
@@ -151,9 +150,9 @@ class CountyMortRateByStateBarChart {
         let svg = this.svg;
         let xScale = this.xScale;
         let yScale = this.yScale;
-        let states_data = get_states_data(gender, race);
+        let states_data = this.get_states_data(gender, race);
         // update graph title
-        this.container.select("#graph_title").text("Mortality rate in each state for Gender: " + gender + " and Race: " + race);
+        this.container.select("#graph_title").text("Mortality rate in each state for Gender: (" + gender + ") and Race: (" + race + ")");
         //update xscale and yscale
         xScale.domain(d3.range(states_data.length));
         yScale.domain([0, d3.max(states_data, function(d) { return d.mort_rate; })]);
@@ -178,7 +177,7 @@ class CountyMortRateByStateBarChart {
 
     county_mort_rate_bars(state){
         let svg = this.svg;
-        let county_data_of_state = get_county_data_of_state(state, gender, race);
+        let county_data_of_state = this.get_county_data(state, gender, race);
 
         // Update the graph's title
         this.container.select("#graph_title").text("Mortality rate across counties in " + state + " for Gender: " + gender + " and Race: " + race + "");
@@ -234,54 +233,46 @@ class CountyMortRateByStateBarChart {
                 d3.select("#tooltip").select("#tooltipLabel").text(d.name);
                 d3.select("#tooltip").classed("hidden", false);
                 // highlight the state/county on the map
-                map.eachLayer(function(layer){
-                    if(layer.feature){
-                        if(map_type_level === "state"){
+                if(map_type_level === "state"){
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
                             if(layer.feature.properties.name === d.name){
                                 highlightFeature({target: layer});
                             }
-                        }else{
-                            if(layer.feature.properties.STATE === state){
-                                let name = layer.feature.properties.NAME;
-                                //some problems with counties having the word county in their name
-                                let idx_mod = -7;
-                                //for Puerto Rico, although there are still some problems with spanish letters or something
-                                if(layer.feature.properties.STATE === "PR"){
-                                    idx_mod = -10;
-                                }
-                                if (name === d.name.substring(0, d.name.length+idx_mod) || name === d.name && d.type === "County"){
-                                    highlightCountyFeature({target: layer});
-                                }
+                        }
+                    });
+                }else if (d.type === "County"){
+                    let geoid = get_geoid_from_mort_rate_county_name(d.name, state);
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
+                            if(layer.feature.properties.GEO_ID === geoid){
+                                highlightCountyFeature({target: layer});
                             }
                         }
-                    }
-                });
+                    });
+                }
             })
             .on("mouseout", function(d) { 
                 d3.select("#tooltip").classed("hidden", true);
                 //unhighlight state/county
-                map.eachLayer(function(layer){
-                    if(layer.feature){
-                        if(map_type_level === "state"){
+                if(map_type_level === "state"){
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
                             if(layer.feature.properties.name === d.name){
                                 resetHighlight({target: layer});
                             }
-                        }else{
-                            if(layer.feature.properties.STATE === state){
-                                let name = layer.feature.properties.NAME;
-                                //some problems with counties having the word county in their name
-                                let idx_mod = -7;
-                                //for Puerto Rico, although there are still some problems with spanish letters or something
-                                if(layer.feature.properties.STATE === "PR"){
-                                    idx_mod = -10;
-                                }
-                                if (name === d.name.substring(0, d.name.length+idx_mod) || name === d.name && d.type === "County"){
-                                    resetHighlightCounty({target: layer});
-                                }
+                        }
+                    });
+                }else if(d.type === "County"){
+                    let geoid = get_geoid_from_mort_rate_county_name(d.name, state);
+                    map.eachLayer(function(layer){
+                        if(layer.feature){
+                            if(layer.feature.properties.GEO_ID === geoid){
+                                resetHighlightCounty({target: layer});
                             }
                         }
-                    }
-                });
+                    });
+                }
             });
         return rects;
     }
@@ -345,6 +336,46 @@ class CountyMortRateByStateBarChart {
             .attr("x", function(d, i) { return xScale(i); });
     }
 
+    get_states_data(){
+        let data = [];
+        for (let i =0; i<json_data.length; i++){
+            if((json_data[i][11] === "State" || json_data[i][11] === "Nation") && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null){
+                let name = json_data[i][10]
+                if(name !== "Guam" && name !== "Virgin Islands of the U.S." && name !== "American Samoa" && name !== "Northern Mariana Islands"){
+                    data.push({
+                        name: json_data[i][10],
+                        mort_rate: Math.round(json_data[i][15]),
+                        type: json_data[i][11]
+                    });
+                }
+            }
+        }
+        return data;
+    }
+
+    get_county_data(state_abbreviation) {
+        let data = [];
+        for (let i = 0; i < json_data.length; i++) {
+            if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null) {
+                data.push({
+                    name: json_data[i][10],
+                    type: json_data[i][11],
+                    mort_rate: Math.round(json_data[i][15]),
+                    // Rafal added
+                    state: json_data[i][9]
+                    // Include the state information as well
+
+                });
+            }
+        }
+        if (data.length === 0) {
+            console.log('did not find any data with state abbreviation: ' + state_abbreviation
+                        + 'gender: ' + gender
+                        + 'race: ' + race);
+        }
+        return data;
+    }
+
     graph_bar_color(d) {
         let color;
         switch (true) {
@@ -400,51 +431,3 @@ addLoadEvent(function(e) {
     countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, div);
     countyMortRateByStateBarChart.update_bars("MA", "Overall", "Overall");
 });
-
-/*
-  _____________________________________________________________________
-
-
-  _____________________________________________________________________
-
-*/
-
-function get_states_data(gender, race){
-    let data = [];
-    for (let i =0; i<json_data.length; i++){
-        if((json_data[i][11] === "State" || json_data[i][11] === "Nation") && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null){
-            let name = json_data[i][10]
-            if(name !== "Guam" && name !== "Virgin Islands of the U.S." && name !== "American Samoa" && name !== "Northern Mariana Islands"){
-                data.push({
-                    name: json_data[i][10],
-                    mort_rate: Math.round(json_data[i][15]),
-                    type: json_data[i][11]
-                });
-            }
-        }
-    }
-    return data;
-}
-
-// a list that contains the name, state vs county type and mortality rate
-function get_county_data_of_state(state_abbreviation, gender, race) {
-    let data = [];
-    for (let i = 0; i < json_data.length; i++) {
-        if (json_data[i][9] === state_abbreviation && json_data[i][21] === gender && json_data[i][23] === race && json_data[i][15] !== null) {
-            data.push({
-            name: json_data[i][10],
-            type: json_data[i][11],
-            mort_rate: Math.round(json_data[i][15]),
-            // Rafal added
-            state: json_data[i][9]
-            // Include the state information as well
-            });
-        }
-    }
-    if (data.length === 0) {
-        console.log('did not find any data with state abbreviation: ' + state_abbreviation
-                    + 'gender: ' + gender
-                    + 'race: ' + race);
-    }
-    return data;
-}

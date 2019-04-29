@@ -304,7 +304,7 @@
 			} else {
 				switch (true) {
 					case (d === null):
-						color = 'rgba(255, 99, 71, 0)'
+						color = '#BEBEBE'
 						break;
 					case (d >= 140):
 						color = '#d73027';
@@ -319,7 +319,7 @@
 						color = '#fee090';
 						break;
 					case (-20 <= d && d < 20):
-						color = '#BEBEBE';
+						color = '#f7f7f7';
 						break;
 					case (-60 <= d && d < -20):
 						color = '#e0f3f8';
@@ -611,14 +611,14 @@
 						// Single comparison mode
 						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
 							+ 'State: ' + props.name + '</b><br />'
-							+ 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Overall Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
 							+ 'Mortality rate: ' + return_state_information(props.abbreviation, gender, race)[0];
 					}else{
 						// Multiple comparison mode
 						let temp = return_state_information_difference(props.abbreviation);
 						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
 							+ 'State: ' + props.name + '</b><br />'
-							+ 'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Overall Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />'
 							+ 'Mortality rate percentage difference: ' + temp[0] + '<br />'
 							+ "Lookup criteria 1 : Gender(" + g1 +") Race(" + r1 +') mortality rate: ' + temp[2] + '<br />'
 							+ "Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
@@ -634,14 +634,14 @@
 						//single comparison mode
 						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
 							+ 'County: ' + props.NAME + '</b><br />'
-							+ 'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Overall Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
 							+ 'Mortality rate: '+ return_county_information(props.NAME, props.STATE, gender, race)[0];
 					}else{
 						//multiple comparison mode
 						let temp = return_county_information_difference(props.NAME, props.STATE);
 						this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + '<b>'
 							+ 'County: ' + props.NAME + '</b><br />'
-							+ 'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
+							+ 'Overall Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />'
 							+ 'Mortality rate percentage difference: ' + temp[0] + '<br />'
 							+ "Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 +') mortality rate: ' + temp[2] + '<br />'
 							+ "Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];

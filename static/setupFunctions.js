@@ -32,3 +32,22 @@ function get_county_pop_data_by_geoid(geoid){
     }
     return null;
 }
+
+//converts the county name from the mortality rates data to geoid
+// some bugs with puerto rico
+function get_geoid_from_mort_rate_county_name(county, state_abbreviation){
+    let counties = countyData.features
+    let idx_mod = -7;
+    if(state_abbreviation === "PR"){
+        idx_mod = -10;
+    }
+    // try and get a match using county boundaries dataset
+    for(let i = 0; i < counties.length; i++){
+        if (counties[i].properties.STATE === state_abbreviation){
+            if(county.substring(0, county.length+idx_mod) === counties[i].properties.NAME || county === counties[i].properties.NAME){
+                return counties[i].properties.GEO_ID;
+            }
+        }
+    }
+    return null;
+}
