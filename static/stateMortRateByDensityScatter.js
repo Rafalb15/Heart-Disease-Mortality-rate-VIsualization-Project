@@ -107,7 +107,7 @@ class StateMortRatebyDensity {
             .attr("id", "x_axis")
             .attr("transform", "translate(0, " + (h - padding*2) + ")");
 
-        this.xScale = d3.scaleLinear().range([2*padding, w - padding * 2]);
+        this.xScale = d3.scaleSqrt().range([2*padding, w - padding * 2]);
         this.yScale = d3.scaleLinear().range([h - padding*2, padding/2]);
 
     }
@@ -132,9 +132,9 @@ class StateMortRatebyDensity {
             this.container.select("#graph_title").text("Gender: (" + gender + ") and Race: (" + race + ") mortality rate vs density for counties in " + this.cur_state);
         }
 
-        let xScale = this.xScale.domain([0, d3.max(data, function(d) { return d.density; })])
+        let xScale = this.xScale.domain([0, d3.max(data, function(d) { return Math.round(d.density); })])
         let yScale = this.yScale.domain([0, d3.max(data, function(d) { return Math.round(d.mort_rate); }) + 100])
-        let xAxis = d3.axisBottom().scale(xScale).ticks(5);
+        let xAxis = d3.axisBottom().scale(xScale).ticks(10);
         let yAxis = d3.axisLeft().scale(yScale).ticks(5);
         svg.select("#y_axis")
             .transition()
