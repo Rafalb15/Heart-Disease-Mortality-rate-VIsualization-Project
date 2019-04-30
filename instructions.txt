@@ -3,8 +3,12 @@ Instructions:
 From the main directory (where server.py file exists)
 Execute:
 python server.py <port_number>
+Navigate to: 127.0.0.1:<port number>
 
 Example: python server.py 9000
+Example: 127.0.0.1:9000
+
+
 
 Requirements:
 Python version: 3+
