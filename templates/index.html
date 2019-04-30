@@ -581,12 +581,12 @@
 				map.addLayer(geojson_county);
 				map.removeLayer(geojson);
 				map_type_level = "county";
-				//resetHighlight(last_item_highlight);
+				resetHighlight(last_item_highlight);
 			} else if (map.getZoom() <= zoom_state_county_split && map_type_level != "state") {
 				map.addLayer(geojson);
 				map.removeLayer(geojson_county);
 				map_type_level = "state";
-				//resetHighlightCounty(last_item_highlight);
+				resetHighlightCounty(last_item_highlight);
 			}
 			info.update();
 		});
@@ -674,7 +674,7 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		function highlightFeature(e) {
 			if (map_enable === true) {
-				last_item_highlight = e.target;
+				last_item_highlight = e;
 				let layer = e.target;
 				stateMortRateByDensityScatter.highlight_state_selection(layer.feature.properties.name);
 				countyMortRateByStateBarChart.highlight_state_selection(layer.feature.properties.name);
@@ -693,7 +693,7 @@
 
 		function highlightCountyFeature(e) {
 			if (map_enable === true) {
-				last_item_highlight = e.target;
+				last_item_highlight = e;
 				let layer = e.target;
 				stateMortRateByDensityScatter.highlight_county_selection(layer.feature.properties.GEO_ID);
 				countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
