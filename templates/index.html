@@ -1384,14 +1384,15 @@
 		var w = w0; // set up variable for dynamic width
 		var h = Math.round(body.clientHeight * 0.23);
 
-		xpadding = 0;
+		// set order of race, gender display
+		race_list = ["White", "Black", "API", "AI/AN", "Hispanic"];
+		gender_list = ["Female", "Male"]
 
-		race_list = ["White", "Black", "Hispanic", "Asian and Pacific Islander", "American Indian and Alaskan Native"];
-		gender_list = ["Male", "Female"]
+		xpadding = 0; // sets the minimum of x_state domain, 0 looks best,
 
 		function get_race_abbreviation(race) {
 			if (race === "Asian and Pacific Islander") {
-				race = "APIA";
+				race = "API";
 			} else if (race === "American Indian and Alaskan Native") {
 				race = "AI/AN";
 			}
@@ -1399,7 +1400,7 @@
 		}
 
 		// get state data for two levels of stratification
-		// strata2 argument not used
+		// strata2 argument not used yet, hope to implement
 		function get_state_data(state_name, strata, strata2 = "") {
 			var data = [];
 
@@ -1521,7 +1522,7 @@
 			return color;
 		}
 
-
+		// the following 3 functions are formatters for the grouped bar chart title
 		function separate_with_commas(state_names) {
 			var series = "";
 			for (let i = 0; i < state_names.length - 1; i++) {
@@ -1561,8 +1562,6 @@
 		}
 
 		function update_grouped_barchart(state_data, strata, strata2 = "") {
-			// adapted from https://stackoverflow.com/questions/45211408/making-a-grouped-bar-chart-using-d3-js
-
 			// remove old chart, old chart title
 			chart.selectAll("*").remove()
 
@@ -1672,6 +1671,7 @@
 			} // end if(strata == "overall" & strata2 == ""){
 
 			// if one stratifying variable picked
+			// nest on two keys
 			if (strata != "overall" & strata2 == "") {
 				data = d3.nest()
 					.key(function(d) {
@@ -1682,6 +1682,7 @@
 					})
 					.entries(data);
 
+				// set up state scale
 				var x_state = d3.scaleBand()
 					.rangeRound([xpadding, w])
 					.padding(0.05)
@@ -1689,10 +1690,14 @@
 						return d.key;
 					}));
 
-				strata_categories = data[0].values.map(function(d, i) {
-					return d.key;
-				});
+				// set x_strata domain
+				if(strata == "race"){
+					strata_categories = race_list;
+				} else {
+					strata_categories = gender_list;
+				}
 
+				// set up strata scale
 				var x_strata = d3.scaleBand()
 					.rangeRound([0, x_state.bandwidth()])
 					.padding(0.02)
@@ -1723,12 +1728,12 @@
 					})
 					.enter().append("rect")
 					.attr("x", function(d) {
-						return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(), 50])) / 2;
+						return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(), 50])) / 2; // position strata correctly
 					})
 					.attr("y", function(d) {
 						return y(d.values[0].mort_rate);
 					})
-					.attr("width", d3.min([x_strata.bandwidth(), 50]))
+					.attr("width", d3.min([x_strata.bandwidth(), 50])) // set the widest width to be no more than 50
 					.attr("height", function(d) {
 						return h - y(d.values[0].mort_rate);
 					})
@@ -1749,6 +1754,7 @@
 				g.selectAll("text")
 					.attr("y", 15);
 
+				// add strata axis for each state
 				bars.append("g")
 					.attr("class", "axis")
 					.attr("transform", "translate(0," + h + ")")
@@ -1806,7 +1812,7 @@
 				}
 			});
 
-		// buttons for cases where strata2 not ""
+		// buttons for cases where strata2 not "" -> not implemented yet
 		// d3.select("#groupedBarChartButtons")
 		// 	.select("#selectRaceByGender")
 		// 	.on("click", function() {
