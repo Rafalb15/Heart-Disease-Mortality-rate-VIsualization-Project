@@ -3,17 +3,31 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Heart Disease Mortality Data Among US Adults (population age 35+)</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" type="image/x-icon" href="https://leafletjs.com/examples/choropleth/docs/images/favicon.ico">
-	<link rel="stylesheet" href="/static/leaflet.css" crossorigin="">
-	<!-- integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" -->
-	<script src="/static/leaflet.js" crossorigin=""></script>
-	<!-- integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" -->
-	<script src="/static/d3.js"></script>
-	<script src='//js.zapjs.com/js/download.js'></script>
-	<script src="static/setupFunctions.js"></script>
+	<link rel="shortcut icon" type="image/x-icon"
+		href="https://leafletjs.com/examples/choropleth/docs/images/favicon.ico">
+	<link rel="stylesheet" href="./static/leaflet.css">
+	<link rel="stylesheet" href="./static/bootstrap.css">
+
+
+	<script src="./static/leaflet.js"></script>
+	<script src="./static/d3.js"></script>
+	<script src="./static/setupFunctions.js"></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js'></script>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Nunito" />
+
+	<title>Heart Disease Mortality Viz | Rafał Bielech</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Heart Disease Mortality Data Among US Adults (population age 35+)">
+	<meta name="author" content="Rafał Bielech">
+	<link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+	<link rel="manifest" href="./images/favicon/site.webmanifest">
+	<link rel="mask-icon" href="./images/favicon/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="./images/favicon/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="./images/favicon/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
 
 
 	<style>
@@ -21,6 +35,7 @@
 		body {
 			height: 100%;
 			margin: 20;
+			font-family: Nunito;
 		}
 
 		html {
@@ -44,12 +59,12 @@
 		}
 
 		.grow_title:hover {
-			height: 80px;
+			height: 120px;
 		}
 
 		.grow_map_info {
 			border-radius: 10px;
-			height: 35px;
+			height: 25px;
 			width: 50%;
 			float: left;
 			position: left;
@@ -59,7 +74,7 @@
 		}
 
 		.grow_map_info:hover {
-			height: 175px;
+			height: 220px;
 		}
 
 		select {
@@ -128,10 +143,50 @@
 		}
 	</style>
 
-	<style>#map { width: 100%; height: 50%}
-.info { padding: 6px 8px; font: 14px/16px Georgia, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
-.legend { text-align: left; font-family: Georgia; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 2px; opacity: 0.7; } .queue {padding: 6px 8px; font: 14px/16px Georgia, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;}
-</style>
+	<style>
+		#map {
+			width: 100%;
+			height: 50%
+		}
+
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Georgia, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255, 255, 255, 0.8);
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			border-radius: 5px;
+		}
+
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			font-family: Georgia;
+			line-height: 18px;
+			color: #555;
+		}
+
+		.legend i {
+			width: 18px;
+			height: 18px;
+			float: left;
+			margin-right: 2px;
+			opacity: 0.7;
+		}
+
+		.queue {
+			padding: 6px 8px;
+			font: 14px/16px Georgia, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255, 255, 255, 0.8);
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			border-radius: 5px;
+		}
+	</style>
 	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
 </head>
 
@@ -140,15 +195,16 @@
 	<!-- ########################################################################################################################### -->
 	<!-- #################################### DIVS ############################################################################## -->
 	<!-- ########################################################################################################################### -->
-	<div style="width:100%; ">
+	<div class="row text-muted" style="padding-top: 20px">
 		<div class="grow_title">
-			<h1 style="padding:0px; margin:10px; font-family: Georgia;"><i>US Heart Disease Mortality rate Visualization</i></h1>
-			<h4 style="padding:0px; margin:0px; font-family: Georgia;">Data is age-adjusted 35+, spatially smoothed, and averaged over 3 years. Data is seperated by 6 race classes including overall and 3 gender classes including overall</h4>
+			<h2 style="padding-bottom:10px; margin:0px;">US Heart Disease Mortality rate Visualization</h2>
+			<h6 style="padding:0px; margin:0px">Data is age-adjusted 35+, spatially smoothed, and averaged over 3 years.
+				Data is seperated by 6 race classes including overall and 3 gender classes including overall</h6>
 		</div>
 	</div>
 	<!-- ##################################################### MAP Functionality div ############################################################################ -->
 	<div class="grow_map_info" style="color:grey; padding:5px; margin-bottom:10px">
-		<h4 style="margin-bottom:5px">Hover over to learn about map functionality</h4>
+		<h5 style="margin-bottom:5px">Hover over to learn about map functionality</h5>
 		<!-- <p>Hover over to learn about map functionality</p> -->
 		<div style="font-size:14px;padding:5px;font-family: Georgia">
 			<li>Zooming on the map will alternate between county or state layer</li>
@@ -162,23 +218,32 @@
 		</div>
 	</div>
 	<!-- ##################################################### MAP ############################################################################ -->
-	<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"></div>
+	<div id="map"
+		class="rounded leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"
+		tabindex="0" style="position: relative;"></div>
 	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
-	<div id="graph_selector" style="color:grey; padding:5px; margin:0px; font-family: Georgia; text-align: center; width: 100%;">
+	<div id="graph_selector"
+		style="color:grey; padding:5px; margin:0px; font-family: Georgia; text-align: center; width: 100%;">
 
-		<h4 style="margin: 0px">
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="county_bar_chart" checked><i>State/County Mortality rate bar chart</i></label>
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="density_vs_mort_rate_scatter"><i>Pop. density vs Mortality rate scatterplot</i></label>
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input type="radio" name="radio_graph_select" value="state_comp_bar_chart"><i>Comparison between selected states</i></label>
-		</h4>
+		<h6 style="margin: 0px">
+			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input
+					style="padding-right: 5%; padding-left: 5%" type="radio" name="radio_graph_select"
+					value="county_bar_chart" checked>State/County Mortality rate bar chart</label>
+			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input
+					style="padding-right: 5%; padding-left: 5%" type="radio" name="radio_graph_select"
+					value="density_vs_mort_rate_scatter">Pop. density vs Mortality rate scatterplot</label>
+			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input
+					style="padding-right: 5%; padding-left: 5%" type="radio" name="radio_graph_select"
+					value="state_comp_bar_chart">Comparison between selected states</label>
+		</h6>
 	</div>
-	<hr style="border-top: dotted 2px;" />
+	<hr class="text-muted" />
 	<!-- #################################### radio buttons below map ################################################################### -->
 	<div id="countyMortRateByState" class="graph">
-		<script src="/static/countyMortRateByStateBarChart.js"></script>
+		<script src="./static/countyMortRateByStateBarChart.js"></script>
 	</div>
 	<div id="stateMortRateByDensity" class="graph">
-		<script src="/static/stateMortRateByDensityScatter.js"></script>
+		<script src="./static/stateMortRateByDensityScatter.js"></script>
 	</div>
 	<!-- #################################### bottomest? of page ################################################################### -->
 	<!-- stolen from Dennis - Jon -->
@@ -189,7 +254,9 @@
 
 	<!--<button type="button" id="selectGenderByRace">Gender by Race</button><button type="button" id="selectRaceByGender">Race by Gender</button>-->
 	<div id="jonsgraph" class="graph">
-		<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button" id="selectGender">Gender</button><button type="button" id="selectRace">Race</button><span id="groupedBarChartTitle"></span></div>
+		<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button"
+				id="selectGender">Gender</button><button type="button" id="selectRace">Race</button><span
+				id="groupedBarChartTitle"></span></div>
 	</div>
 	<!-- ########################################################################################################################### -->
 	<!-- ########################################################################################################################### -->
@@ -197,11 +264,11 @@
 	<!-- ########################################################################################################################### -->
 	<!-- source: https://leafletjs.com/examples/choropleth/ -->
 	<!-- MAP js files  -->
-	<script type="text/javascript" src="/static/us_states_boundary.js"></script>
-	<script type="text/javascript" src="/static/data_as_json.js"></script>
-	<script type="text/javascript" src="/static/us_county_boundary.js"></script>
-	<script type="text/javascript" src="/static/cache.js"></script>
-	<script type="text/javascript" src="/static/censusPopDataFiltered.js"></script>
+	<script type="text/javascript" src="./static/us_states_boundary.js"></script>
+	<script type="text/javascript" src="./static/data_as_json.js"></script>
+	<script type="text/javascript" src="./static/us_county_boundary.js"></script>
+	<script type="text/javascript" src="./static/cache.js"></script>
+	<script type="text/javascript" src="./static/censusPopDataFiltered.js"></script>
 	<!-- end MAP js files  -->
 
 	<script type="text/javascript">
@@ -251,7 +318,7 @@
 			// find the average from a list, return the average only if the length of the array is more than 0
 			let sum, avg = 0;
 			if (array.length != 0) {
-				sum = array.reduce(function(a, b) {
+				sum = array.reduce(function (a, b) {
 					return a + b;
 				});
 				avg = sum / array.length;
@@ -323,7 +390,7 @@
 						color = '#f7f7f7';
 						break;
 					case (-60 <= d && d < -20):
-							color = '#cbebf3';
+						color = '#cbebf3';
 						break;
 					case (-100 <= d && d < -60):
 						color = '#abd9e9';
@@ -445,7 +512,8 @@
 			let mort_rate_val = 0;
 			for (let i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
-				if (json_data[i][9] === state_name && json_data[i][11] === "State" && json_data[i][21] === gender && json_data[i][23] === race) {
+				if (json_data[i][9] === state_name && json_data[i][11] === "State" && json_data[i][21] === gender &&
+					json_data[i][23] === race) {
 					// GeographicalLevel = "State"
 					mort_rate_val = json_data[i][15];
 					break;
@@ -465,7 +533,8 @@
 			let mort_rate_val = 0;
 			for (let i = 0; i < json_data.length; i++) {
 				// make sure that correct state is being looked at, and race / gender are both reporting overall
-				if (json_data[i][9] === state && json_data[i][10].includes(county) && json_data[i][11] === "County" && json_data[i][21] === gender && json_data[i][23] === race) {
+				if (json_data[i][9] === state && json_data[i][10].includes(county) && json_data[i][11] === "County" &&
+					json_data[i][21] === gender && json_data[i][23] === race) {
 					// GeographicalLevel = "County"
 					mort_rate_val = json_data[i][15];
 					break;
@@ -573,7 +642,7 @@
 			// setView defines the center of the map
 		}).setView([37.8, -98], current_zoom).setMaxBounds(mybounds);
 
-		map.on('zoomend', function() {
+		map.on('zoomend', function () {
 			// based on the zoom of the map, determine which layer to show/remove
 			// once the map is swtiched, update the global layer variable
 			// update the informational section in top right
@@ -591,13 +660,14 @@
 			info.update();
 		});
 
-		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-			// define the min Zoom so the user doesn't see a grey background
-			maxZoom: 10,
-			minZoom: 2,
-			attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
-			id: 'mapbox.streets'
-		}).addTo(map);
+		L.tileLayer(
+			'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+				// define the min Zoom so the user doesn't see a grey background
+				maxZoom: 10,
+				minZoom: 2,
+				attribution: 'Map data: <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors ',
+				id: 'mapbox.streets'
+			}).addTo(map);
 
 		graph_selection_change();
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -609,13 +679,13 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		var info = L.control();
 
-		info.onAdd = function(map) {
+		info.onAdd = function (map) {
 			this._div = L.DomUtil.create('div', 'info');
 			this.update();
 			return this._div;
 		};
 
-		info.update = function(props) {
+		info.update = function (props) {
 			// based on the current layer of the map, display different information in the top right
 			// State level zoom
 			if (map_type_level === "state") {
@@ -633,7 +703,8 @@
 							'State: ' + props.name + '</b><br />' +
 							'Density: ' + Math.round(props.density) + ' people / mi<sup>2</sup>' + '</b><br />' +
 							'Mortality rate percentage difference: ' + temp[0] + '<br />' +
-							"Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 + ') mortality rate: ' + temp[2] + '<br />' +
+							"Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 + ') mortality rate: ' + temp[2] +
+							'<br />' +
 							"Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
 					}
 				} else {
@@ -656,11 +727,13 @@
 							'County: ' + props.NAME + '</b><br />' +
 							'Density: ' + density + ' people / mi<sup>2</sup>' + '</b><br />' +
 							'Mortality rate percentage difference: ' + temp[0] + '<br />' +
-							"Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 + ') mortality rate: ' + temp[2] + '<br />' +
+							"Lookup criteria 1 : Gender(" + g1 + ") Race(" + r1 + ') mortality rate: ' + temp[2] +
+							'<br />' +
 							"Lookup criteria 2 : Gender(" + g2 + ") Race(" + r2 + ') mortality rate: ' + temp[3];
 					}
 				} else {
-					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' + 'Hover over a county to learn more!'
+					this._div.innerHTML = '<h4>US Heart Disease Mortality rate</h4>' +
+						'Hover over a county to learn more!'
 				}
 			}
 
@@ -696,7 +769,8 @@
 				last_item_highlight = e;
 				let layer = e.target;
 				stateMortRateByDensityScatter.highlight_county_selection(layer.feature.properties.GEO_ID);
-				countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature.properties.STATE);
+				countyMortRateByStateBarChart.highlight_county_selection(layer.feature.properties.NAME, layer.feature
+					.properties.STATE);
 				layer.setStyle({
 					weight: 6,
 					color: 'DodgerBlue',
@@ -774,7 +848,7 @@
 						if (selection_list.length > 1) {
 							// if the selection list is greater than 1, then delete the state
 							// that the user clicks on
-							var filtered = selection_list.filter(function(value, index, arr) {
+							var filtered = selection_list.filter(function (value, index, arr) {
 								return value != state;
 							});
 							//console.log(filtered);
@@ -788,7 +862,7 @@
 						selection_list.push(state);
 						queue.update_full();
 					} else {
-						var filtered = selection_list.filter(function(value, index, arr) {
+						var filtered = selection_list.filter(function (value, index, arr) {
 							return value != state;
 						});
 						//console.log(filtered);
@@ -888,13 +962,15 @@
 			if (race_gender_inspector === "Single") {
 				// Single mode
 				// Try to get a value from cache
-				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE);
+				cache_lookup = exists_in_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature
+					.properties.STATE);
 				if (cache_lookup === undefined) {
 					//console.log("no cache");
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
 					temp = return_county_information(feature.properties.NAME, feature.properties.STATE, gender, race)[1];
-					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE, temp);
+					add_to_cache(race_gender_inspector + gender + race, feature.properties.NAME + feature.properties.STATE,
+						temp);
 				} else {
 					// get the value from the cache
 					temp = cache_lookup;
@@ -904,12 +980,14 @@
 			} else {
 				// Multiple mode
 				//temp = return_county_information_difference(feature.properties.NAME)[1];
-				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE);
+				cache_lookup = exists_in_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature
+					.properties.STATE);
 				if (cache_lookup === undefined) {
 					// if the value does not exist in the cache, get the value using search on the json data
 					// append the result to the cache to be used later
 					temp = return_county_information_difference(feature.properties.NAME, feature.properties.STATE)[1];
-					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties.STATE, temp);
+					add_to_cache(race_gender_inspector + g1 + r1 + g2 + r2, feature.properties.NAME + feature.properties
+						.STATE, temp);
 				} else {
 					// get the value from the cache
 					temp = cache_lookup;
@@ -941,12 +1019,14 @@
 		}
 		// load the data asynchrously
 		setTimeout(load_county_data, 0);
-		map.attributionControl.addAttribution('Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>');
+		map.attributionControl.addAttribution(
+			'Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>'
+			);
 
 		////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////
 		function layer_fadeout(layer, sleep_time, aggressiveness) {
-			let fadeEffect = setInterval(function() {
+			let fadeEffect = setInterval(function () {
 				if (layer.options.fillOpacity > 0) {
 					layer.setStyle({
 						fillOpacity: layer.options.fillOpacity - aggressiveness
@@ -959,7 +1039,7 @@
 		////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////
 		function layer_fadein(layer, sleep_time, aggressiveness, opacity) {
-			let fadeEffect = setInterval(function() {
+			let fadeEffect = setInterval(function () {
 				if (Math.round(layer.options.fillOpacity * 100) / 100 < opacity) {
 					layer.setStyle({
 						fillOpacity: layer.options.fillOpacity + aggressiveness
@@ -971,7 +1051,7 @@
 		}
 
 		function combined(layer, sleep_time, aggressiveness, opacity, return_style) {
-			let fadeEffectin = setInterval(function() {
+			let fadeEffectin = setInterval(function () {
 				if (layer.options.fillOpacity > 0) {
 					layer.setStyle({
 						fillOpacity: layer.options.fillOpacity - aggressiveness
@@ -982,7 +1062,7 @@
 			}, sleep_time);
 			return_style.fillOpacity = 0.0;
 			layer.setStyle(return_style);
-			let fadeEffectout = setInterval(function() {
+			let fadeEffectout = setInterval(function () {
 				if (Math.round(layer.options.fillOpacity * 100) / 100 < opacity) {
 					layer.setStyle({
 						fillOpacity: layer.options.fillOpacity + aggressiveness
@@ -996,7 +1076,7 @@
 		////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////
 		function reload_geojson() {
-			geojson.eachLayer(async function(layer) {
+			geojson.eachLayer(async function (layer) {
 				// get the current color of the respective layer
 				let existing_color = layer.options.fillColor;
 				let return_style = style(layer.feature);
@@ -1018,7 +1098,7 @@
 
 
 		function reload_geojson_county() {
-			geojson_county.eachLayer(async function(layer) {
+			geojson_county.eachLayer(async function (layer) {
 				// get the current color of the respective layer
 				// get the new color based on the selection of the data
 				let existing_color = layer.options.fillColor;
@@ -1047,7 +1127,7 @@
 			position: 'bottomright'
 		});
 
-		dropdown.onAdd = function(e) {
+		dropdown.onAdd = function (e) {
 			// add some values to the dropdown
 			this._div = L.DomUtil.create('div', 'info');
 			this._div.innerHTML = '<div style="text-align: center;"> <h4>Race / Gender interaction</h4>' +
@@ -1057,7 +1137,8 @@
 
 				'<div id = "single_selection_dropdown" style="text-align: left; padding-top: 5px; padding-bottom: 5px; font-family: Georgia">' +
 				'<div style="padding-left: 5px; padding-bottom: 5px">Gender - <select id="dd_gender_single1" onchange="event_listener(event)"><option>Overall</option><option>Female</option><option>Male</option></select></div>' +
-				'<div style="padding-left: 5px; padding-bottom: 5px">Race - ' + '<select id="dd_race_single1" onchange="event_listener(event)"><option>Overall</option><option>White</option>' +
+				'<div style="padding-left: 5px; padding-bottom: 5px">Race - ' +
+				'<select id="dd_race_single1" onchange="event_listener(event)"><option>Overall</option><option>White</option>' +
 				'<option>Black</option><option>Asian and Pacific Islander</option><option>American Indian and Alaskan Native</option><option>Hispanic</option></select></div>' +
 				'</div>' +
 
@@ -1132,17 +1213,19 @@
 
 
 		function event_listener(e) {
-			document.getElementById("update_button").style = "opacity:1; background-color: red; margin: auto; border-radius: 12px;";
+			document.getElementById("update_button").style =
+				"opacity:1; background-color: red; margin: auto; border-radius: 12px;";
 		}
 
 		function execute() {
 			// save the choices from the dropdowns and go forward with the animation
-			document.getElementById("update_button").style = "opacity:0.5; background-color: white; margin: auto; border-radius: 12px;";
+			document.getElementById("update_button").style =
+				"opacity:0.5; background-color: white; margin: auto; border-radius: 12px;";
 			let changed_vals = [];
 			changed_vals = save_dropdown_options();
 			drop_down_operator(true);
 			reload_based_on_priority();
-			setTimeout(function() {
+			setTimeout(function () {
 				drop_down_operator(false);
 			}, 500);
 			if (race_gender_inspector === "Single") {
@@ -1188,10 +1271,11 @@
 			}
 		}
 
-		window.radio_change = function() {
+		window.radio_change = function () {
 			// Based on the radio button selection, display different set of divs to the user
 			// first, get the radio button value to determine where the user has clicked
-			document.getElementById("update_button").style = "opacity:0.5; background-color: white; margin: auto; border-radius: 12px;";
+			document.getElementById("update_button").style =
+				"opacity:0.5; background-color: white; margin: auto; border-radius: 12px;";
 			let curr_selection;
 			let radio_choice = document.getElementsByName("radio_comp_type");
 			for (let i = 0; i < radio_choice.length; i++) {
@@ -1263,14 +1347,14 @@
 			position: 'topcenter'
 		});
 
-		queue.onAdd = function(e) {
+		queue.onAdd = function (e) {
 			// Initially, make the div invisible to the user
 			this._div = L.DomUtil.create('div', 'info');
 			this._div.style.opacity = "0.0";
 			return this._div;
 		}
 
-		queue.update = function(props) {
+		queue.update = function (props) {
 			// show the div if the user clicks any state and wants to add it to the queue
 			// set the opacity of the div to 1.0
 			this._div.style.opacity = "1.0";
@@ -1281,7 +1365,7 @@
 			fade_Out_Effect(this._div);
 		}
 
-		queue.update_full = function(props) {
+		queue.update_full = function (props) {
 			// show the div if the user clicks any state and wants to add it to the queue
 			// set the opacity of the div to 1.0
 			this._div.style.opacity = "1.0";
@@ -1294,7 +1378,7 @@
 
 		function fade_Out_Effect(div) {
 			// decrease the opacity of the div by 0.01 every 20 ms, to provide a smooth fadeout effect
-			let fadeEffect = setInterval(function() {
+			let fadeEffect = setInterval(function () {
 				if (!div.style.opacity) {
 					div.style.opacity = 1;
 				}
@@ -1319,14 +1403,14 @@
 			position: 'bottomleft'
 		});
 
-		legend.onAdd = function(map) {
+		legend.onAdd = function (map) {
 			// create a div with legend styling
 			this._div = L.DomUtil.create('div', 'info legend');
 			this.update();
 			return this._div;
 		};
 
-		legend.update = function() {
+		legend.update = function () {
 			if (race_gender_inspector === "Multiple") {
 				resp_labels = [];
 				partitions = [-140, -100, -60, -20, 20, 60, 100, 140];
@@ -1407,7 +1491,8 @@
 			if (strata == "overall") {
 				for (let j = 0; j < state_name.length; j++) {
 					for (let i = 0; i < json_data.length; i++) {
-						if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] === "Overall") {
+						if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] ===
+							"Overall" && json_data[i][23] === "Overall") {
 							data.push({
 								state: json_data[i][10],
 								mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1423,7 +1508,8 @@
 				if (strata2 == "") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] == "Overall") {
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] !=
+								"Overall" && json_data[i][23] == "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1436,7 +1522,8 @@
 				} else if (strata2 == "race") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] != "Overall") {
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] !=
+								"Overall" && json_data[i][23] != "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1454,7 +1541,8 @@
 				if (strata2 == "") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] === "Overall" && json_data[i][23] != "Overall") {
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] ===
+								"Overall" && json_data[i][23] != "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1467,7 +1555,8 @@
 				} else if (strata2 == "gender") {
 					for (let j = 0; j < state_name.length; j++) {
 						for (let i = 0; i < json_data.length; i++) {
-							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] != "Overall" && json_data[i][23] != "Overall") {
+							if (json_data[i][10] === state_name[j] && json_data[i][11] === "State" && json_data[i][21] !=
+								"Overall" && json_data[i][23] != "Overall") {
 								data.push({
 									state: json_data[i][10],
 									mort_rate: parseFloat(json_data[i][15]) || 0,
@@ -1582,7 +1671,7 @@
 
 			// set up y axis
 			var y = d3.scaleLinear().rangeRound([h, 0]);
-			var ymaxdomain = d3.max(data, function(d) {
+			var ymaxdomain = d3.max(data, function (d) {
 				return d.mort_rate;
 			});
 			y.domain([0, ymaxdomain]);
@@ -1591,7 +1680,7 @@
 			// if no stratifying variable picked
 			if (strata == "overall" & strata2 == "") {
 				data = d3.nest()
-					.key(function(d) {
+					.key(function (d) {
 						return d.state
 					})
 					.entries(data);
@@ -1601,7 +1690,7 @@
 				var x_state = d3.scaleBand()
 					.rangeRound([xpadding, w])
 					.padding(0.05)
-					.domain(data.map(function(d) {
+					.domain(data.map(function (d) {
 						return d.key;
 					}));
 
@@ -1612,36 +1701,36 @@
 					.data(data)
 					.enter()
 					.append("g")
-					.attr("transform", function(d) {
+					.attr("transform", function (d) {
 						return "translate(" + x_state(d.key) + ",0)";
 					})
 
 				// add d3-min tooltip
 				var tip2 = d3.tip()
 					.attr("class", "tooltip2")
-					.html(function(d) {
+					.html(function (d) {
 						return d.values[0].mort_rate;
 					});
 				bars.call(tip2);
 
 				bars.selectAll("rect")
-					.data(function(d) {
+					.data(function (d) {
 						return [d];
 					})
 					.enter()
 					.append("rect")
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						// position the bars for the strata variable correctly
 						return (x_state.bandwidth() - d3.min([x_state.bandwidth(), 50])) / 2;
 					})
-					.attr("y", function(d) {
+					.attr("y", function (d) {
 						return y([d.values[0].mort_rate]);
 					})
 					.attr("width", d3.min([x_state.bandwidth(), 50])) // sent width of the bars to be no bigger than 100px
-					.attr("height", function(d) {
+					.attr("height", function (d) {
 						return h - y([d.values[0].mort_rate]);
 					})
-					.attr("fill", function(d) {
+					.attr("fill", function (d) {
 						return graph_bar_color([d.values[0].mort_rate]);
 					})
 					.attr("opacity", 0.7)
@@ -1674,10 +1763,10 @@
 			// nest on two keys
 			if (strata != "overall" & strata2 == "") {
 				data = d3.nest()
-					.key(function(d) {
+					.key(function (d) {
 						return d.state
 					})
-					.key(function(d) {
+					.key(function (d) {
 						return d[strata]
 					})
 					.entries(data);
@@ -1686,12 +1775,12 @@
 				var x_state = d3.scaleBand()
 					.rangeRound([xpadding, w])
 					.padding(0.05)
-					.domain(data.map(function(d) {
+					.domain(data.map(function (d) {
 						return d.key;
 					}));
 
 				// set x_strata domain
-				if(strata == "race"){
+				if (strata == "race") {
 					strata_categories = race_list;
 				} else {
 					strata_categories = gender_list;
@@ -1714,30 +1803,31 @@
 				// add d3-min tooltip
 				var tip2 = d3.tip()
 					.attr("class", "tooltip2")
-					.html(function(d) {
+					.html(function (d) {
 						return d.values[0].mort_rate;
 					});
 				bars.call(tip2);
 
-				bars.attr("transform", function(d) {
+				bars.attr("transform", function (d) {
 						return "translate(" + x_state(d.key) + ",0)";
 					})
 					.selectAll("rect")
-					.data(function(d) {
+					.data(function (d) {
 						return d.values;
 					})
 					.enter().append("rect")
-					.attr("x", function(d) {
-						return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(), 50])) / 2; // position strata correctly
+					.attr("x", function (d) {
+						return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(), 50])) /
+						2; // position strata correctly
 					})
-					.attr("y", function(d) {
+					.attr("y", function (d) {
 						return y(d.values[0].mort_rate);
 					})
 					.attr("width", d3.min([x_strata.bandwidth(), 50])) // set the widest width to be no more than 50
-					.attr("height", function(d) {
+					.attr("height", function (d) {
 						return h - y(d.values[0].mort_rate);
 					})
-					.attr("fill", function(d) {
+					.attr("fill", function (d) {
 						return graph_bar_color(d.values[0].mort_rate)
 					})
 					.attr("opacity", 0.7)
@@ -1758,7 +1848,7 @@
 				bars.append("g")
 					.attr("class", "axis")
 					.attr("transform", "translate(0," + h + ")")
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						return x_state(d.key);
 					})
 					.call(d3.axisBottom(x_strata).tickSize(0))
@@ -1784,7 +1874,7 @@
 
 		d3.select("#groupedBarChartButtons")
 			.select("#selectOverall")
-			.on("click", function() {
+			.on("click", function () {
 				if (selection_list.length > 0) {
 					//New values for dataset
 					jons_graph_type = "overall";
@@ -1794,7 +1884,7 @@
 
 		d3.select("#groupedBarChartButtons")
 			.select("#selectGender")
-			.on("click", function() {
+			.on("click", function () {
 				if (selection_list.length > 0) {
 					//New values for dataset
 					jons_graph_type = "gender";
@@ -1804,7 +1894,7 @@
 
 		d3.select("#groupedBarChartButtons")
 			.select("#selectRace")
-			.on("click", function() {
+			.on("click", function () {
 				if (selection_list.length > 0) {
 					//New values for dataset
 					jons_graph_type = "race";
@@ -1848,6 +1938,130 @@
 
 		var chart_title = d3.select("#groupedBarChartTitle")
 	</script>
+	<hr>
+	<div class="container text-muted" >
+	<div class="row">
+		<div class="col-lg-12">
+			<h2 style="text-align:center; margin-top:30px;">Interactive map for impact of heart disease mortality in
+				the United States project writeup</h2>
+		</div>
+
+		<hr class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="border-top: 2px solid #000000;">
+	</div>
+	<div class="row offset10">
+		<div class="col-12">
+			<p>Interactive map visualization was a final project for a Data Visualization and Analysis class
+				(COMPSCI590V) that I enrolled in while at University of Massachusetts. The work was done by myself,
+				Dennis Shen, and Jon Moyer. </p>
+
+			<p>Heart disease is the leading cause of death in the United States, for most races. Alienating the
+				causes of heart disease is very difficult, as different races and genders are affected differently.
+				Some of the questions we attempted to answer in our visualization are found below:
+
+				<ul>
+					<li>Does heart disease affect specific regions of the country more than others?
+					</li>
+					<li>How do different races compare against each other across the United States?
+					</li>
+					<li>Does gender have a role in the mortality rate?
+					</li>
+					<li>What are some trends that can be noticed by the magnitude of the mortality rate in various
+						parts
+						of the country?
+					</li>
+				</ul>
+			</p>
+			<p>
+				The video on the left gives a brief overview of our final built product and highlights some of the
+				functionality built in. The map allows users to see how mortality affects various genders and races
+				on the state and county level. Moreover, users can compare two different groups like black males and
+				asian females. The map is the driver for the below graphs which provided deeper analysis. Users are
+				able to add states to a bin that allows comparison across up to five states.
+			</p>
+			<p>
+				Source code is publically available: <a
+					href="https://github.com/rafalbielech/Heart-Disease-Mortality-rate-VIsualization-Project"
+					target="_blank">Github</a>
+			</p>
+		</div>
+
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<h4 style="text-align:center; margin-top:10px;">Our methodology</h4>
+		</div>
+		<hr class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="border-top: 2px solid #000000;">
+	</div>
+	<div class="row offset10">
+		<div class="col-lg-12">
+			<p>
+				The choropleth map visualization has been implemented using Leaflet JS, which is a lightweight, yet
+				very
+				powerful library for visualizing interactive maps. A ​tutorial​ of a choropleth map for visualizing
+				population density across the United States was referenced, but the functionality was expanded to
+				accomplish specific tasks and support respective functionality. Leaflet enables beautiful map
+				visualization by binding a Leaflet map element to div element on a web page. Maps are enhanced by
+				adding
+				layers onto the underlying map that can be extended with additional functionality. Moreover, other
+				html
+				elements can be appended to the map such as radio buttons, dropdowns, and tooltips, as demonstrated
+				during this project. The underlying map is returned from an API call to MapBox which host several
+				different maps for specific needs.
+			</p>
+			<p>
+				Heart disease mortality rate data was made available from ​data.gov​ website, with the data being
+				available in several formats. In this visualization, we utilize data in JSON format for easy
+				interaction
+				with Javascript. The data in this dataset is age-adjusted, spatially smoothed, and averaged over 3
+				years
+				starting from 2015. The dataset is represented in a multi tiered format, with the top stratification
+				representing heart disease mortality rate on the state level including all races and counties. The
+				data
+				is further stratified by providing mortality rate on the county level for all races and gender,
+				while
+				also offering further breakdown by race and gender. The different races that are recorded in the
+				data
+				are White, Black, Asian and Pacific Islander (APIA), American Indian and Alaskan Native (AI/AN),
+				Hispanic, followed by Overall. Furthermore, the corresponding genders are Female and Male, followed
+				by
+				Overall. In certain cases, data was not available for combinations of race, gender, and county,
+				which
+				was handled accordingly by the visualization.
+			</p>
+			<p>
+				The actual data is stored as an array containing 60,000+ rows by 20+ columns. In our implementation,
+				we
+				reference the data portion of the Heart disease data by iterating through the array that was
+				initialized
+				using assignment: ​var json_data = heart_disease_data.data;.​ This allows us to consume all of the
+				data
+				in a linear fashion. In order to filter the data for specific tasks, we retrieve the mortality rate
+				based on respective location stratification (state versus county), gender, and race.
+			</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<h4 style="text-align:center; margin-top:10px;">Our contributions</h4>
+		</div>
+		<hr class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="border-top: 2px solid #000000;">
+	</div>
+	<div class="row offset10">
+		<div class="col-lg-12">
+			<p>
+				The interaction between map and supporting graphs was done by Rafal (me).
+			</p>
+			<p>
+				Dennis Shen implemented State/Country breakdown bar chart along with Population density scatter
+				plot.
+			</p>
+			<p>
+				Jon Moyer implemented bar chart used for comparison between states.
+			</p>
+		</div>
+	</div>
+	<hr>
+	</div>
 
 </body>
 
