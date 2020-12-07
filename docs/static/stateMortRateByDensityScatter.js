@@ -297,6 +297,6 @@ addLoadEvent(function(e) {
   //let scatter = div.append("div");
   let w = Math.round(document.body.clientWidth * 1);
   let h = Math.round(document.body.clientHeight * 0.3);
-  stateMortRateByDensityScatter = new StateMortRatebyDensity(w, h, div);
+  stateMortRateByDensityScatter = new StateMortRatebyDensity(1000, 300, div);
   stateMortRateByDensityScatter.update_scatter("Massachusetts", "Overall", "Overall");
 });

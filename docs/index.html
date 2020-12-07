@@ -1,51 +1,46 @@
 <!DOCTYPE html>
-<html class="gr__leafletjs_com">
+<html lang="en">
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="" />
+	<meta name="author" content="Rafał Bielech" />
+	<title>US Heart Disease Mortality rate Visualization - Rafał Bielech</title>
+	<link rel="apple-touch-icon" sizes="180x180" href="./assets/img/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./assets/img/favicon/favicon-16x16.png">
+	<link rel="manifest" href="./assets/img/favicon/site.webmanifest">
+	<link rel="mask-icon" href="./assets/img/favicon/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="./assets/img/favicon/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="./assets/img/favicon/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+	<script src="js/fontawesome-all.js"></script>
+	<link href="css/styles.css" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+		type="text/css" />
+	<link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+
 	<link rel="shortcut icon" type="image/x-icon"
 		href="https://leafletjs.com/examples/choropleth/docs/images/favicon.ico">
-	<link rel="stylesheet" href="./static/leaflet.css">
-	<link rel="stylesheet" href="./static/bootstrap.css">
+	<link rel="stylesheet" href="static/leaflet.css">
 
 
-	<script src="./static/leaflet.js"></script>
-	<script src="./static/d3.js"></script>
-	<script src="./static/setupFunctions.js"></script>
+	<script src="static/leaflet.js"></script>
+	<script src="static/d3.js"></script>
+	<script src="static/setupFunctions.js"></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js'></script>
-	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Nunito" />
-
-	<title>Heart Disease Mortality Viz | Rafał Bielech</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Heart Disease Mortality Data Among US Adults (population age 35+)">
-	<meta name="author" content="Rafał Bielech">
-	<link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
-	<link rel="manifest" href="./images/favicon/site.webmanifest">
-	<link rel="mask-icon" href="./images/favicon/safari-pinned-tab.svg" color="#5bbad5">
-	<link rel="shortcut icon" href="./images/favicon/favicon.ico">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-	<meta name="msapplication-TileColor" content="#da532c">
-	<meta name="msapplication-config" content="./images/favicon/browserconfig.xml">
-	<meta name="theme-color" content="#ffffff">
-
-
+	<script type="text/javascript" src="static/us_states_boundary.js"></script>
+	<script type="text/javascript" src="static/data_as_json.js"></script>
+	<script type="text/javascript" src="static/us_county_boundary.js"></script>
+	<script type="text/javascript" src="static/cache.js"></script>
+	<script type="text/javascript" src="static/censusPopDataFiltered.js"></script>
+	<script src="static/countyMortRateByStateBarChart.js"></script>
+	<script src="static/stateMortRateByDensityScatter.js"></script>
 	<style>
-		html,
-		body {
-			height: 100%;
-			margin: 20;
-			font-family: Nunito;
-		}
-
-		html {
-			overflow-y: scroll;
-		}
-
 		.graph {
-			margin-top: 8px
+			margin-top: 8px;
 		}
 
 		.grow_title {
@@ -83,9 +78,7 @@
 			width: 75px;
 			text-overflow: ellipsis;
 		}
-	</style>
 
-	<style type="text/css">
 		/* copied from lab 6 - Dennis */
 		#tooltip {
 			position: absolute;
@@ -112,11 +105,7 @@
 			font-size: 16px;
 			line-height: 20px;
 		}
-	</style>
 
-
-
-	<style type="text/css">
 		/* copied from Dennis above - Jon */
 		#tooltip2 {
 			position: absolute;
@@ -143,13 +132,18 @@
 			font-size: 16px;
 			line-height: 20px;
 		}
-	</style>
 
-	<style>
 		#map {
-			width: 100%;
-			height: 50%
+			width: 80%;
+			max-width: 1000px;
+			height: 500px;
 		}
+
+		/* svg {
+			width: 80%;
+			max-width: 1000px;
+			height: 500px;
+		} */
 
 		.info {
 			padding: 6px 8px;
@@ -189,100 +183,236 @@
 			border-radius: 5px;
 		}
 	</style>
-	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
 </head>
 
-<body data-gr-c-s-loaded="true" style="width:80%; margin: 0 auto">
-	<!-- ########################################################################################################################### -->
-	<!-- ########################################################################################################################### -->
-	<!-- #################################### DIVS ############################################################################## -->
-	<!-- ########################################################################################################################### -->
-	<div class="row text-muted" style="padding-top: 20px">
-		<div class="grow_title">
-			<h2 style="padding-bottom:10px; margin:0px;">US Heart Disease Mortality rate Visualization</h2>
-			<h6 style="padding:0px; margin:0px">Data is age-adjusted 35+, spatially smoothed, and averaged over 3 years.
-				Data is seperated by 6 race classes including overall and 3 gender classes including overall</h6>
+<body id="page-top">
+	<!-- Navigation-->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+		<a class="navbar-brand js-scroll-trigger" href="#page-top">
+			<span class="d-block d-lg-none">US Heart Disease Mort. Rate</span>
+			<span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+					src="assets/img/me_icon.jpg" alt="" /></span>
+		</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
+				class="navbar-toggler-icon"></span></button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav">
+				<li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">About</a></li>
+				<li class="nav-item"><a class="nav-link js-scroll-trigger" href="#demo">Demo</a></li>
+				<li class="nav-item"><a class="nav-link js-scroll-trigger" href="#methodology">Methodology</a></li>
+				<li class="nav-item"><a class="nav-link js-scroll-trigger" href="#contribution">Contribution</a></li>
+			</ul>
 		</div>
-	</div>
-	<div class="col-12">
-                <a href="https://rafalbielech.github.io/projects">
-                    <div class="text-primary"><span class="material-icons">
-                            arrow_back_ios
-                        </span><span class="material-icons">
-                            dashboard
-                        </span>
-                        <div class="my-auto">Go back to view other projects</div>
-                    </div>
-                </a>
-            </div>
-	<!-- ##################################################### MAP Functionality div ############################################################################ -->
-	<div class="grow_map_info" style="color:grey; padding:5px; margin-bottom:10px">
-		<h5 style="margin-bottom:5px">Hover over to learn about map functionality</h5>
-		<!-- <p>Hover over to learn about map functionality</p> -->
-		<div style="font-size:14px;padding:5px;font-family: Georgia">
-			<li>Zooming on the map will alternate between county or state layer</li>
-			<li>State hover corresponds to mark in scatterplot, more info in top right of map</li>
-			<li>County hover corresponds to county in bar chart, more info in top right of map</li>
-			<li>Single click on state adds state to list for further analysis</li>
-			<li>If more than one state in list, selecting state will remove state from list if already present</li>
-			<li>Trying to add more than 5 unique states into list, will reset list</li>
-			<li>Double click on state zooms to state's bounds and switches to county layer</li>
-			<li>Double click on county zooms out to state layer</li>
-		</div>
-	</div>
-	<!-- ##################################################### MAP ############################################################################ -->
-	<div id="map"
-		class="rounded leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"
-		tabindex="0" style="position: relative;"></div>
-	<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
-	<div id="graph_selector"
-		style="color:grey; padding:5px; margin:0px; font-family: Georgia; text-align: center; width: 100%;">
+	</nav>
 
-		<h6 style="margin: 0px">
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input
-					style="padding-right: 5%; padding-left: 5%" type="radio" name="radio_graph_select"
-					value="county_bar_chart" checked>State/County Mortality rate bar chart</label>
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input
-					style="padding-right: 5%; padding-left: 5%" type="radio" name="radio_graph_select"
-					value="density_vs_mort_rate_scatter">Pop. density vs Mortality rate scatterplot</label>
-			<label style="padding-right: 5%; padding-left: 5%" onchange="graph_selection_change()"><input
-					style="padding-right: 5%; padding-left: 5%" type="radio" name="radio_graph_select"
-					value="state_comp_bar_chart">Comparison between selected states</label>
-		</h6>
-	</div>
-	<hr class="text-muted" />
-	<!-- #################################### radio buttons below map ################################################################### -->
-	<div id="countyMortRateByState" class="graph">
-		<script src="./static/countyMortRateByStateBarChart.js"></script>
-	</div>
-	<div id="stateMortRateByDensity" class="graph">
-		<script src="./static/stateMortRateByDensityScatter.js"></script>
-	</div>
-	<!-- #################################### bottomest? of page ################################################################### -->
-	<!-- stolen from Dennis - Jon -->
-	<div id="tooltip2" class="hidden">
-		<p><strong><span id="tooltip2Label">Important Label Heading</span></strong></p>
-		<p><span id="value2">100</span></p>
-	</div>
 
-	<!--<button type="button" id="selectGenderByRace">Gender by Race</button><button type="button" id="selectRaceByGender">Race by Gender</button>-->
-	<div id="jonsgraph" class="graph">
-		<div id="groupedBarChartButtons"><button type="button" id="selectOverall">Overall</button><button type="button"
-				id="selectGender">Gender</button><button type="button" id="selectRace">Race</button><span
-				id="groupedBarChartTitle"></span></div>
+	<div class="container-fluid p-0">
+		<section class="information-section" id="about" style="align-items: center;">
+			<div class="information-section-content">
+				<h2 class="mb-0">
+					US Heart Disease Mortality Rate Visualization
+
+				</h2>
+				<div class="subheading mb-2">
+					Code is made available on <a target="_blank"
+						href="https://github.com/rafalbielech/Heart-Disease-Mortality-rate-VIsualization-Project">Github</a>,
+					built as a data visualization project for UMass CS 590V Spring 2020 semester.
+				</div>
+
+				<div class="social-icons mt-2">
+					<a class="social-icon" title="Project page" target="_blank"
+						href="https://rafalbielech.github.io/projects/"><i class="fab fas fa-laptop-code"></i></a>
+					<a class="social-icon" title="GitHub" target="_blank"
+						href="https://github.com/rafalbielech/Heart-Disease-Mortality-rate-VIsualization-Project"><i
+							class="fab fa-github"></i></a>
+				</div>
+
+				<div class="text-muted mt-5 mb-2">Interactive map visualization was a final project for a Data
+					Visualization and Analysis class (COMPSCI590V) that I enrolled in while at University of
+					Massachusetts. The work was done by myself, Dennis Shen, and Jon Moyer.</div>
+
+				<div class="subheading text-primary mb-1">Programming Languages, Tools & Platforms</div>
+				<ul class="list-inline dev-icons">
+					<li class="list-inline-item"><i class="fab fa-html5"></i></li>
+					<li class="list-inline-item"><i class="fab fa-css3-alt"></i></li>
+					<li class="list-inline-item"><i class="fab fa-js-square"></i></li>
+
+				</ul>
+
+			</div>
+		</section>
+		<hr class="m-0" />
+		<section class="information-section" id="demo">
+			<div class="information-section-content">
+				<h2 class="mb-2">Demo</h2>
+				<hr>
+				<div class="d-flex mb-5">
+					<div class="row">
+						<div class="col-12">
+							<div id="map"
+								class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"
+								tabindex="0"></div>
+							<!-- #################################### BOTTOM OF PAGE ############################################################################## -->
+						</div>
+						<div class="col-12">
+							<div id="graph_selector"
+								style="color:grey; padding:5px; margin:0px; font-family: Georgia; text-align: center; width: 100%;">
+
+								<h6 style="margin: 0px">
+									<label style="padding-right: 5%; padding-left: 5%"
+										onchange="graph_selection_change()"><input
+											style="padding-right: 5%; padding-left: 5%" type="radio"
+											name="radio_graph_select" value="county_bar_chart" checked>State/County
+										Mortality rate bar chart</label>
+									<label style="padding-right: 5%; padding-left: 5%"
+										onchange="graph_selection_change()"><input
+											style="padding-right: 5%; padding-left: 5%" type="radio"
+											name="radio_graph_select" value="density_vs_mort_rate_scatter">Pop. density
+										vs Mortality rate scatterplot</label>
+									<label style="padding-right: 5%; padding-left: 5%"
+										onchange="graph_selection_change()"><input
+											style="padding-right: 5%; padding-left: 5%" type="radio"
+											name="radio_graph_select" value="state_comp_bar_chart">Comparison between
+										selected states</label>
+								</h6>
+							</div>
+							<hr class="text-muted" />
+							<!-- #################################### radio buttons below map ################################################################### -->
+							<div id="countyMortRateByState" class="graph">
+							</div>
+							<div id="stateMortRateByDensity" class="graph">
+
+							</div>
+							<!-- #################################### bottomest? of page ################################################################### -->
+							<!-- stolen from Dennis - Jon -->
+							<div id="tooltip2" class="hidden">
+								<p><strong><span id="tooltip2Label">Important Label Heading</span></strong></p>
+								<p><span id="value2">100</span></p>
+							</div>
+
+							<!--<button type="button" id="selectGenderByRace">Gender by Race</button><button type="button" id="selectRaceByGender">Race by Gender</button>-->
+							<div id="jonsgraph" class="graph">
+								<div id="groupedBarChartButtons"><button type="button"
+										id="selectOverall">Overall</button><button type="button"
+										id="selectGender">Gender</button><button type="button"
+										id="selectRace">Race</button><span id="groupedBarChartTitle"></span></div>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+		</section>
+		<hr class="m-0" />
+		<section class="information-section" id="methodology">
+			<div class="information-section-content">
+				<h2 class="mb-2">Methodology</h2>
+				<hr>
+				<div class="d-flex mb-5">
+					<div class="row offset10">
+						<div class="col-lg-12">
+							<p>
+								The choropleth map visualization has been implemented using Leaflet JS, which is a
+								lightweight, yet
+								very
+								powerful library for visualizing interactive maps. A ​tutorial​ of a choropleth map for
+								visualizing
+								population density across the United States was referenced, but the functionality was
+								expanded to
+								accomplish specific tasks and support respective functionality. Leaflet enables
+								beautiful map
+								visualization by binding a Leaflet map element to div element on a web page. Maps are
+								enhanced by
+								adding
+								layers onto the underlying map that can be extended with additional functionality.
+								Moreover, other
+								html
+								elements can be appended to the map such as radio buttons, dropdowns, and tooltips, as
+								demonstrated
+								during this project. The underlying map is returned from an API call to MapBox which
+								host several
+								different maps for specific needs.
+							</p>
+							<p>
+								Heart disease mortality rate data was made available from ​data.gov​ website, with the
+								data being
+								available in several formats. In this visualization, we utilize data in JSON format for
+								easy
+								interaction
+								with Javascript. The data in this dataset is age-adjusted, spatially smoothed, and
+								averaged over 3
+								years
+								starting from 2015. The dataset is represented in a multi tiered format, with the top
+								stratification
+								representing heart disease mortality rate on the state level including all races and
+								counties. The
+								data
+								is further stratified by providing mortality rate on the county level for all races and
+								gender,
+								while
+								also offering further breakdown by race and gender. The different races that are
+								recorded in the
+								data
+								are White, Black, Asian and Pacific Islander (APIA), American Indian and Alaskan Native
+								(AI/AN),
+								Hispanic, followed by Overall. Furthermore, the corresponding genders are Female and
+								Male, followed
+								by
+								Overall. In certain cases, data was not available for combinations of race, gender, and
+								county,
+								which
+								was handled accordingly by the visualization.
+							</p>
+							<p>
+								The actual data is stored as an array containing 60,000+ rows by 20+ columns. In our
+								implementation,
+								we
+								reference the data portion of the Heart disease data by iterating through the array that
+								was
+								initialized
+								using assignment: ​var json_data = heart_disease_data.data;.​ This allows us to consume
+								all of the
+								data
+								in a linear fashion. In order to filter the data for specific tasks, we retrieve the
+								mortality rate
+								based on respective location stratification (state versus county), gender, and race.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<hr class="m-0" />
+		<section class="information-section" id="contribution">
+			<div class="information-section-content">
+				<h2 class="mb-2">Contribution</h2>
+				<hr>
+				<div class="d-flex mb-5">
+					<div class="row offset10">
+						<div class="col-lg-12">
+							<p>
+								The interaction between map and supporting graphs was done by Rafal (me).
+							</p>
+							<p>
+								Dennis Shen implemented State/Country breakdown bar chart along with Population density
+								scatter
+								plot.
+							</p>
+							<p>
+								Jon Moyer implemented bar chart used for comparison between states.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
 	</div>
-	<!-- ########################################################################################################################### -->
-	<!-- ########################################################################################################################### -->
-	<!-- #################################### SCRIPTS ############################################################################## -->
-	<!-- ########################################################################################################################### -->
-	<!-- source: https://leafletjs.com/examples/choropleth/ -->
-	<!-- MAP js files  -->
-	<script type="text/javascript" src="./static/us_states_boundary.js"></script>
-	<script type="text/javascript" src="./static/data_as_json.js"></script>
-	<script type="text/javascript" src="./static/us_county_boundary.js"></script>
-	<script type="text/javascript" src="./static/cache.js"></script>
-	<script type="text/javascript" src="./static/censusPopDataFiltered.js"></script>
-	<!-- end MAP js files  -->
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.bundle.min.js"></script>
+	<script src="js/jquery.easing.min.js"></script>
+	<script src="js/scripts.js"></script>
 
 	<script type="text/javascript">
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -1034,7 +1164,7 @@
 		setTimeout(load_county_data, 0);
 		map.attributionControl.addAttribution(
 			'Heart disease data: <a target="_blank" href="https://catalog.data.gov/dataset/heart-disease-mortality-data-among-us-adults-35-by-state-territory-and-county-5fb7c">US Heart Disease Mortality Data</a>'
-			);
+		);
 
 		////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////
@@ -1477,9 +1607,9 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		var w0 = Math.round(body.clientWidth); // static width
+		var w0 = 1000;
 		var w = w0; // set up variable for dynamic width
-		var h = Math.round(body.clientHeight * 0.23);
+		var h = 400;
 
 		// set order of race, gender display
 		race_list = ["White", "Black", "API", "AI/AN", "Hispanic"];
@@ -1831,7 +1961,7 @@
 					.enter().append("rect")
 					.attr("x", function (d) {
 						return x_strata(d.key) + (x_strata.bandwidth() - d3.min([x_strata.bandwidth(), 50])) /
-						2; // position strata correctly
+							2; // position strata correctly
 					})
 					.attr("y", function (d) {
 						return y(d.values[0].mort_rate);
@@ -1946,136 +2076,11 @@
 		//Create SVG element
 		var chart = d3.select("#jonsgraph")
 			.append("svg")
-			.attr("width", w + margin.left + margin.right)
-			.attr("height", h + margin.top + margin.bottom);
+			.attr("width", 900 + margin.left + margin.right)
+			.attr("height", 260 + margin.top + margin.bottom);
 
 		var chart_title = d3.select("#groupedBarChartTitle")
 	</script>
-	<hr>
-	<div class="container text-muted" >
-	<div class="row">
-		<div class="col-lg-12">
-			<h2 style="text-align:center; margin-top:30px;">Interactive map for impact of heart disease mortality in
-				the United States project writeup</h2>
-		</div>
-
-		<hr class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="border-top: 2px solid #000000;">
-	</div>
-	<div class="row offset10">
-		<div class="col-12">
-			<p>Interactive map visualization was a final project for a Data Visualization and Analysis class
-				(COMPSCI590V) that I enrolled in while at University of Massachusetts. The work was done by myself,
-				Dennis Shen, and Jon Moyer. </p>
-
-			<p>Heart disease is the leading cause of death in the United States, for most races. Alienating the
-				causes of heart disease is very difficult, as different races and genders are affected differently.
-				Some of the questions we attempted to answer in our visualization are found below:
-
-				<ul>
-					<li>Does heart disease affect specific regions of the country more than others?
-					</li>
-					<li>How do different races compare against each other across the United States?
-					</li>
-					<li>Does gender have a role in the mortality rate?
-					</li>
-					<li>What are some trends that can be noticed by the magnitude of the mortality rate in various
-						parts
-						of the country?
-					</li>
-				</ul>
-			</p>
-			<p>
-				The video on the left gives a brief overview of our final built product and highlights some of the
-				functionality built in. The map allows users to see how mortality affects various genders and races
-				on the state and county level. Moreover, users can compare two different groups like black males and
-				asian females. The map is the driver for the below graphs which provided deeper analysis. Users are
-				able to add states to a bin that allows comparison across up to five states.
-			</p>
-			<p>
-				Source code is publically available: <a
-					href="https://github.com/rafalbielech/Heart-Disease-Mortality-rate-VIsualization-Project"
-					target="_blank">Github</a>
-			</p>
-		</div>
-
-	</div>
-	<div class="row">
-		<div class="col-lg-12">
-			<h4 style="text-align:center; margin-top:10px;">Our methodology</h4>
-		</div>
-		<hr class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="border-top: 2px solid #000000;">
-	</div>
-	<div class="row offset10">
-		<div class="col-lg-12">
-			<p>
-				The choropleth map visualization has been implemented using Leaflet JS, which is a lightweight, yet
-				very
-				powerful library for visualizing interactive maps. A ​tutorial​ of a choropleth map for visualizing
-				population density across the United States was referenced, but the functionality was expanded to
-				accomplish specific tasks and support respective functionality. Leaflet enables beautiful map
-				visualization by binding a Leaflet map element to div element on a web page. Maps are enhanced by
-				adding
-				layers onto the underlying map that can be extended with additional functionality. Moreover, other
-				html
-				elements can be appended to the map such as radio buttons, dropdowns, and tooltips, as demonstrated
-				during this project. The underlying map is returned from an API call to MapBox which host several
-				different maps for specific needs.
-			</p>
-			<p>
-				Heart disease mortality rate data was made available from ​data.gov​ website, with the data being
-				available in several formats. In this visualization, we utilize data in JSON format for easy
-				interaction
-				with Javascript. The data in this dataset is age-adjusted, spatially smoothed, and averaged over 3
-				years
-				starting from 2015. The dataset is represented in a multi tiered format, with the top stratification
-				representing heart disease mortality rate on the state level including all races and counties. The
-				data
-				is further stratified by providing mortality rate on the county level for all races and gender,
-				while
-				also offering further breakdown by race and gender. The different races that are recorded in the
-				data
-				are White, Black, Asian and Pacific Islander (APIA), American Indian and Alaskan Native (AI/AN),
-				Hispanic, followed by Overall. Furthermore, the corresponding genders are Female and Male, followed
-				by
-				Overall. In certain cases, data was not available for combinations of race, gender, and county,
-				which
-				was handled accordingly by the visualization.
-			</p>
-			<p>
-				The actual data is stored as an array containing 60,000+ rows by 20+ columns. In our implementation,
-				we
-				reference the data portion of the Heart disease data by iterating through the array that was
-				initialized
-				using assignment: ​var json_data = heart_disease_data.data;.​ This allows us to consume all of the
-				data
-				in a linear fashion. In order to filter the data for specific tasks, we retrieve the mortality rate
-				based on respective location stratification (state versus county), gender, and race.
-			</p>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-12">
-			<h4 style="text-align:center; margin-top:10px;">Our contributions</h4>
-		</div>
-		<hr class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="border-top: 2px solid #000000;">
-	</div>
-	<div class="row offset10">
-		<div class="col-lg-12">
-			<p>
-				The interaction between map and supporting graphs was done by Rafal (me).
-			</p>
-			<p>
-				Dennis Shen implemented State/Country breakdown bar chart along with Population density scatter
-				plot.
-			</p>
-			<p>
-				Jon Moyer implemented bar chart used for comparison between states.
-			</p>
-		</div>
-	</div>
-	<hr>
-	</div>
-
 </body>
 
 </html>

@@ -406,6 +406,6 @@ addLoadEvent(function(e) {
     let div = d3.select("#countyMortRateByState");
     let w = Math.round(document.body.clientWidth * 1);
     let h = Math.round(document.body.clientHeight * 0.3);
-    countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(w, h, div);
+    countyMortRateByStateBarChart = new CountyMortRateByStateBarChart(1000, 300, div);
     countyMortRateByStateBarChart.update_bars("MA", "Overall", "Overall");
 });
